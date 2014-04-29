@@ -125,6 +125,11 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-MYBIN=/home/dan/bin
-PATH=$PATH:$MYBIN
-export MYBIN PATH
+MYBIN=/home/danshan/bin
+BLACKBERRY_BIN=/home/danshan/workspace/bb_sdk/cordova-blackberry/bin/dependencies/bb-tools/bin
+PATH=$PATH:$MYBIN:$BLACKBERRY_BIN
+export MYBIN PATH BLACKBERRY_BIN
+
+#THIS MUST BE AT THE END OF THE FILE FOR JENV TO WORK!!!
+[[ -s "/home/danshan/.jenv/bin/jenv-init.sh" ]] && source "/home/danshan/.jenv/bin/jenv-init.sh" && source "/home/danshan/.jenv/commands/completion.sh"
+
