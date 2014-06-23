@@ -1396,8 +1396,8 @@ Bundle 'bufexplorer.zip'
 " non github repos
 "Bundle 'git://git.wincent.com/command-t.git'
 "Bundle 'https://github.com/Lokaltog/vim-powerline'
-Bundle 'https://github.com/mattn/zencoding-vim.git'
-Bundle 'https://github.com/drmingdrmer/xptemplate'
+"Bundle 'https://github.com/mattn/zencoding-vim.git'
+"Bundle 'https://github.com/drmingdrmer/xptemplate'
 "Bundle 'https://github.com/nathanaelkane/vim-indent-guides'
 
 "
