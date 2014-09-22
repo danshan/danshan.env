@@ -1375,23 +1375,23 @@ set pastetoggle=<F12>
 
 "vundle插件管理
 " git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+"set rtp+=~/.vim/bundle/vundle/
+"call vundle#rc()
 
 " let Vundle manage Vundle
 " required! 
-Bundle 'gmarik/vundle'
+"Bundle 'gmarik/vundle'
 
 " My Bundles here:
 "
 " original repos on github
-Bundle 'scrooloose/nerdtree.git'
+"Bundle 'scrooloose/nerdtree.git'
 
 " vim-scripts repos
 "Bundle 'L9'
 "Bundle 'FuzzyFinder'
-Bundle 'winmanager'
-Bundle 'bufexplorer.zip'
+"Bundle 'winmanager'
+"Bundle 'bufexplorer.zip'
 
 " non github repos
 "Bundle 'git://git.wincent.com/command-t.git'
@@ -1430,26 +1430,26 @@ Bundle 'bufexplorer.zip'
 map <silent> <F3> :NERDTree<CR>
 
 " Zencoding
-let g:user_zen_settings = {
-  \  'php' : {
-  \    'extends' : 'html',
-  \    'filters' : 'c',
-  \  },
-  \  'xml' : {
-  \    'extends' : 'html',
-  \  },
-  \  'haml' : {
-  \    'extends' : 'html',
-  \  },
-  \  'jsp' : {
-  \    'extends' : 'html',
-  \  },
-  \}
+"let g:user_zen_settings = {
+"  \  'php' : {
+"  \    'extends' : 'html',
+"  \    'filters' : 'c',
+"  \  },
+"  \  'xml' : {
+"  \    'extends' : 'html',
+"  \  },
+"  \  'haml' : {
+"  \    'extends' : 'html',
+"  \  },
+"  \  'jsp' : {
+"  \    'extends' : 'html',
+"  \  },
+"  \}
 
 " WinManager
-nmap <silent> mm :WMToggle<CR>
-let g:winManagerWindowLayout = "FileExplorer,BufExplorer" " 合并FileExplorer和BufExplorer
-let g:winManagerWidth = 40 " WinManager默认宽度
+"nmap <silent> mm :WMToggle<CR>
+"let g:winManagerWindowLayout = "FileExplorer,BufExplorer" " 合并FileExplorer和BufExplorer
+"let g:winManagerWidth = 40 " WinManager默认宽度
 
 " PowerLine
 "let g:Powerline_symbols = 'fancy'
