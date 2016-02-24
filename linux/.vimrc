@@ -187,7 +187,6 @@ endif
 
 "国际化设置
 " "multi_byte" 指韩国语和其他多字节语言支持
-if has("multi_byte")
 
     " "fileencodings" 缺省为 "ucs-bom",这是一个字符编码的列表,开始
     "编辑已存在的文件时,参考此选项.如果文件被读入,Vim尝试使用本
@@ -218,32 +217,11 @@ if has("multi_byte")
     "不同实例               "isnot"
     "
     "设置CJK环境的编码选择
-    if v:lang =~ "^zh_CN"
-        set encoding=cp936
-        set termencoding=cp936
-        set fileencoding=cp936
-    elseif v:lang =~ "^zh_TW"
-        set encoding=big5
-        set termencoding=big5
-        set fileencoding=big5
-    elseif v:lang =~ "^ko"
-        set encoding=euc-kr
-        set termencoding=euc-kr
-        set fileencoding=euc-kr
-    elseif v:lang =~ "^ja_JP"
-        set encoding=euc-jp
-        set termencoding=euc-jp
-        set fileencoding=euc-jp
-    endif
 
     "在必要的时候,使用utf-8替代CJK的设置
-    if v:lang =~ "utf8$" || v:lang =~ "UTF-8$"
         set encoding=utf-8
         set termencoding=utf-8
         set fileencoding=utf-8
-    endif
-    
-endif " end of if has("multi_byte")
 
 " "ambiwidth" 缺省为 "single"
 "只有在 "encoding" 和 "utf-8" 或别的Unicode编码时才有效.告诉Vim怎
@@ -600,6 +578,7 @@ set cmdheight=2
 "和 ":print" 相同,但每行之前显示行号 (也参见 "highlight"
 "和 "numberwidth" 选项).
 set nu
+set relativenumber
 
 " "lazyredraw" / "lz"   (缺省关闭)
 "如果置位本选项,执行宏,寄存器和其它不通过输入的命令时屏
@@ -1375,8 +1354,8 @@ set pastetoggle=<F12>
 
 "vundle插件管理
 " git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-"set rtp+=~/.vim/bundle/vundle/
-"call vundle#rc()
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
 
 " let Vundle manage Vundle
 " required! 
@@ -1385,7 +1364,7 @@ set pastetoggle=<F12>
 " My Bundles here:
 "
 " original repos on github
-"Bundle 'scrooloose/nerdtree.git'
+Bundle 'scrooloose/nerdtree.git'
 
 " vim-scripts repos
 "Bundle 'L9'
@@ -1457,5 +1436,5 @@ map <silent> <F3> :NERDTree<CR>
 " Indent Guides
 " 默认的对齐线宽度
 "let g:indent_guides_auto_colors = 0 
-"autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=3 
+"autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=3 
 "autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=4
