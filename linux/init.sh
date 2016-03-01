@@ -14,3 +14,9 @@ sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/i
 
 # install jenv
 curl -L -s get.jenv.io | bash
+
+# install
+brew install python
+pip install --upgrade pip
+pip install gfwlist2pac
+
