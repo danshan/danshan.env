@@ -212,17 +212,14 @@ function callApp(appName) {
 
 keys.push(Phoenix.bind('`', alt, function() { callApp('iTerm'); }));
 keys.push(Phoenix.bind('1', alt, function() { callApp('Google Chrome'); }));
-keys.push(Phoenix.bind('2', alt, function() { callApp('Firefox'); }));
-keys.push(Phoenix.bind('3', alt, function() { callApp('BearyChat'); }));
-keys.push(Phoenix.bind('4', alt, function() { callApp('QQ'); }));
-keys.push(Phoenix.bind('5', alt, function() { callApp('Wechat'); }));
-keys.push(Phoenix.bind('q', alt, function() { callApp('QQ'); }));
-keys.push(Phoenix.bind('a', alt, function() { callApp('Wechat'); }));
-keys.push(Phoenix.bind('e', alt, function() { callApp('Preview'); }));
+keys.push(Phoenix.bind('2', alt, function() { callApp('BearyChat'); }));
+keys.push(Phoenix.bind('3', alt, function() { callApp('QQ'); }));
+keys.push(Phoenix.bind('4', alt, function() { callApp('Wechat'); }));
 keys.push(Phoenix.bind('w', alt, function() { callApp('KeePassX'); }));
 keys.push(Phoenix.bind('s', alt, function() { callApp('IntelliJ IDEA 15'); }));
-keys.push(Phoenix.bind('t', alt, function() { callApp('Sublime Text'); }));
+keys.push(Phoenix.bind('e', alt, function() { callApp('Sublime Text'); }));
 keys.push(Phoenix.bind(',', alt, function() { callApp('Evernote'); }));
+keys.push(Phoenix.bind('.', alt, function() { callApp('Nylas N1'); }));
 keys.push(Phoenix.bind('/', alt, function() { callApp('Finder'); }));
 
 
