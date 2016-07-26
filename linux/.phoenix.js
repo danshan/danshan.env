@@ -87,10 +87,10 @@ function moveToScreen(window, screen) {
 
 function windowsOnOtherScreen() {
     var start = new Date().getTime();
-    var otherWindowsOnSameScreen = Window.focusedWindow().otherWindowsOnSameScreen();  // slow
+    var otherWindowsOnSameScreen = Window.focused().otherWindowsOnSameScreen();  // slow
     Phoenix.log('windowsOnOtherScreen 0.1: ' + (new Date().getTime() - start));
     var otherWindowTitlesOnSameScreen = _.map(otherWindowsOnSameScreen , function(w) { return w.title(); });
-    var return_value = _.chain(Window.focusedWindow().otherWindowsOnAllScreens())
+    var return_value = _.chain(Window.focused().otherWindowsOnAllScreens())
         .filter(function(window) { return ! _.contains(otherWindowTitlesOnSameScreen, window.title()); })
         .value();
     return return_value;
@@ -158,7 +158,7 @@ function saveMousePositionForWindow(window) {
 
 
 function setMousePositionForWindowCenter(window) {
-    Mouse.moveTo({
+    Mouse.move({
         x: window.topLeft().x + window.frame().width / 2,
         y: window.topLeft().y + window.frame().height / 2
     });
@@ -176,15 +176,15 @@ function restoreMousePositionForWindow(window) {
         setMousePositionForWindowCenter(window);
         return;
     }
-    Mouse.moveTo(pos);
+    Mouse.move(pos);
     heartbeatWindow(window);
 }
 
 function restoreMousePositionForNow() {
-    if (Window.focusedWindow() === undefined) {
+    if (Window.focused() === undefined) {
         return;
     }
-    restoreMousePositionForWindow(Window.focusedWindow());
+    restoreMousePositionForWindow(Window.focused());
 }
 
 /**
@@ -200,7 +200,7 @@ function launchOrFocus(appName) {
 
 //switch app, and remember mouse position
 function callApp(appName) {
-    var window = Window.focusedWindow();
+    var window = Window.focused();
     if (window) {
         saveMousePositionForWindow(window);
     }
@@ -210,26 +210,25 @@ function callApp(appName) {
     }
 }
 
-keys.push(Phoenix.bind('`', alt, function() { callApp('iTerm'); }));
-keys.push(Phoenix.bind('1', alt, function() { callApp('Google Chrome'); }));
-keys.push(Phoenix.bind('2', alt, function() { callApp('BearyChat'); }));
-keys.push(Phoenix.bind('3', alt, function() { callApp('QQ'); }));
-keys.push(Phoenix.bind('4', alt, function() { callApp('Wechat'); }));
-keys.push(Phoenix.bind('w', alt, function() { callApp('KeePassX'); }));
-keys.push(Phoenix.bind('s', alt, function() { callApp('IntelliJ IDEA 15'); }));
-keys.push(Phoenix.bind('e', alt, function() { callApp('Sublime Text'); }));
-keys.push(Phoenix.bind(',', alt, function() { callApp('Evernote'); }));
-keys.push(Phoenix.bind('.', alt, function() { callApp('Nylas N1'); }));
-keys.push(Phoenix.bind('/', alt, function() { callApp('Finder'); }));
-
+keys.push(new Key('`', alt, function() { callApp('iTerm'); }));
+keys.push(new Key('1', alt, function() { callApp('Google Chrome'); }));
+keys.push(new Key('2', alt, function() { callApp('BearyChat'); }));
+keys.push(new Key('3', alt, function() { callApp('QQ'); }));
+keys.push(new Key('4', alt, function() { callApp('Wechat'); }));
+keys.push(new Key('w', alt, function() { callApp('KeePassX'); }));
+keys.push(new Key('s', alt, function() { callApp('IntelliJ IDEA 15'); }));
+keys.push(new Key('e', alt, function() { callApp('Sublime Text'); }));
+keys.push(new Key(',', alt, function() { callApp('Evernote'); }));
+keys.push(new Key('.', alt, function() { callApp('Nylas N1'); }));
+keys.push(new Key('/', alt, function() { callApp('Finder'); }));
+keys.push(new Key(';', alt, function() { callApp('OmniFocus'); }));
 
 /**
  * My Configuartion Screen
  */
-
 // Next screen, now only support 2 display // TODO
-keys.push(Phoenix.bind('l', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('l', alt, function() {
+  var window = Window.focused();
   if (!window) return;
   if (window.screen() === window.screen().next()) return;
   if (window.screen().next().frameInRectangle().x < window.screen().frameInRectangle().x) {
@@ -245,8 +244,8 @@ keys.push(Phoenix.bind('l', alt, function() {
 }));
 
 // Previous Screen, now only support 2 display // TODO
-keys.push(Phoenix.bind('h', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('h', alt, function() {
+  var window = Window.focused();
   if (!window) return;
   if (window.screen() === window.screen().next()) return;
   if (window.screen().next().frameInRectangle().x > window.screen().frameInRectangle().x) {
@@ -262,8 +261,8 @@ keys.push(Phoenix.bind('h', alt, function() {
 
 // Window Smaller
 
-keys.push(Phoenix.bind('-', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('-', alt, function() {
+  var window = Window.focused();
   if (!window) return;
   var oldFrame = window.frame();
   var frame = getSmallerFrame(oldFrame);
@@ -274,8 +273,8 @@ keys.push(Phoenix.bind('-', alt, function() {
 }));
 
 // Window Larger
-keys.push(Phoenix.bind('=', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('=', alt, function() {
+  var window = Window.focused();
   if (!window) return;
   var frame = getLargerFrame(window.frame());
   if (frame.width > window.screen().frameInRectangle().width ||
@@ -287,24 +286,24 @@ keys.push(Phoenix.bind('=', alt, function() {
 }));
 
 // Window Maximize
-keys.push(Phoenix.bind('m', altShift, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('m', altShift, function() {
+  var window = Window.focused();
   if (!window) return;
   window.maximize();
   setWindowCentral(window);
 }));
 
 // Window Central
-keys.push(Phoenix.bind('m', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('m', alt, function() {
+  var window = Window.focused();
   if (!window) return;
   setWindowCentral(window);
 }))
 
 
 // Window >
-keys.push(Phoenix.bind('l', altCtrl, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('l', altCtrl, function() {
+  var window = Window.focused();
   if (!window) return;
   window.setFrame({
     x: window.frame().x + 100,
@@ -316,8 +315,8 @@ keys.push(Phoenix.bind('l', altCtrl, function() {
 }));
 
 // Window <
-keys.push(Phoenix.bind('h', altCtrl, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('h', altCtrl, function() {
+  var window = Window.focused();
   if (!window) return;
   window.setFrame({
     x: window.frame().x - 100,
@@ -329,8 +328,8 @@ keys.push(Phoenix.bind('h', altCtrl, function() {
 }));
 
 // Window ^
-keys.push(Phoenix.bind('k', altCtrl, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('k', altCtrl, function() {
+  var window = Window.focused();
   if (!window) return;
   window.setFrame({
     x: window.frame().x,
@@ -342,8 +341,8 @@ keys.push(Phoenix.bind('k', altCtrl, function() {
 }));
 
 // Window v
-keys.push(Phoenix.bind('j', altCtrl, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('j', altCtrl, function() {
+  var window = Window.focused();
   if (!window) return;
   window.setFrame({
     x: window.frame().x,
@@ -356,8 +355,8 @@ keys.push(Phoenix.bind('j', altCtrl, function() {
 
 
 // Next Window in One Screen
-keys.push(Phoenix.bind('k', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('k', alt, function() {
+  var window = Window.focused();
   if (!window) {
     if (Window.visibleWindowsInOrder().length == 0) return;
     Window.visibleWindowsInOrder()[0].focus();
@@ -370,8 +369,8 @@ keys.push(Phoenix.bind('k', alt, function() {
 }));
 
 // Previous Window in One Screen 
-keys.push(Phoenix.bind('j', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('j', alt, function() {
+  var window = Window.focused();
   if (!window) {
     if (Window.visibleWindowsInOrder().length == 0) return;
     Window.visibleWindowsInOrder()[0].focus();
@@ -386,11 +385,9 @@ keys.push(Phoenix.bind('j', alt, function() {
 /**
  * My Configuartion Mouse
  */
-
 // Central Mouse
-
-keys.push(Phoenix.bind('space', alt, function() {
-  var window = Window.focusedWindow();
+keys.push(new Key('space', alt, function() {
+  var window = Window.focused();
   if (!window) return;
   setMousePositionForWindowCenter(window);
 }));
