@@ -218,10 +218,10 @@ keys.push(new Key('4', alt, function() { callApp('Wechat'); }));
 keys.push(new Key('w', alt, function() { callApp('KeePassX'); }));
 keys.push(new Key('s', alt, function() { callApp('IntelliJ IDEA 15'); }));
 keys.push(new Key('e', alt, function() { callApp('Sublime Text'); }));
-keys.push(new Key(',', alt, function() { callApp('Evernote'); }));
+keys.push(new Key(',', alt, function() { callApp('Quiver'); }));
 keys.push(new Key('.', alt, function() { callApp('Mail'); }));
 keys.push(new Key('/', alt, function() { callApp('Finder'); }));
-keys.push(new Key(';', alt, function() { callApp('OmniFocus'); }));
+keys.push(new Key(';', alt, function() { callApp('Reminder'); }));
 
 /**
  * My Configuartion Screen
