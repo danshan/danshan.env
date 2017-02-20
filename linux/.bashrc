@@ -128,3 +128,6 @@ fi
 if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
+
+#THIS MUST BE AT THE END OF THE FILE FOR JENV TO WORK!!!
+[[ -s "/Users/dan/.jenv/bin/jenv-init.sh" ]] && source "/Users/dan/.jenv/bin/jenv-init.sh" && source "/Users/dan/.jenv/commands/completion.sh"
