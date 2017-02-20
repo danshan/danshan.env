@@ -282,42 +282,18 @@ Phoenix.set({
  * My Configuartion App
  */
 
-keys.push(new Key('`', alt, function() {
-  callApp('iTerm');
-}));
-keys.push(new Key('1', alt, function() {
-  callApp('Google Chrome');
-}));
-keys.push(new Key('2', alt, function() {
-  callApp('Safari');
-}));
-keys.push(new Key('3', alt, function() {
-  callApp('QQ');
-}));
-keys.push(new Key('4', alt, function() {
-  callApp('Wechat');
-}));
-keys.push(new Key('w', alt, function() {
-  callApp('KeePassX');
-}));
-keys.push(new Key('s', alt, function() {
-  callApp('IntelliJ IDEA 15');
-}));
-keys.push(new Key('e', alt, function() {
-  callApp('Sublime Text');
-}));
-keys.push(new Key(',', alt, function() {
-  callApp('Quiver');
-}));
-keys.push(new Key('.', alt, function() {
-  callApp('Mail');
-}));
-keys.push(new Key('/', alt, function() {
-  callApp('Finder');
-}));
-keys.push(new Key(';', alt, function() {
-  callApp('Reminder');
-}));
+keys.push(new Key('`', alt, function() { callApp('iTerm'); }));
+keys.push(new Key('1', alt, function() { callApp('Google Chrome'); }));
+keys.push(new Key('2', alt, function() { callApp('Safari'); }));
+keys.push(new Key('3', alt, function() { callApp('wanda'); }));
+keys.push(new Key('4', alt, function() { callApp('Wechat'); }));
+keys.push(new Key('w', alt, function() { callApp('KeePassX'); }));
+keys.push(new Key('s', alt, function() { callApp('IntelliJ IDEA'); }));
+keys.push(new Key('e', alt, function() { callApp('Atom'); }));
+keys.push(new Key(',', alt, function() { callApp('Quiver'); }));
+keys.push(new Key('.', alt, function() { callApp('Microsoft Outlook'); }));
+keys.push(new Key('/', alt, function() { callApp('Finder'); }));
+keys.push(new Key(';', alt, function() { callApp('Preview'); }));
 
 /**
  * My Configuartion Screen
@@ -587,6 +563,7 @@ keys.push(new Key('space', alt, function() {
 // mash + o
 
 // move window to prev space
+/*
 keys.push(new Key('i', altCtrl, function() {
   var window = getCurrentWindow();
   if (window === undefined) {
@@ -611,9 +588,10 @@ keys.push(new Key('i', altCtrl, function() {
   prevWindow.focus();
   }
 }));
+*/
 
 // move window to next space
-keys.push(new Key('o', altCtrl, function() {
+keys.push(new Key('i', altCtrl, function() {
   var window = getCurrentWindow();
   if (window === undefined) {
   return;
@@ -655,6 +633,7 @@ function moveWindowToTargetSpace(window, nextWindow, allSpaces, spaceIndex) {
 };
 
 // move window to park space
+/*
 keys.push(new Key('delete', alt, function() {
   var isFollow = false;
   var window = getCurrentWindow();
@@ -704,3 +683,4 @@ keys.push(new Key('return', altCtrl, function() {
   moveWindowToTargetSpace(parkedWindow, nextWindow, allSpaces, parkSpaceIndex);
   })
 }));
+*/
