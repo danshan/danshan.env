@@ -284,16 +284,17 @@ Phoenix.set({
 
 keys.push(new Key('`', alt, function() { callApp('iTerm'); }));
 keys.push(new Key('1', alt, function() { callApp('Google Chrome'); }));
-keys.push(new Key('2', alt, function() { callApp('Safari'); }));
+keys.push(new Key('2', alt, function() { callApp('Opera'); }));
 keys.push(new Key('3', alt, function() { callApp('wanda'); }));
 keys.push(new Key('4', alt, function() { callApp('Wechat'); }));
-keys.push(new Key('w', alt, function() { callApp('KeePassX'); }));
-keys.push(new Key('s', alt, function() { callApp('IntelliJ IDEA'); }));
+keys.push(new Key('w', alt, function() { callApp('LastPass'); }));
+keys.push(new Key('s', alt, function() { callApp('IntelliJ IDEA Community'); }));
 keys.push(new Key('e', alt, function() { callApp('Atom'); }));
 keys.push(new Key(',', alt, function() { callApp('Quiver'); }));
 keys.push(new Key('.', alt, function() { callApp('Microsoft Outlook'); }));
 keys.push(new Key('/', alt, function() { callApp('Finder'); }));
 keys.push(new Key(';', alt, function() { callApp('Preview'); }));
+keys.push(new Key('n', alt, function() { callApp('Slack'); }));
 
 /**
  * My Configuartion Screen
