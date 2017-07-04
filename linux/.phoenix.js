@@ -287,7 +287,7 @@ keys.push(new Key('1', alt, function() { callApp('Google Chrome'); }));
 keys.push(new Key('2', alt, function() { callApp('Opera'); }));
 keys.push(new Key('3', alt, function() { callApp('wanda'); }));
 keys.push(new Key('4', alt, function() { callApp('Wechat'); }));
-keys.push(new Key('w', alt, function() { callApp('LastPass'); }));
+keys.push(new Key('w', alt, function() { callApp('KeePassXC'); }));
 keys.push(new Key('s', alt, function() { callApp('IntelliJ IDEA CE'); }));
 keys.push(new Key('e', alt, function() { callApp('Sublime Text'); }));
 keys.push(new Key(',', alt, function() { callApp('Quiver'); }));

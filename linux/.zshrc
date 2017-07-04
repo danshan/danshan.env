@@ -52,8 +52,6 @@ plugins=(git autojump ssh-agent)
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 export JAVA_HOME="/Users/dan/.jenv/candidates/java/1.8"
-export JYTHON_HOME="/duitang/dist/sys/jython"
-export ARCANIST_HOME="/Users/Dan/workspace/tools/arcanist/arcanist"
 export PATH="$PATH:$JYTHON_HOME/bin"
 export PATH="$PATH:$ARCANIST_HOME/bin"
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -102,7 +100,7 @@ alias noproxy='unset http_proxy https_proxy; echo "stop proxy"'
 alias jump='ssh 10.214.124.132'
 
 #THIS MUST BE AT THE END OF THE FILE FOR JENV TO WORK!!!
-[[ -s "/Users/Dan/.jenv/bin/jenv-init.sh" ]] && source "/Users/Dan/.jenv/bin/jenv-init.sh" && source "/Users/Dan/.jenv/commands/completion.sh"
+[[ -s "/Users/dan/.jenv/bin/jenv-init.sh" ]] && source "/Users/dan/.jenv/bin/jenv-init.sh" && source "/Users/dan/.jenv/commands/completion.sh"
 eval "$(rbenv init -)"
 
 export NVM_DIR="/Users/dan/.nvm"

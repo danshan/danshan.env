@@ -1,32 +1,32 @@
 # github
 Host github.com
 User git
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/personal/id_rsa_github
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/personal/id_rsa_github
 
 # coding.net
 Host git.coding.net
 User git
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/personal/id_rsa_github
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/personal/id_rsa_github
 
 # github.wanda-group.net
 Host github.wanda-group.net
 User git
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/personal/id_rsa_github
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/personal/id_rsa_github
 
 # github.wanda-itg.local
 Host github.wanda-itg.local
 User git
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/personal/id_rsa_github
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/personal/id_rsa_github
 
 # test vm
 Host 10.214.16*.*
 User ansiblebot
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/id_rsa_ansible
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/id_rsa_ansible
 
 # jump machine
 Host 10.214.124.132
 User shanhonghao
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/jump_132.pem
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/jump_132.pem
 
 Host 10.214.124.53
 User userapp 
@@ -35,46 +35,46 @@ User userapp
 # nexus 
 Host 10.214.125.17
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 # jenkins 
 Host 10.214.125.14
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 # nexus
 Host 10.214.125.13
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 # sonar
 Host 10.214.125.16
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 # cmdb
 Host 10.214.125.17
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 # jira
 Host 10.214.125.97
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 # confluence 
 Host 10.214.125.98
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 # nginx 
 Host 10.214.125.120
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 Host 10.214.125.121
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 
 Host 10.214.125.1*
 User userapp 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/id_rsa_userapp_devops
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/id_rsa_userapp_devops
 
 Host 10.214.210.208
 User shanhonghao 
-IdentityFile /Users/dan/Dropbox/personal/sync/ssh/wanda/devops_prod
+IdentityFile /Users/dan/Cloud/Dropbox/personal/sync/ssh/wanda/devops_prod
 
 Host 10.214.210.*
 User admin
