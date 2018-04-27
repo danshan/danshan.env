@@ -100,6 +100,12 @@ function restoreMousePositionForWindow(window) {
   heartbeatWindow(window);
 }
 
+function centralMouse() {
+  var window = getCurrentWindow();
+  if (!window ) return;
+  setMousePositionCenterForWindow(window);
+}
+
 /**
  * Window functions
  */
@@ -446,3 +452,9 @@ Key.on('j', mashCtrl, function () { moveCurrentWindow(0, 100); });
 // Previous Window in One Screen
 Key.on('j', mash, function () { getNextWindowsOfCurrentScreen(); });
 Key.on('k', mash, function () { getPreviousWindowOfCurrentScreen(); });
+
+/**
+ * Mouse configuration
+ */
+
+ Key.on('space', mash, function() { centralMouse(); })
