@@ -207,7 +207,7 @@ function setWindowCentral(window) {
 
 function moveCurrentWindow(x, y) {
   var window = getCurrentWindow();
-  if (!window)  return; 
+  if (!window) return;
 
   window.setFrame({
     x: window.frame().x + x,
@@ -216,6 +216,50 @@ function moveCurrentWindow(x, y) {
     height: window.frame().height
   });
   heartbeatWindow(window);
+}
+
+function getAnotherWindowOfCurrentScreen(window, offset) {
+  var windows = window.others({ visible: true, screen: window.screen() });
+  windows.push(window);
+  var screen = window.screen();
+  windows = _.chain(windows).sortBy(function (window) {
+    return window.app().pid + "-" + window.hash();
+  }).value();
+
+  var index = (_.indexOf(windows, window) + offset + windows.length) % windows.length;
+  return windows[index];
+}
+
+function getPreviousWindowOfCurrentScreen() {
+  var window = getCurrentWindow();
+  if (!window) {
+    if (Window.recent().length == 0) return;
+    Window.recent()[0].focus();
+    return;
+  }
+  saveMousePositionForWindow(window);
+  var targetWindow = getAnotherWindowOfCurrentScreen(window, -1)
+  if (!targetWindow) {
+    return;
+  }
+  targetWindow.focus();
+  restoreMousePositionForWindow(targetWindow);
+}
+
+function getNextWindowsOfCurrentScreen() {
+  var window = getCurrentWindow();
+  if (!window) {
+    if (Window.recent().length == 0) return;
+    Window.recent()[0].focus();
+    return;
+  }
+  saveMousePositionForWindow(window);
+  var targetWindow = getAnotherWindowOfCurrentScreen(window, 1)
+  if (!targetWindow) {
+    return;
+  }
+  targetWindow.focus();
+  restoreMousePositionForWindow(targetWindow);
 }
 
 /**
@@ -268,7 +312,7 @@ function moveToScreen(window, screen) {
 
 function getCurrentWindow() {
   var window = Window.focused();
-  if (window === undefined) {
+  if (!window) {
     window = App.focused().mainWindow();
   }
   if (!window) return;
@@ -398,3 +442,7 @@ Key.on('l', mashCtrl, function () { moveCurrentWindow(100, 0); });
 Key.on('k', mashCtrl, function () { moveCurrentWindow(0, -100); });
 // Window v
 Key.on('j', mashCtrl, function () { moveCurrentWindow(0, 100); });
+
+// Previous Window in One Screen
+Key.on('j', mash, function () { getNextWindowsOfCurrentScreen(); });
+Key.on('k', mash, function () { getPreviousWindowOfCurrentScreen(); });
