@@ -102,7 +102,7 @@ function restoreMousePositionForWindow(window) {
 
 function centralMouse() {
   var window = getCurrentWindow();
-  if (!window ) return;
+  if (!window) return;
   setMousePositionCenterForWindow(window);
 }
 
@@ -457,4 +457,4 @@ Key.on('k', mash, function () { getPreviousWindowOfCurrentScreen(); });
  * Mouse configuration
  */
 
- Key.on('space', mash, function() { centralMouse(); })
+Key.on('space', mash, function () { centralMouse(); })
