@@ -26,7 +26,8 @@ var activeWindowsTimes = {}; // last active time for window
 
 function alert(message) {
   var modal = new Modal();
-  modal.message = message;
+  modal.text = message;
+  modal.origin = (0, 0);
   modal.duration = 2;
   modal.show();
 }
@@ -49,6 +50,16 @@ if (!String.format) {
 function alertTitle(window) {
   alert(window.title());
 }
+
+function sortByMostRecent(windows) {
+  var visibleAppMostRecentFirst = _.map(
+    Window.recent(), function (w) { return w.hash(); }
+  );
+  var visibleAppMostRecentFirstWithWeight = _.zipObject(
+    visibleAppMostRecentFirst, _.range(visibleAppMostRecentFirst.length)
+  );
+  return _.sortBy(windows, function (window) { return visibleAppMostRecentFirstWithWeight[window.hash()]; });
+};
 
 /**
  * Mouse functions
@@ -104,18 +115,121 @@ function heartbeatWindow(window) {
 // switch app, and remember mouse position
 
 function callApp(appName) {
-  var window = Window.focused();
+  var window = getCurrentWindow();
   if (window) {
     saveMousePositionForWindow(window)
   }
-  var app = App.launch(appName);
-  Timer.after(0.300, function () {
+  var app = App.get(appName);
+  if (!app) app = App.launch(appName);
+
+  Timer.after(0.100, function () {
     app.focus();
     var newWindow = _.first(app.windows());
-    if (newWindow && window !== newWindow) {
+    if (newWindow && window.hash() != newWindow.hash()) {
       restoreMousePositionForWindow(newWindow);
     }
   });
+}
+
+/**
+ * Screen functions
+ */
+
+function moveToScreen(window, screen) {
+  if (!window) return;
+  if (!screen) return;
+
+  var frame = window.frame();
+  var oldScreenRect = window.screen().visibleFrameInRectangle();
+  var newScreenRect = screen.visibleFrameInRectangle();
+  var xRatio = newScreenRect.width / oldScreenRect.width;
+  var yRatio = newScreenRect.height / oldScreenRect.height;
+
+  var mid_pos_x = frame.x + Math.round(0.5 * frame.width);
+  var mid_pos_y = frame.y + Math.round(0.5 * frame.height);
+
+  window.setFrame({
+    x: (mid_pos_x - oldScreenRect.x) * xRatio + newScreenRect.x - 0.5 * frame.width,
+    y: (mid_pos_y - oldScreenRect.y) * yRatio + newScreenRect.y - 0.5 * frame.height,
+    width: frame.width,
+    height: frame.height
+  });
+};
+
+function getCurrentWindow() {
+  var window = Window.focused();
+  if (window === undefined) {
+    window = App.focused().mainWindow();
+  }
+  if (!window) return;
+  return window;
+}
+
+function focusAnotherScreen(window, targetScreen) {
+  if (!window) return;
+  var currentScreen = window.screen();
+  if (window.screen() === targetScreen) return;
+
+  saveMousePositionForWindow(window);
+  var targetScreenWindows = sortByMostRecent(targetScreen.windows());
+  if (targetScreenWindows.length == 0) {
+    return;
+  }
+  var targetWindow = targetScreenWindows[0]
+  targetWindow.focus();  // bug, two window in two space, focus will focus in same space first
+  restoreMousePositionForWindow(targetWindow);
+}
+
+function focusOnNextScreen() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  var allScreens = Screen.all();
+  var currentScreen = window.screen();
+  if (!currentScreen) return;
+  var targetScreen = currentScreen.next();
+  if (_.indexOf(_.map(allScreens, function (x) { return x.hash(); }), targetScreen.hash())
+    >= _.indexOf(_.map(allScreens, function (x) { return x.hash(); }), currentScreen.hash())) {
+    return;
+  } else {
+    focusAnotherScreen(window, targetScreen);
+  }
+}
+
+function focusOnPreviousScreen() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  var allScreens = Screen.all();
+  var currentScreen = window.screen();
+  if (!currentScreen) return;
+  var targetScreen = currentScreen.previous();
+  if (_.indexOf(_.map(allScreens, function (x) { return x.hash(); }), targetScreen.hash())
+    <= _.indexOf(_.map(allScreens, function (x) { return x.hash(); }), currentScreen.hash())) {
+    return;
+  } else {
+    focusAnotherScreen(window, targetScreen);
+  }
+}
+
+function moveToNextScreen() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  if (window.screen() === window.screen().next()) return;
+  moveToScreen(window, window.screen().next());
+  restoreMousePositionForWindow(window);
+  window.focus();
+}
+
+function moveToPreviousScreen() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  if (window.screen() === window.screen().next()) return;
+  moveToScreen(window, window.screen().previous());
+  restoreMousePositionForWindow(window);
+  window.focus();
 }
 
 /**
@@ -126,4 +240,26 @@ function callApp(appName) {
 Key.on('`', mash, function () { callApp('iTerm'); });
 Key.on('1', mash, function () { callApp('Google Chrome'); });
 Key.on('2', mash, function () { callApp('Safari'); });
+Key.on('4', mash, function () { callApp('WeChat'); });
+Key.on('w', mash, function () { callApp('KeePassXC'); });
 Key.on('e', mash, function () { callApp('VSCode'); });
+Key.on('s', mash, function () { callApp('IntelliJ IDEA Ultimate'); });
+Key.on(',', mash, function () { callApp('Quiver'); });
+Key.on('.', mash, function () { callApp('Microsoft Outlook'); });
+Key.on('/', mash, function () { callApp('Finder'); });
+Key.on(';', mash, function () { callApp('Preview'); });
+Key.on('n', mash, function () { callApp('Slack'); });
+Key.on('m', mash, function () { callApp('Mail'); });
+
+/**
+ * Screen configuration
+ */
+
+// Next screen
+Key.on('l', mash, function () { focusOnNextScreen(); });
+// Previous screen
+Key.on('h', mash, function () { focusOnPreviousScreen(); });
+// Move current window to next screen
+Key.on('l', mashShift, function () { moveToNextScreen(); });
+// Move current window to previous screen
+Key.on('h', mashShift, function () { moveToPreviousScreen(); });
