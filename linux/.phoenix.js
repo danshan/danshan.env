@@ -137,16 +137,42 @@ function getLargerFrame(frame) {
 
 function adapterScreenFrame(windowFrame, screenFrame) {
   return {
-    x: Math.max(0, windowFrame.x),
-    y: Math.max(0, windowFrame.y),
+    x: Math.max(screenFrame.x, windowFrame.x),
+    y: Math.max(screenFrame.y, windowFrame.y),
     width: Math.min(screenFrame.width, windowFrame.width),
     height: Math.min(screenFrame.height, windowFrame.height)
   };
 }
 
+function fitScreenHeight() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  window.setFrame({
+    x: window.frame().x,
+    y: window.screen().flippedVisibleFrame().y,
+    width: window.frame().width,
+    height: window.screen().flippedVisibleFrame().height
+  });
+  heartbeatWindow(window);
+}
+
+function fitScreenWidth() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  window.setFrame({
+    x: window.screen().flippedVisibleFrame().x,
+    y: window.frame().y,
+    width: window.screen().flippedVisibleFrame().width,
+    height: window.frame().height
+  });
+  heartbeatWindow(window);
+}
+
 function smallerCurrentWindow() {
   var window = getCurrentWindow();
-  var screenFrame = window.screen().flippedFrame();
+  var screenFrame = window.screen().flippedVisibleFrame();
   if (!window) return;
 
   var originFrame = window.frame();
@@ -156,7 +182,7 @@ function smallerCurrentWindow() {
 
 function largerCurrentWindow() {
   var window = getCurrentWindow();
-  var screenFrame = window.screen().flippedFrame();
+  var screenFrame = window.screen().flippedVisibleFrame();
   if (!window) return;
 
   var originFrame = window.frame();
@@ -173,8 +199,8 @@ function centralCurrentWindow() {
 
 function setWindowCentral(window) {
   window.setTopLeft({
-    x: (window.screen().flippedFrame().width - window.size().width) / 2 + window.screen().flippedFrame().x,
-    y: (window.screen().flippedFrame().height - window.size().height) / 2 + window.screen().flippedFrame().y
+    x: (window.screen().flippedVisibleFrame().width - window.size().width) / 2 + window.screen().flippedVisibleFrame().x,
+    y: (window.screen().flippedVisibleFrame().height - window.size().height) / 2 + window.screen().flippedVisibleFrame().y
   });
   heartbeatWindow(window);
 };
@@ -347,3 +373,5 @@ Key.on('-', mash, function () { smallerCurrentWindow(); });
 Key.on('=', mash, function () { largerCurrentWindow(); });
 // Window central 
 Key.on('m', mash, function () { centralCurrentWindow(); });
+Key.on('\\', mash, function () { fitScreenHeight(); });
+Key.on('\\', mashShift, function () { fitScreenWidth(); });
