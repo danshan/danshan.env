@@ -54,24 +54,17 @@ export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export JAVA_HOME="/Users/dan/.jenv/candidates/java/1.8"
 export PATH="$PATH:$JYTHON_HOME/bin"
 export PATH="$PATH:$ARCANIST_HOME/bin"
-# export MANPATH="/usr/local/man:$MANPATH"
-#export PYTHONPATH=/usr/local/Cellar/ansible/2.1.0.0/libexec/lib/python2.7/site-packages
 
 eval $(thefuck --alias)
 
 source $ZSH/oh-my-zsh.sh
-#source /usr/local/bin/virtualenvwrapper.sh
 
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='mvim'
-fi
+export EDITOR="vim"
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -90,21 +83,22 @@ fi
 
 alias subl="'/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl'"
 alias nano="subl"
-export EDITOR="vim"
-
-# alias wdproxy='export http_proxy=socks5://vpn08.iladder.win:25; export https_proxy=socks5://vpn08.iladder.win:25; export no_proxy=localhost,127.0.0.0/8,127.0.1.1,127.0.1.1*,local.home,*.wanda.cn,*.wanda.com,*.wanda.net; echo "use proxy for wanda"'
-#alias wdproxy1='export http_proxy=http://shanhonghao:9fzzbFXnS2@10.15.206.30:8080; export https_proxy=http://shanhonghao:9fzzbFXnS2@10.15.206.30:8080; export no_proxy=localhost,127.0.0.0/8,127.0.1.1,127.0.1.1*,local.home,*.wanda.cn,*.wanda.net,*.wanda.com; echo "use proxy1 for wanda"'
-#alias gfwproxy='export http_proxy=socks5://127.0.0.1:1234; export https_proxy=socks5://127.0.0.1:1234; echo "use proxy for gfw"'
-alias fuckgfw='export https_proxy=http://127.0.0.1:1235;export http_proxy=http://127.0.0.1:1235;export no_proxy=localhost,127.0.0.0/8,10.0.0.0/8,local.home,*.wanda.cn,*.wanda.net,*.wanda.com,*.wanda-itg.local,*.wanda-group.net;echo "use proxy $http_proxy"'
+alias fuckgfw='export https_proxy=http://127.0.0.1:1234;export http_proxy=http://127.0.0.1:1234;export no_proxy=localhost,127.0.0.0/8,10.0.0.0/8,local.home;echo "use proxy $http_proxy"'
 alias noproxy='unset http_proxy https_proxy; echo "stop proxy"'
-alias jump='ssh 10.214.124.132'
 
 #THIS MUST BE AT THE END OF THE FILE FOR JENV TO WORK!!!
 [[ -s "/Users/dan/.jenv/bin/jenv-init.sh" ]] && source "/Users/dan/.jenv/bin/jenv-init.sh" && source "/Users/dan/.jenv/commands/completion.sh"
 eval "$(rbenv init -)"
 
+# config for nvm 
 export NVM_DIR="/Users/dan/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
+# config for autojump
 [[ -s $(brew --prefix)/etc/profile.d/autojump.sh ]] && . $(brew --prefix)/etc/profile.d/autojump.sh
 
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
