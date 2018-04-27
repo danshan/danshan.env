@@ -108,6 +108,77 @@ function heartbeatWindow(window) {
   activeWindowsTimes[window.app().pid] = new Date().getTime() / 1000;
 }
 
+function maximizeCurrentWindow() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  window.maximize();
+  heartbeatWindow(window);
+}
+
+function getResizeFrame(frame, ratio) {
+  var mid_pos_x = frame.x + 0.5 * frame.width;
+  var mid_pos_y = frame.y + 0.5 * frame.height;
+  return {
+    x: Math.round(frame.x + frame.width / 2 * (1 - ratio)),
+    y: Math.round(frame.y + frame.height / 2 * (1 - ratio)),
+    width: Math.round(frame.width * ratio),
+    height: Math.round(frame.height * ratio)
+  }
+}
+
+function getSmallerFrame(frame) {
+  return getResizeFrame(frame, 0.9);
+}
+
+function getLargerFrame(frame) {
+  return getResizeFrame(frame, 1.1);
+}
+
+function adapterScreenFrame(windowFrame, screenFrame) {
+  return {
+    x: Math.max(0, windowFrame.x),
+    y: Math.max(0, windowFrame.y),
+    width: Math.min(screenFrame.width, windowFrame.width),
+    height: Math.min(screenFrame.height, windowFrame.height)
+  };
+}
+
+function smallerCurrentWindow() {
+  var window = getCurrentWindow();
+  var screenFrame = window.screen().flippedFrame();
+  if (!window) return;
+
+  var originFrame = window.frame();
+  var frame = getSmallerFrame(originFrame);
+  window.setFrame(adapterScreenFrame(frame, screenFrame));
+}
+
+function largerCurrentWindow() {
+  var window = getCurrentWindow();
+  var screenFrame = window.screen().flippedFrame();
+  if (!window) return;
+
+  var originFrame = window.frame();
+  var frame = getLargerFrame(originFrame);
+  window.setFrame(adapterScreenFrame(frame, screenFrame));
+}
+
+function centralCurrentWindow() {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  setWindowCentral(window);
+}
+
+function setWindowCentral(window) {
+  window.setTopLeft({
+    x: (window.screen().flippedFrame().width - window.size().width) / 2 + window.screen().flippedFrame().x,
+    y: (window.screen().flippedFrame().height - window.size().height) / 2 + window.screen().flippedFrame().y
+  });
+  heartbeatWindow(window);
+};
+
 /**
  * App functions
  */
@@ -263,3 +334,16 @@ Key.on('h', mash, function () { focusOnPreviousScreen(); });
 Key.on('l', mashShift, function () { moveToNextScreen(); });
 // Move current window to previous screen
 Key.on('h', mashShift, function () { moveToPreviousScreen(); });
+
+/**
+ * Window configuration
+ */
+
+// Window maximize
+Key.on('m', mashShift, function () { maximizeCurrentWindow(); });
+// Window smaller 
+Key.on('-', mash, function () { smallerCurrentWindow(); });
+// Window larger 
+Key.on('=', mash, function () { largerCurrentWindow(); });
+// Window central 
+Key.on('m', mash, function () { centralCurrentWindow(); });
