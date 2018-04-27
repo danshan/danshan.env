@@ -205,6 +205,19 @@ function setWindowCentral(window) {
   heartbeatWindow(window);
 };
 
+function moveCurrentWindow(x, y) {
+  var window = getCurrentWindow();
+  if (!window)  return; 
+
+  window.setFrame({
+    x: window.frame().x + x,
+    y: window.frame().y + y,
+    width: window.frame().width,
+    height: window.frame().height
+  });
+  heartbeatWindow(window);
+}
+
 /**
  * App functions
  */
@@ -373,5 +386,15 @@ Key.on('-', mash, function () { smallerCurrentWindow(); });
 Key.on('=', mash, function () { largerCurrentWindow(); });
 // Window central 
 Key.on('m', mash, function () { centralCurrentWindow(); });
+// Window fit screen height
 Key.on('\\', mash, function () { fitScreenHeight(); });
+// Window fit screen width 
 Key.on('\\', mashShift, function () { fitScreenWidth(); });
+// Window <
+Key.on('h', mashCtrl, function () { moveCurrentWindow(-100, 0); });
+// Window >
+Key.on('l', mashCtrl, function () { moveCurrentWindow(100, 0); });
+// Window ^
+Key.on('k', mashCtrl, function () { moveCurrentWindow(0, -100); });
+// Window v
+Key.on('j', mashCtrl, function () { moveCurrentWindow(0, 100); });
