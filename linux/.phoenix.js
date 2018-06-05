@@ -268,6 +268,22 @@ function getNextWindowsOfCurrentScreen() {
   restoreMousePositionForWindow(targetWindow);
 }
 
+function layoutWindow(xRatio, yRatio, widthRatio, heightRatio) {
+  var window = getCurrentWindow();
+  if (!window) return;
+
+  var screenFrame = window.screen().flippedVisibleFrame();
+  var screenWidth = screenFrame.width;
+  var screenHeight = screenFrame.height;
+
+  window.setFrame({
+    x: screenFrame.x + screenWidth * xRatio,
+    y: screenFrame.y + screenHeight * yRatio,
+    width: screenWidth * widthRatio,
+    height: screenHeight * heightRatio
+  });
+};
+
 /**
  * App functions
  */
@@ -404,6 +420,7 @@ Key.on('4', mash, function () { callApp('WeChat'); });
 Key.on('w', mash, function () { callApp('KeePassXC'); });
 Key.on('e', mash, function () { callApp('VSCode'); });
 Key.on('s', mash, function () { callApp('IntelliJ IDEA Ultimate'); });
+Key.on('d', mash, function () { callApp('WebStorm'); });
 Key.on(',', mash, function () { callApp('Quiver'); });
 Key.on('.', mash, function () { callApp('Microsoft Outlook'); });
 Key.on('/', mash, function () { callApp('Finder'); });
@@ -452,6 +469,11 @@ Key.on('j', mashCtrl, function () { moveCurrentWindow(0, 100); });
 // Previous Window in One Screen
 Key.on('j', mash, function () { getNextWindowsOfCurrentScreen(); });
 Key.on('k', mash, function () { getPreviousWindowOfCurrentScreen(); });
+
+Key.on('left', mashCtrl, function () { layoutWindow(0, 0, 0.5, 1); });
+Key.on('right', mashCtrl, function () { layoutWindow(0.5, 0, 0.5, 1); });
+Key.on('up', mashCtrl, function () { layoutWindow(0, 0, 1, 0.5); });
+Key.on('down', mashCtrl, function () { layoutWindow(0, 0.5, 1, 0.5); });
 
 /**
  * Mouse configuration
