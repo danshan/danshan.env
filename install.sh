@@ -84,7 +84,6 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
-ln -s -f ${DANSHAN_ENV}/conffolders/zed ${HOME}/.config/zed
 
 ###################################################
 # Install configs
@@ -95,6 +94,9 @@ git clone https://github.com/danshan/hammerspoon-config.git ~/.hammerspoon
 
 printf "⚙️  Configuring neovim...\n"
 git clone https://github.com/danshan/nvim.git ~/.config/nvim
+
+printf "⚙️  Configuring zed...\n"
+git clone https://github.com/danshan/zed-config.git ~/.config/zed
 
 printf "🎉 danshan.env installation complete!\n"
 printf "💡 Don't forget to restart your terminal to tweak your preferences.\n"
