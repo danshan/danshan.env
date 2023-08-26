@@ -84,6 +84,7 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
+ln -s -f ${DANSHAN_ENV}/conffolders/zed ${HOME}/.config/zed
 
 ###################################################
 # Install configs
