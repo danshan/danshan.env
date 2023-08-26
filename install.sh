@@ -1,4 +1,4 @@
-#!/bin/bash #!/bin/zsh
+#!/bin/zsh #!/bin/bash
 
 export DANSHAN_ENV=${DANSHAN_ENV:-"${HOME}/.config/danshan.env"}
 printf "📦 Installing danshan.env\n"
@@ -45,7 +45,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 printf "📦 Installing sdkman...\n"
 curl -s "https://get.sdkman.io" | bash
 
-
 ###################################################
 # Install Packages
 ###################################################
@@ -57,7 +56,14 @@ cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
 done
 
 cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
-    brew install --cask "$pkg"
+    pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
+    app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
+    if [ -e "/Applications/${app_name}.app" ]; then
+        printf "✅ Application ${app_name} exists.\n"
+    else 
+        printf "📦 Installing latest Bash...\n"
+        brew install "$pkg_name"
+    fi
 done
 
 ###################################################
