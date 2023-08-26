@@ -51,9 +51,9 @@ curl -s "https://get.sdkman.io" | bash
 
 printf "📦 Installing essential danshan.env toolchains...\n"
 
-cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
-    brew install "$pkg"
-done
+#cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
+#    brew install "$pkg"
+#done
 
 cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
     pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"

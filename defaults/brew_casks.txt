@@ -21,6 +21,7 @@ microsoft-edge|Microsoft Edge
 rapidapi|RapidApi
 keycastr|KeyCastr
 the-unarchiver|The Unarchiver
+bartender|Bartender 4
 baiduinput 
 font-hack-nerd-font
 font-fira-code-nerd-font
