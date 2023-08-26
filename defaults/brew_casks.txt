@@ -1,2 +1,6 @@
+sublime-text
+visual-studio-code
+iterm2
 font-hack-nerd-font
-wezterm
+font-fira-code-nerd-font
+font-jetbrains-mono-nerd-font

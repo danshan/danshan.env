@@ -7,7 +7,8 @@ yarn
 graphviz
 lrzsz
 neovim
-httpie
 fzf
 thefuck
 tig
+httpie
+autojump

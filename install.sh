@@ -36,6 +36,17 @@ brew tap homebrew/services
 brew tap homebrew/bundle
 
 ###################################################
+# Install Shell Environments
+###################################################
+
+printf "📦 Installing oh-my-zsh...\n"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+printf "📦 Installing sdkman...\n"
+curl -s "https://get.sdkman.io" | bash
+
+
+###################################################
 # Install Packages
 ###################################################
 
@@ -57,7 +68,7 @@ printf "⚙️  Configuring Shell...\n"
 case ${SHELL} in
 *zsh)
     export DS_SHELL=${HOME}/.zshrc
-    ln -s -f ${DS_SHELL} ${HOME}/.zshrc
+    ln -s -f ${DANSHAN_ENV}/dotfiles/_zshrc ${DS_SHELL}
     ;;
 *bash)
     if [[ $(bash --version | head -n1 | cut -d' ' -f4 | cut -d'.' -f1) -lt 5 ]]; then
@@ -65,7 +76,7 @@ case ${SHELL} in
         brew install bash bash-completion
     fi
     export DS_SHELL=${HOME}/.bashrc
-    ln -s -f ${DS_SHELL} ${HOME}/.bashrc
+    ln -s -f ${DANSHAN_ENV}/dotfiles/_bashrc ${DS_SHELL}
     ;;
 esac
 

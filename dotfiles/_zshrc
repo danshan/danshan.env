@@ -56,7 +56,7 @@ HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
-ZSH_CUSTOM=${HOME}/Dropbox/sync/mac/.oh-my-zshrc
+ZSH_CUSTOM="${HOME}/Dropbox/sync/mac/.oh-my-zshrc"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
@@ -68,8 +68,8 @@ plugins=(git ssh-agent history extract zsh-autosuggestions mvn httpie aliases)
 # User configuration
 
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-export PATH="$PATH:${HOME}/.bin"
-export PATH="$PATH:${HOME}/.local/bin"
+export PATH="$PATH:$HOME/.bin"
+export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:/usr/local/go/bin"
 
 source $ZSH/oh-my-zsh.sh
@@ -82,17 +82,10 @@ eval $(/opt/homebrew/bin/brew shellenv)
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if test ! "$(command -v nvim)"; then
-    export EDITOR="nvim"
-    alias vim='nvim'
-    alias vi='nvim'
-    alias v='nvim'
-else 
-    export EDITOR="vim"
-    alias vim='vim'
-    alias vi='vim'
-    alias v='vim'
-    
+export EDITOR="vim"
+alias vim='nvim'
+alias vi='nvim'
+alias v='nvim'
 alias nv='neovide --multigrid'
 alias vv='neovide --multigrid'
 
@@ -117,26 +110,25 @@ alias nano="subl"
 alias fuckgfw='export https_proxy=http://127.0.0.1:6152;export http_proxy=http://127.0.0.1:6152;export all_proxy=socks5://127.0.0.1:6153;export no_proxy=localhost,127.0.0.1,10.96.0.0/12,192.168.99.0/24,192.168.39.0/24'
 alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 
-## proxy
-#export https_proxy=http://127.0.0.1:1235;export http_proxy=http://127.0.0.1:1235;export all_proxy=socks5://127.0.0.1:1234
-
 #THIS MUST BE AT THE END OF THE FILE FOR JENV TO WORK!!!
 #eval "$(rbenv init -)"
 
 # config for autojump
 [ -f $(brew --prefix)/etc/profile.d/autojump.sh ] && . $(brew --prefix)/etc/profile.d/autojump.sh
 
-# Add JAVA_HOME
-export JAVA_HOME="${HOME}/.sdkman/candidates/java/current"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && echo "loading shell integration" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+# SDKMAN
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+[[ -s "${SDKMAN_DIR}/bin/sdkman-init.sh" ]] && source "${SDKMAN_DIR}/bin/sdkman-init.sh"
+
+# Add JAVA_HOME
+export JAVA_HOME="${SDKMAN_DIR}/candidates/java/current"
 
 # fzf
 #export FZF_DEFAULT_COMMAND='fd --type file'
@@ -176,8 +168,8 @@ export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
 # nvm
 # brew install nvm
 export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 # starship
 #eval "$(starship init zsh)"
@@ -185,7 +177,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('${HOME}/workspace/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$(${HOME}'/workspace/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
