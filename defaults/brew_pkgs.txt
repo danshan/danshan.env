@@ -1,4 +1,5 @@
 rbenv
+nvm
 wget
 cloc
 telnet
