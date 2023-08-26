@@ -13,3 +13,6 @@ thefuck
 tig
 httpie
 autojump
+tmux
+ripgrep
+pyenv
