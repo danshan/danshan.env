@@ -1,0 +1,27 @@
+sethandler <C-h> n:vim
+sethandler <C-j> n:vim
+sethandler <C-k> n:vim
+sethandler <C-l> n:vim
+sethandler <C-w> n:vim
+
+set visualbell
+set noerrorbells
+
+set relativenumber
+set number
+
+let mapleader = ","
+let g:mapleader = ","
+
+" split window
+nmap <leader>sv <C-w>v
+nmap <leader>sh <C-w>s
+nmap <C-h> <C-w>h
+nmap <C-j> <C-w>j
+nmap <C-k> <C-w>k
+nmap <C-l> <C-w>l
+
+" tab
+nmap <S-L> gt
+nmap <S-H> gT
+
