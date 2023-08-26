@@ -1,0 +1,13 @@
+rbenv
+wget
+cloc
+telnet
+podman
+yarn
+graphviz
+lrzsz
+neovim
+httpie
+fzf
+thefuck
+tig
