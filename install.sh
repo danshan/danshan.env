@@ -59,6 +59,8 @@ curl -s "https://get.sdkman.io" | bash
 
 printf "📦 Installing essential danshan.env toolchains...\n"
 
+brew update
+
 cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
     brew install "$pkg"
 done
@@ -98,7 +100,7 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
-ln -s -f ${DANSHAN_ENV}/dotfiles/_p10k.zsh ${HOME}/.config/.p10k.zsh
+ln -s -f ${DANSHAN_ENV}/dotfiles/_p10k.zsh ${HOME}/.p10k.zsh
 
 ###################################################
 # Install configs
