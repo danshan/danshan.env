@@ -3,6 +3,7 @@
 export DANSHAN_ENV=${DANSHAN_ENV:-"${HOME}/.config/danshan.env"}
 printf "📦 Installing danshan.env\n"
 
+mkdir ${HOME}/.bin
 
 ###################################################
 # Install Homebrew
@@ -40,7 +41,14 @@ brew tap homebrew/bundle
 ###################################################
 
 printf "📦 Installing oh-my-zsh...\n"
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [[ ${BREW_CN} ]]; then
+    sh -c "$(curl -fsSL https://gitee.com/shmhlsy/oh-my-zsh-install.sh/raw/master/install.sh)"
+    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+else
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+fi
+
 
 printf "📦 Installing sdkman...\n"
 curl -s "https://get.sdkman.io" | bash
@@ -90,6 +98,7 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
+ln -s -f ${DANSHAN_ENV}/dotfiles/_p10k.zsh ${HOME}/.config/.p10k.zsh
 
 ###################################################
 # Install configs
