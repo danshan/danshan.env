@@ -53,6 +53,10 @@ fi
 printf "📦 Installing sdkman...\n"
 curl -s "https://get.sdkman.io" | bash
 
+printf "📦 Installing Catppuccion themes...\n"
+git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
+git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
+
 ###################################################
 # Install Packages
 ###################################################
@@ -61,20 +65,20 @@ printf "📦 Installing essential danshan.env toolchains...\n"
 
 brew update
 
-cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
-    brew install "$pkg"
-done
+#cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
+#    brew install "$pkg"
+#done
 
-cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
-    pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
-    app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
-    if [ -e "/Applications/${app_name}.app" ]; then
-        printf "✅ Application ${app_name} exists.\n"
-    else 
-        printf "📦 Installing latest Bash...\n"
-        brew install "$pkg_name"
-    fi
-done
+# cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
+#     pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
+#     app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
+#     if [ -e "/Applications/${app_name}.app" ]; then
+#         printf "✅ Application ${app_name} exists.\n"
+#     else 
+#         printf "📦 Installing ${pkg_name}...\n"
+#         brew install "$pkg_name"
+#     fi
+# done
 
 ###################################################
 # Update Shell Settings
@@ -101,7 +105,9 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.zsh ${HOME}/.fzf.zsh
-ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash${HOME}/.fzf.bash
+ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash ${HOME}/.fzf.bash
+ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.toml ${HOME}/.alacritty.toml
+ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.yml ${HOME}/.alacritty.yml
 
 ###################################################
 # Install configs
