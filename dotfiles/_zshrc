@@ -171,10 +171,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
-# starship
-eval "$(starship init zsh)"
-
-
+=======
+>>>>>>> 0d68bb8829a9f7236f4558b7c3c407c6f593d2ee
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$(${HOME}'/workspace/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -194,3 +192,4 @@ unset __conda_setup
 ###_BEGIN_Completion_ae
 test -e "${HOME}/.completion/ae.completion.sh" &&  source "${HOME}/.completion/ae.completion.sh"
 ###_END_Completion_ae
+

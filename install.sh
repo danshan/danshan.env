@@ -1,8 +1,9 @@
-#!/bin/bash #!/bin/zsh
+#!/bin/zsh #!/bin/bash
 
 export DANSHAN_ENV=${DANSHAN_ENV:-"${HOME}/.config/danshan.env"}
 printf "📦 Installing danshan.env\n"
 
+mkdir ${HOME}/.bin
 
 ###################################################
 # Install Homebrew
@@ -40,11 +41,17 @@ brew tap homebrew/bundle
 ###################################################
 
 printf "📦 Installing oh-my-zsh...\n"
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+if [[ ${BREW_CN} ]]; then
+    sh -c "$(curl -fsSL https://gitee.com/shmhlsy/oh-my-zsh-install.sh/raw/master/install.sh)"
+    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+else
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+fi
+
 
 printf "📦 Installing sdkman...\n"
 curl -s "https://get.sdkman.io" | bash
-
 
 ###################################################
 # Install Packages
@@ -52,12 +59,21 @@ curl -s "https://get.sdkman.io" | bash
 
 printf "📦 Installing essential danshan.env toolchains...\n"
 
+brew update
+
 cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
     brew install "$pkg"
 done
 
 cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
-    brew install --cask "$pkg"
+    pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
+    app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
+    if [ -e "/Applications/${app_name}.app" ]; then
+        printf "✅ Application ${app_name} exists.\n"
+    else 
+        printf "📦 Installing latest Bash...\n"
+        brew install "$pkg_name"
+    fi
 done
 
 ###################################################
@@ -84,6 +100,7 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
+ln -s -f ${DANSHAN_ENV}/dotfiles/_p10k.zsh ${HOME}/.p10k.zsh
 
 ###################################################
 # Install configs
