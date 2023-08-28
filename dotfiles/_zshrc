@@ -76,7 +76,7 @@ source $ZSH/oh-my-zsh.sh
 
 # Homebrew
 export HOMEBREW_NO_AUTO_UPDATE=true # no update when use brew
-eval $(/opt/homebrew/bin/brew shellenv)
+eval $($HOMEBREW_PREFIX/bin/brew shellenv)
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -172,7 +172,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 # starship
-#eval "$(starship init zsh)"
+eval "$(starship init zsh)"
 
 
 # >>> conda initialize >>>
