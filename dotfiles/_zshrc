@@ -110,16 +110,14 @@ alias nano="subl"
 alias fuckgfw='export https_proxy=http://127.0.0.1:6152;export http_proxy=http://127.0.0.1:6152;export all_proxy=socks5://127.0.0.1:6153;export no_proxy=localhost,127.0.0.1,10.96.0.0/12,192.168.99.0/24,192.168.39.0/24'
 alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 
-#THIS MUST BE AT THE END OF THE FILE FOR JENV TO WORK!!!
-#eval "$(rbenv init -)"
-
 # config for autojump
 [ -f $(brew --prefix)/etc/profile.d/autojump.sh ] && . $(brew --prefix)/etc/profile.d/autojump.sh
 
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+# rvm
 export PATH="$PATH:$HOME/.rvm/bin"
 
+# iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && echo "loading shell integration" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # SDKMAN
@@ -153,8 +151,10 @@ alias ungron="gron --ungron"
 export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
 
 # nvm
-# brew install nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

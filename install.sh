@@ -100,7 +100,8 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
-ln -s -f ${DANSHAN_ENV}/dotfiles/_p10k.zsh ${HOME}/.p10k.zsh
+ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.zsh ${HOME}/.fzf.zsh
+ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash${HOME}/.fzf.bash
 
 ###################################################
 # Install configs
