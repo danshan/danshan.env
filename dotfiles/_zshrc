@@ -63,7 +63,7 @@ ZSH_CUSTOM="${HOME}/Dropbox/sync/mac/.oh-my-zshrc"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git ssh-agent history extract zsh-autosuggestions oc kubectl helm)
-plugins=(git ssh-agent history extract zsh-autosuggestions mvn httpie aliases)
+plugins=(git history extract zsh-autosuggestions mvn httpie aliases)
 
 # User configuration
 
@@ -130,24 +130,11 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # Add JAVA_HOME
 export JAVA_HOME="${SDKMAN_DIR}/candidates/java/current"
 
-# fzf
-#export FZF_DEFAULT_COMMAND='fd --type file'
-#export FZF_CTRL_T_COMMAND=$FZF_DEFAULT_COMMAND
-#export FZF_ALT_C_COMMAND="fd -t d . "
-#export FZF_DEFAULT_OPTS='--height 40% --reverse --border'
-#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-#alias pp='fzf --preview '"'"'[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || (highlight -O ansi -l {} || coderay {} || rougify {} || cat {}) 2> /dev/null | head -500'"'"
-#alias oo='fzf --preview '"'"'[[ $(file --mime {}) =~ binary ]] && echo {} is a binary file || (highlight -O ansi -l {} || coderay {} || rougify {} || tac {}) 2> /dev/null | head -500'"'"  # flashback
-
 source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
-
-# thefuck
-#eval $(thefuck --alias)
-
 
 # virtualenvwrapper
 export WORKON_HOME=$HOME/.virtualenvs
@@ -170,26 +157,4 @@ export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
 export NVM_DIR="$HOME/.nvm"
 [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
-=======
->>>>>>> 0d68bb8829a9f7236f4558b7c3c407c6f593d2ee
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$(${HOME}'/workspace/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "${HOME}/workspace/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "${HOME}/workspace/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="${HOME}/workspace/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
-
-###_BEGIN_Completion_ae
-test -e "${HOME}/.completion/ae.completion.sh" &&  source "${HOME}/.completion/ae.completion.sh"
-###_END_Completion_ae
 
