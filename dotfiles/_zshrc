@@ -118,7 +118,7 @@ alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 export PATH="$PATH:$HOME/.rvm/bin"
 
 # iTerm2 shell integration
-test -e "${HOME}/.iterm2_shell_integration.zsh" && echo "loading shell integration" && source "${HOME}/.iterm2_shell_integration.zsh"
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # SDKMAN
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!

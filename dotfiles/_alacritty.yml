@@ -1,6 +1,13 @@
+# Theme
+import:
+  - ~/.config/catppuccin-alacritty/catppuccin-frappe.yml
+
 # Font configuration
 font:
   normal:
     family: Hack Nerd Font Mono
     style: Regular 
-  size: 16
+  size: 14
+
+env:
+  TERM: xterm-256color

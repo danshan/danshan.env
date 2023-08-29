@@ -56,6 +56,9 @@ curl -s "https://get.sdkman.io" | bash
 printf "📦 Installing Catppuccion themes...\n"
 git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
 git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
+git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
+git clone --depth=1 https://github.com/catppuccin/alacritty.git ~/.config/catppuccin-alacritty
+
 
 ###################################################
 # Install Packages
