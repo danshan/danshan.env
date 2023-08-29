@@ -58,6 +58,7 @@ git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catp
 git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
 git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
 git clone --depth=1 https://github.com/catppuccin/alacritty.git ~/.config/catppuccin-alacritty
+git clone --depth=1 https://github.com/catppuccin/fleet.git ~/.config/catppuccin-fleet && mkdir -p ~/.fleet/themes && cp ~/.config/catppuccin-fleet/themes/*.json ~/.fleet/themes/
 
 
 ###################################################
@@ -68,20 +69,20 @@ printf "📦 Installing essential danshan.env toolchains...\n"
 
 brew update
 
-#cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
-#    brew install "$pkg"
-#done
+cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
+    brew install "$pkg"
+done
 
-# cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
-#     pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
-#     app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
-#     if [ -e "/Applications/${app_name}.app" ]; then
-#         printf "✅ Application ${app_name} exists.\n"
-#     else 
-#         printf "📦 Installing ${pkg_name}...\n"
-#         brew install "$pkg_name"
-#     fi
-# done
+cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
+    pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
+    app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
+    if [ -e "/Applications/${app_name}.app" ]; then
+        printf "✅ Application ${app_name} exists.\n"
+    else 
+        printf "📦 Installing ${pkg_name}...\n"
+        brew install "$pkg_name"
+    fi
+done
 
 ###################################################
 # Update Shell Settings
