@@ -3,7 +3,6 @@ nvm
 wget
 cloc
 telnet
-podman
 yarn
 graphviz
 lrzsz
@@ -17,4 +16,3 @@ tmux
 ripgrep
 pyenv
 diff-so-fancy
-fzf

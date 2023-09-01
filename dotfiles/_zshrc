@@ -76,7 +76,7 @@ source $ZSH/oh-my-zsh.sh
 
 # Homebrew
 export HOMEBREW_NO_AUTO_UPDATE=true # no update when use brew
-eval $($HOMEBREW_PREFIX/bin/brew shellenv)
+eval $(/opt/homebrew/bin/brew shellenv)
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8

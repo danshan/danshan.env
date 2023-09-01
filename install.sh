@@ -22,9 +22,6 @@ if test ! "$(command -v brew)"; then
     fi
 fi
 
-printf "⚙️  Adding Custom settings...\n"
-cp -i -v ${DANSHAN_ENV}/defaults.sh ${DANSHAN_ENV}/custom.sh
-
 printf "📦 Activating Homebrew on MacOS...\n"
 if [[ $(uname -m) = "arm64" ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -48,6 +45,30 @@ else
 fi
 
 
+###################################################
+# Install Packages
+###################################################
+
+printf "📦 Installing essential danshan.env toolchains...\n"
+
+brew update
+
+cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
+    printf "📦 Installing homebrew package: ${pkg}\n"
+    brew install "$pkg"
+done
+
+cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
+    pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
+    app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
+    if [ -e "/Applications/${app_name}.app" ]; then
+        printf "✅ Application ${app_name} exists.\n"
+    else 
+        printf "📦 Installing ${pkg_name}...\n"
+        brew install --cask "$pkg_name"
+    fi
+done
+
 printf "📦 Installing sdkman...\n"
 curl -s "https://get.sdkman.io" | bash
 
@@ -65,29 +86,6 @@ git clone https://github.com/gpakosz/.tmux.git ${HOME}/.config/oh-my-tmux
 ln -f -s ${HOME}/.config/oh-my-tmux/.tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf.local ${HOME}/.tmux.conf.local
 tmux source-file ${HOME}/.tmux.conf
-
-###################################################
-# Install Packages
-###################################################
-
-printf "📦 Installing essential danshan.env toolchains...\n"
-
-brew update
-
-cat ${DANSHAN_ENV}/defaults/brew_pkgs.txt | while read -r pkg; do
-    brew install "$pkg"
-done
-
-cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
-    pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
-    app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
-    if [ -e "/Applications/${app_name}.app" ]; then
-        printf "✅ Application ${app_name} exists.\n"
-    else 
-        printf "📦 Installing ${pkg_name}...\n"
-        brew install "$pkg_name"
-    fi
-done
 
 ###################################################
 # Update Shell Settings
