@@ -23,7 +23,7 @@ keycastr|KeyCastr
 the-unarchiver|The Unarchiver
 bartender|Bartender 4
 alacritty|Alacritty
-fleet|Fleet
+warp|Warp
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font

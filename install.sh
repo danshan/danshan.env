@@ -43,23 +43,28 @@ brew tap homebrew/bundle
 printf "📦 Installing oh-my-zsh...\n"
 if [[ ${BREW_CN} ]]; then
     sh -c "$(curl -fsSL https://gitee.com/shmhlsy/oh-my-zsh-install.sh/raw/master/install.sh)"
-    git clone --depth=1 https://gitee.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 else
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 fi
 
 
 printf "📦 Installing sdkman...\n"
 curl -s "https://get.sdkman.io" | bash
 
-printf "📦 Installing Catppuccion themes...\n"
+printf "📦 Installing catppuccin themes...\n"
 git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
 git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
 git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
-git clone --depth=1 https://github.com/catppuccin/alacritty.git ~/.config/catppuccin-alacritty
-git clone --depth=1 https://github.com/catppuccin/fleet.git ~/.config/catppuccin-fleet && mkdir -p ~/.fleet/themes && cp ~/.config/catppuccin-fleet/themes/*.json ~/.fleet/themes/
+git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
+git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
+mkdir -p ${HOME}/.warp/themes
+cp -f ${HOME}/.config/catppuccin-warp/dist/*.yml ${HOME}/.warp/themes/
 
+printf "📦 Installing oh-my-tmux...\n"
+git clone https://github.com/gpakosz/.tmux.git ${HOME}/.config/oh-my-tmux 
+ln -f -s ${HOME}/.config/oh-my-tmux/.tmux.conf ${HOME}/.tmux.conf
+ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf.local ${HOME}/.tmux.conf.local
+tmux source-file ${HOME}/.tmux.conf
 
 ###################################################
 # Install Packages
@@ -106,7 +111,6 @@ esac
 
 ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
-ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.zsh ${HOME}/.fzf.zsh
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash ${HOME}/.fzf.bash
