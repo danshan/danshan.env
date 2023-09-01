@@ -78,8 +78,6 @@ git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.conf
 git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
 git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
 git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
-mkdir -p ${HOME}/.warp/themes
-cp -f ${HOME}/.config/catppuccin-warp/dist/*.yml ${HOME}/.warp/themes/
 
 printf "📦 Installing oh-my-tmux...\n"
 git clone https://github.com/gpakosz/.tmux.git ${HOME}/.config/oh-my-tmux 
@@ -120,13 +118,19 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.yml ${HOME}/.alacritty.yml
 ###################################################
 
 printf "⚙️  Configuring hammerspoon...\n"
-git clone https://github.com/danshan/hammerspoon-config.git ~/.hammerspoon
+git clone --depth=1 git@github.com/danshan/hammerspoon-config.git ${HOME}/.hammerspoon
 
 printf "⚙️  Configuring neovim...\n"
-git clone https://github.com/danshan/nvim.git ~/.config/nvim
+git clone --depth=1 git@github.com/danshan/nvim.git ${HOME}/.config/nvim
 
 printf "⚙️  Configuring zed...\n"
-git clone https://github.com/danshan/zed-config.git ~/.config/zed
+git clone --depth=1 git@github.com/danshan/zed-config.git ${HOME}/.config/zed
+
+printf "⚙️  Configuring warp...\n"
+mkdir -p ${HOME}/.warp
+git clone --depth=1 git@github.com:danshan/warp-workflows.git ${HOME}/.warp/workflows
+mkdir -p ${HOME}/.warp/themes
+cp -f ${HOME}/.config/catppuccin-warp/dist/*.yml ${HOME}/.warp/themes/
 
 printf "🎉 danshan.env installation complete!\n"
 printf "💡 Don't forget to restart your terminal to tweak your preferences.\n"
