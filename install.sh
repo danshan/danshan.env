@@ -76,7 +76,7 @@ printf "📦 Installing catppuccin themes...\n"
 git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
 git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
 git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
-git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
+# git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
 git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
 
 printf "📦 Installing oh-my-tmux...\n"
@@ -110,8 +110,8 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.zsh ${HOME}/.fzf.zsh
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash ${HOME}/.fzf.bash
-ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.toml ${HOME}/.alacritty.toml
-ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.yml ${HOME}/.alacritty.yml
+# ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.toml ${HOME}/.alacritty.toml
+# ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.yml ${HOME}/.alacritty.yml
 
 ###################################################
 # Install configs
@@ -123,8 +123,8 @@ git clone --depth=1 git@github.com/danshan/hammerspoon-config.git ${HOME}/.hamme
 printf "⚙️  Configuring neovim...\n"
 git clone --depth=1 git@github.com/danshan/nvim.git ${HOME}/.config/nvim
 
-printf "⚙️  Configuring zed...\n"
-git clone --depth=1 git@github.com/danshan/zed-config.git ${HOME}/.config/zed
+# printf "⚙️  Configuring zed...\n"
+# git clone --depth=1 git@github.com/danshan/zed-config.git ${HOME}/.config/zed
 
 printf "⚙️  Configuring warp...\n"
 mkdir -p ${HOME}/.warp

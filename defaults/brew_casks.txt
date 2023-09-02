@@ -4,7 +4,6 @@ iterm2|iTerm
 alfred|Alfred 5
 hammerspoon|Hammerspoon
 dropbox|Dropbox
-zed|Zed
 notion|Notion
 surge|Surge
 wechat|WeChat
@@ -22,7 +21,6 @@ rapidapi|RapidApi
 keycastr|KeyCastr
 the-unarchiver|The Unarchiver
 bartender|Bartender 4
-alacritty|Alacritty
 warp|Warp
 vivaldi|Vivaldi
 font-hack-nerd-font
