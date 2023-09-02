@@ -16,7 +16,6 @@ pycharm-ce|PyCharm CE
 kap|Kap
 istat-menus|iStat Menus
 appcleaner|AppCleaner
-microsoft-edge|Microsoft Edge
 rapidapi|RapidApi
 keycastr|KeyCastr
 the-unarchiver|The Unarchiver
