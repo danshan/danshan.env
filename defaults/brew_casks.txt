@@ -22,6 +22,9 @@ the-unarchiver|The Unarchiver
 bartender|Bartender 4
 warp|Warp
 vivaldi|Vivaldi
+vlc|VLC
+omnidisksweeper|OmniDiskSweeper
+qqmusic|QQMusic
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
