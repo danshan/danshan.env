@@ -16,3 +16,5 @@ tmux
 ripgrep
 pyenv
 diff-so-fancy
+lazygit
+tree
