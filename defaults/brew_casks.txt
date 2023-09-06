@@ -8,7 +8,6 @@ notion|Notion
 surge|Surge
 wechat|WeChat
 telegram|Telegram
-apifox|Apifox
 postman|Postman
 feishu|Feishu
 intellij-idea|IntelliJ IDEA
@@ -20,7 +19,6 @@ rapidapi|RapidApi
 keycastr|KeyCastr
 the-unarchiver|The Unarchiver
 bartender|Bartender 4
-warp|Warp
 vivaldi|Vivaldi
 vlc|VLC
 omnidisksweeper|OmniDiskSweeper

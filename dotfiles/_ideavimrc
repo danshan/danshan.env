@@ -7,7 +7,7 @@ sethandler <C-w> n:vim
 set visualbell
 set noerrorbells
 
-set relativenumber
+" "set relativenumber
 set number
 
 let mapleader = ","

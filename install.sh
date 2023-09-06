@@ -77,7 +77,7 @@ git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catp
 git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
 git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
 # git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
-git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
+# git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
 
 printf "📦 Installing oh-my-tmux...\n"
 git clone https://github.com/gpakosz/.tmux.git ${HOME}/.config/oh-my-tmux 
@@ -106,8 +106,8 @@ case ${SHELL} in
 esac
 
 ln -s -f ${DANSHAN_ENV}/dotfiles/_vimrc ${HOME}/.vimrc
+ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc ${HOME}/.ideavimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
-ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc.conf ${HOME}/.ideavimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.zsh ${HOME}/.fzf.zsh
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash ${HOME}/.fzf.bash
 # ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.toml ${HOME}/.alacritty.toml
@@ -121,16 +121,16 @@ printf "⚙️  Configuring hammerspoon...\n"
 git clone --depth=1 git@github.com/danshan/hammerspoon-config.git ${HOME}/.hammerspoon
 
 printf "⚙️  Configuring neovim...\n"
-git clone --depth=1 git@github.com/danshan/nvim.git ${HOME}/.config/nvim
+git clone --depth=1 git@github.com/danshan/lazyvim.git ${HOME}/.config/nvim
 
 # printf "⚙️  Configuring zed...\n"
 # git clone --depth=1 git@github.com/danshan/zed-config.git ${HOME}/.config/zed
 
-printf "⚙️  Configuring warp...\n"
-mkdir -p ${HOME}/.warp
-git clone --depth=1 git@github.com:danshan/warp-workflows.git ${HOME}/.warp/workflows
-mkdir -p ${HOME}/.warp/themes
-cp -f ${HOME}/.config/catppuccin-warp/dist/*.yml ${HOME}/.warp/themes/
+# printf "⚙️  Configuring warp...\n"
+# mkdir -p ${HOME}/.warp
+# git clone --depth=1 git@github.com:danshan/warp-workflows.git ${HOME}/.warp/workflows
+# mkdir -p ${HOME}/.warp/themes
+# cp -f ${HOME}/.config/catppuccin-warp/dist/*.yml ${HOME}/.warp/themes/
 
 printf "🎉 danshan.env installation complete!\n"
 printf "💡 Don't forget to restart your terminal to tweak your preferences.\n"
