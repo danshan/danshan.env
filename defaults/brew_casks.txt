@@ -23,6 +23,7 @@ vivaldi|Vivaldi
 vlc|VLC
 omnidisksweeper|OmniDiskSweeper
 qqmusic|QQMusic
+snipaste|Snipaste
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
