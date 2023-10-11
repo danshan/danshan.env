@@ -18,3 +18,4 @@ pyenv
 diff-so-fancy
 lazygit
 tree
+scrcpy
