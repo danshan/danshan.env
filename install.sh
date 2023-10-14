@@ -32,6 +32,7 @@ fi
 brew tap homebrew/cask-fonts
 brew tap homebrew/services
 brew tap homebrew/bundle
+brew tap localsend/localsend
 
 ###################################################
 # Install Shell Environments
