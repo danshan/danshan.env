@@ -25,6 +25,7 @@ omnidisksweeper|OmniDiskSweeper
 qqmusic|QQMusic
 snipaste|Snipaste
 bitwarden|Bitwarden
+android-platform-tools
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
