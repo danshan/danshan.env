@@ -19,3 +19,4 @@ diff-so-fancy
 lazygit
 tree
 scrcpy
+localsend
