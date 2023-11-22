@@ -158,3 +158,7 @@ export NVM_DIR="$HOME/.nvm"
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+
+###_BEGIN_Completion_ae
+test -e "/Users/honghao.shan/.completion/ae.completion.sh" &&  source "/Users/honghao.shan/.completion/ae.completion.sh"
+###_END_Completion_ae
