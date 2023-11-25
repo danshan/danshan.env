@@ -56,7 +56,7 @@ HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
-ZSH_CUSTOM="${HOME}/Dropbox/sync/mac/.oh-my-zshrc"
+ZSH_CUSTOM="${HOME}/Library/CloudStorage/Dropbox/sync/mac/.oh-my-zshrc"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
