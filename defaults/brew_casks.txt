@@ -8,7 +8,6 @@ notion|Notion
 surge|Surge
 wechat|WeChat
 telegram|Telegram
-postman|Postman
 feishu|Feishu
 intellij-idea|IntelliJ IDEA
 pycharm-ce|PyCharm CE
@@ -26,6 +25,9 @@ qqmusic|QQMusic
 snipaste|Snipaste
 bitwarden|Bitwarden
 android-platform-tools
+bruno
+poe
+zspace
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
