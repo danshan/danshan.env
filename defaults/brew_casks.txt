@@ -25,9 +25,9 @@ qqmusic|QQMusic
 snipaste|Snipaste
 bitwarden|Bitwarden
 android-platform-tools
-bruno
-poe
-zspace
+bruno|Bruno
+poe|Poe
+zspace|ZSpace
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
