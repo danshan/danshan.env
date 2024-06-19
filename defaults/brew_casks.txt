@@ -26,8 +26,9 @@ snipaste|Snipaste
 bitwarden|Bitwarden
 android-platform-tools
 bruno|Bruno
-poe|Poe
 zspace|ZSpace
+shottr|Shottr
+zed|Zed
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font

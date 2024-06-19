@@ -20,3 +20,5 @@ lazygit
 tree
 scrcpy
 localsend
+coreutils
+bitwarden-cli
