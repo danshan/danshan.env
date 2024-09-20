@@ -26,6 +26,7 @@ shottr|Shottr
 zed|Zed
 raycast|Raycast
 craft|Craft
+microsoft-edge|Microsoft Edge
 google-chrome|Google Chrome
 drawio|draw.io
 font-hack-nerd-font
