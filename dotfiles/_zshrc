@@ -164,4 +164,4 @@ test -e "${HOME}/.completion/ae.completion.sh" &&  source "${HOME}/.completion/a
 ###_END_Completion_ae
 
 # rust
-test -fe "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
+test -e "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
