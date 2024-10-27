@@ -107,7 +107,7 @@ alias vv='neovide --multigrid'
 alias subl="'/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl'"
 alias code="'/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code'"
 alias nano="subl"
-alias fuckgfw='export https_proxy=http://127.0.0.1:6152;export http_proxy=http://127.0.0.1:6152;export all_proxy=socks5://127.0.0.1:6153;export no_proxy=localhost,127.0.0.1,10.96.0.0/12,192.168.99.0/24,192.168.39.0/24'
+alias fuckgfw='export https_proxy=http://127.0.0.1:6152;export http_proxy=http://127.0.0.1:6152;export all_proxy=socks5://127.0.0.1:6153;export no_proxy=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16'
 alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 
 # config for autojump
@@ -160,5 +160,8 @@ export NVM_DIR="$HOME/.nvm"
 
 
 ###_BEGIN_Completion_ae
-test -e "/Users/honghao.shan/.completion/ae.completion.sh" &&  source "/Users/honghao.shan/.completion/ae.completion.sh"
+test -e "${HOME}/.completion/ae.completion.sh" &&  source "${HOME}/.completion/ae.completion.sh"
 ###_END_Completion_ae
+
+# rust
+test -fe "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
