@@ -1353,18 +1353,27 @@ map <F2> :%s/s*$//g<CR>:noh<CR>''
 set pastetoggle=<F12>
 
 "vundle插件管理
-" git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-"set rtp+=~/.vim/bundle/vundle/
-"call vundle#rc()
+" git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
 
 " let Vundle manage Vundle
 " required! 
-"Bundle 'gmarik/vundle'
+Plugin 'VundleVim/Vundle.vim'
 
 " My Bundles here:
 "
 " original repos on github
-"Bundle 'scrooloose/nerdtree.git'
+Plugin 'scrooloose/nerdtree'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+
+" airline 
+Plugin 'vim-airline/vim-airline'		" 美化底部插件
+Plugin 'vim-airline/vim-airline-themes'	" 主题插件
+
+" hybrid theme
+Plugin 'w0ng/vim-hybrid'
+Plugin 'catppuccin/vim'
 
 " vim-scripts repos
 "Bundle 'L9'
@@ -1379,6 +1388,8 @@ set pastetoggle=<F12>
 "Bundle 'https://github.com/drmingdrmer/xptemplate'
 "Bundle 'https://github.com/nathanaelkane/vim-indent-guides'
 
+" All of your Plugins must be added before the following line
+call vundle#end() " required
 "
 " Brief help
 " :BundleList          - list configured bundles
@@ -1406,7 +1417,18 @@ set pastetoggle=<F12>
 "m 显示文件系统菜单（添加、删除、移动操作）
 "? 帮助
 "q 关闭
-"map <silent> <F3> :NERDTree<CR>
+map <leader>e :NERDTreeToggle<CR>
+
+" airline
+let g:airline#extensions#tabline#enabled = 1                " 设置开启tab样式
+let g:airline#extensions#tabline#formatter = 'jsformatter'  " 设置默认tab栏样式
+
+" airline-theme
+"let g:airline_theme='solarized'
+"let g:airline_theme='angr'              " 好像还是比较喜欢这个颜色
+let g:airline_theme = 'catppuccin_mocha'
+
+colorscheme catppuccin_mocha
 
 " Zencoding
 "let g:user_zen_settings = {

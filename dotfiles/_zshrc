@@ -83,11 +83,10 @@ eval $(/opt/homebrew/bin/brew shellenv)
 
 # Preferred editor for local and remote sessions
 export EDITOR="vim"
-alias vim='nvim'
-alias vi='nvim'
-alias v='nvim'
-alias nv='neovide --multigrid'
-alias vv='neovide --multigrid'
+alias vi='vim'
+alias v='vim'
+#alias nv='neovide --multigrid'
+#alias vv='neovide --multigrid'
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -165,3 +164,6 @@ test -e "${HOME}/.completion/ae.completion.sh" &&  source "${HOME}/.completion/a
 
 # rust
 test -e "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
+
+export SCRCPY_SERVER_PATH=/Applications/极空间.app/Contents/Resources/app.asar.unpacked/bin/platform-tools/scrcpy-server
+export PATH=$PATH:/Applications/极空间.app/Contents/Resources/app.asar.unpacked/bin/platform-tools
