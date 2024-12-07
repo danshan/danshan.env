@@ -111,6 +111,7 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_ideavimrc ${HOME}/.ideavimrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.zsh ${HOME}/.fzf.zsh
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash ${HOME}/.fzf.bash
+ln -s -f ${DANSHAN_ENV}/dotfiles/_gitignore ${HOME}/.gitignore
 # ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.toml ${HOME}/.alacritty.toml
 # ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.yml ${HOME}/.alacritty.yml
 
