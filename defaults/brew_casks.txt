@@ -18,7 +18,7 @@ qqmusic|QQMusic
 bitwarden|Bitwarden
 android-platform-tools
 bruno|Bruno
-zspace|ZSpace
+zspace|极空间
 shottr|Shottr
 raycast|Raycast
 craft|Craft
