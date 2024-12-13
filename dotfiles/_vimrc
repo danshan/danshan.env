@@ -414,7 +414,7 @@ endif "end of if has("gui_running")
 "码,也会存在很多XML的代码,这个时候需要随时切换不同的高亮方案
 map <Leader>1 :set syntax=java<CR>
 map <Leader>2 :set syntax=c<CR>
-map <Leader>3 :set syntax=xhtml<CR>
+map <Leader>3 :set syntax=xml<CR>
 map <Leader>4 :set syntax=python<CR>
 map <Leader>5 :set ft=javascript<CR>
 map <Leader>0 :syntax sync fromstart<CR>
@@ -1426,9 +1426,9 @@ let g:airline#extensions#tabline#formatter = 'jsformatter'  " 设置默认tab栏
 " airline-theme
 "let g:airline_theme='solarized'
 "let g:airline_theme='angr'              " 好像还是比较喜欢这个颜色
-let g:airline_theme = 'catppuccin_mocha'
+"let g:airline_theme = 'catppuccin_mocha'
 
-colorscheme catppuccin_mocha
+"colorscheme angr 
 
 " Zencoding
 "let g:user_zen_settings = {

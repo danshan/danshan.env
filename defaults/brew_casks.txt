@@ -1,5 +1,4 @@
 sublime-text|Sublime Text
-visual-studio-code|Visual Studio Code
 iterm2|iTerm 
 hammerspoon|Hammerspoon
 surge|Surge
@@ -23,6 +22,8 @@ zspace|ZSpace
 shottr|Shottr
 raycast|Raycast
 craft|Craft
+cursor|Cursor
+notion|Notion
 google-chrome|Google Chrome
 microsoft-edge|Microsoft Edge
 microsoft-excel|Microsoft Excel 
@@ -30,6 +31,7 @@ microsoft-word|Microsoft Word
 microsoft-powerpoint|Microsoft PowerPoint
 microsoft-outlook|Microsoft Outlook
 baiduinput
+wetype
 drawio|draw.io
 font-hack-nerd-font
 font-fira-code-nerd-font
