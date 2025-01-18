@@ -1,6 +1,5 @@
 sublime-text|Sublime Text
 iterm2|iTerm 
-hammerspoon|Hammerspoon
 surge|Surge
 wechat|WeChat
 telegram|Telegram
@@ -24,8 +23,7 @@ raycast|Raycast
 craft|Craft
 cursor|Cursor
 notion|Notion
-google-chrome|Google Chrome
-microsoft-edge|Microsoft Edge
+vivaldi|Vivaldi
 microsoft-excel|Microsoft Excel 
 microsoft-word|Microsoft Word
 microsoft-powerpoint|Microsoft PowerPoint
