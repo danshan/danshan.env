@@ -20,17 +20,15 @@ bruno|Bruno
 zspace|极空间
 shottr|Shottr
 raycast|Raycast
-craft|Craft
 cursor|Cursor
 notion|Notion
-vivaldi|Vivaldi
+google-chrome|Google Chrome
 microsoft-excel|Microsoft Excel 
 microsoft-word|Microsoft Word
 microsoft-powerpoint|Microsoft PowerPoint
 microsoft-outlook|Microsoft Outlook
 zed|Zed
 baiduinput
-wetype
 drawio|draw.io
 font-hack-nerd-font
 font-fira-code-nerd-font

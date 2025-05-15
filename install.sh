@@ -3,7 +3,13 @@
 export DANSHAN_ENV=${DANSHAN_ENV:-"${HOME}/.config/danshan.env"}
 printf "📦 Installing danshan.env\n"
 
-mkdir ${HOME}/.bin
+# Check if .bin directory exists, create if not
+if [ ! -d "${HOME}/.bin" ]; then
+    printf "📦 Creating ${HOME}/.bin directory\n"
+    mkdir -p "${HOME}/.bin"
+else
+    printf "✅ ${HOME}/.bin directory already exists\n"
+fi
 
 ###################################################
 # Install Homebrew
@@ -29,9 +35,6 @@ else
     eval "$(/usr/local/Homebrew/bin/brew shellenv)"
 fi
 
-#brew tap homebrew/cask-fonts
-brew tap homebrew/services
-brew tap homebrew/bundle
 brew tap localsend/localsend
 
 ###################################################
@@ -112,21 +115,41 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_screenrc ${HOME}/.screenrc
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.zsh ${HOME}/.fzf.zsh
 ln -s -f ${DANSHAN_ENV}/dotfiles/_fzf.bash ${HOME}/.fzf.bash
 ln -s -f ${DANSHAN_ENV}/dotfiles/_gitignore ${HOME}/.gitignore
-# ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.toml ${HOME}/.alacritty.toml
-# ln -s -f ${DANSHAN_ENV}/dotfiles/_alacritty.yml ${HOME}/.alacritty.yml
 
 ###################################################
 # Install configs
 ###################################################
 
 printf "⚙️  Configuring hammerspoon...\n"
-git clone --depth=1 git@github.com/danshan/hammerspoon-config.git ${HOME}/.hammerspoon
+if [ -d "${HOME}/.hammerspoon" ]; then
+    printf "📦 Updating hammerspoon config...\n"
+    cd ${HOME}/.hammerspoon
+    git pull
+    cd -
+else
+    printf "📦 Installing hammerspoon config...\n"
+    git clone --depth=1 git@github.com:danshan/hammerspoon-config.git ${HOME}/.hammerspoon
+fi
 
 printf "⚙️  Configuring neovim...\n"
-git clone --depth=1 git@github.com/danshan/lazyvim.git ${HOME}/.config/nvim
+if [ -d "${HOME}/.config/nvim" ]; then
+    printf "📦 Updating neovim config...\n"
+    cd ${HOME}/.config/nvim
+    git pull
+    cd -
+else
+    git clone --depth=1 git@github.com:danshan/lazyvim.git ${HOME}/.config/nvim
+fi
 
-# printf "⚙️  Configuring zed...\n"
-# git clone --depth=1 git@github.com/danshan/zed-config.git ${HOME}/.config/zed
+printf "⚙️  Configuring zed...\n"
+if [ -d "${HOME}/.config/zed" ]; then
+    printf "📦 Updating zed config...\n"
+    cd ${HOME}/.config/zed
+    git pull
+    cd -
+else
+    git clone --depth=1 git@github.com:danshan/zed-config.git ${HOME}/.config/zed
+fi
 
 # printf "⚙️  Configuring warp...\n"
 # mkdir -p ${HOME}/.warp
