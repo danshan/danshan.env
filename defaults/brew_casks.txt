@@ -28,6 +28,7 @@ microsoft-excel|Microsoft Excel
 microsoft-word|Microsoft Word
 microsoft-powerpoint|Microsoft PowerPoint
 microsoft-outlook|Microsoft Outlook
+zed|Zed
 baiduinput
 wetype
 drawio|draw.io
