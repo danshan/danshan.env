@@ -89,6 +89,9 @@ ln -f -s ${HOME}/.config/oh-my-tmux/.tmux.conf ${HOME}/.tmux.conf
 ln -s -f ${DANSHAN_ENV}/dotfiles/_tmux.conf.local ${HOME}/.tmux.conf.local
 tmux source-file ${HOME}/.tmux.conf
 
+printf "📦 Installing uv...\n"
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 ###################################################
 # Update Shell Settings
 ###################################################
