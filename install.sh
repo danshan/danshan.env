@@ -36,6 +36,7 @@ else
 fi
 
 brew tap localsend/localsend
+brew tap daipeihust/tap
 
 ###################################################
 # Install Shell Environments
