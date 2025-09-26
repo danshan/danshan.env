@@ -25,3 +25,6 @@ nmap <C-l> <C-w>l
 nmap <S-L> gt
 nmap <S-H> gT
 
+set keep-english-in-normal
+let keep_input_source_in_normal="com.apple.keylayout.UnicodeHexInput"
+
