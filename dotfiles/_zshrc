@@ -63,7 +63,7 @@ ZSH_CUSTOM="${HOME}/Library/CloudStorage/ZSpace/mac/.oh-my-zshrc"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git ssh-agent history extract zsh-autosuggestions oc kubectl helm)
-plugins=(git history extract zsh-autosuggestions mvn httpie aliases)
+plugins=(git history extract zsh-autosuggestions zsh-syntax-highlighting mvn httpie aliases)
 
 # User configuration
 
@@ -127,8 +127,9 @@ export SDKMAN_DIR="$HOME/.sdkman"
 # Add JAVA_HOME
 export JAVA_HOME="${SDKMAN_DIR}/candidates/java/current"
 
-source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# Plugins are now managed through oh-my-zsh plugins array above
+# source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
