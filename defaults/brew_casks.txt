@@ -21,7 +21,6 @@ zspace|极空间
 shottr|Shottr
 raycast|Raycast
 cursor|Cursor
-notion|Notion
 google-chrome|Google Chrome
 microsoft-excel|Microsoft Excel 
 microsoft-word|Microsoft Word
