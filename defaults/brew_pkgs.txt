@@ -1,5 +1,3 @@
-rbenv
-nvm
 wget
 cloc
 telnet
@@ -14,7 +12,6 @@ httpie
 autojump
 tmux
 ripgrep
-pyenv
 diff-so-fancy
 lazygit
 tree
@@ -23,3 +20,4 @@ localsend
 coreutils
 bitwarden-cli
 im-select
+asdf

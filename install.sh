@@ -14,7 +14,6 @@ fi
 ###################################################
 # Install Homebrew
 ###################################################
-
 if test ! "$(command -v brew)"; then
     printf "📦 Homebrew not installed. Installing.\n"
     if [[ $(uname -s) = "Linux" ]] && [[ $(uname -m) = "aarch64" ]]; then
@@ -22,7 +21,9 @@ if test ! "$(command -v brew)"; then
         sleep 5
         exit
     elif [[ ${BREW_CN} ]]; then
-        /bin/bash -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
+        git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/install.git /tmp/brew-install
+        /bin/bash /tmp/brew-install/install.sh
+        rm -rf /tmp/brew-install
     else
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
@@ -54,6 +55,10 @@ fi
 # Install Packages
 ###################################################
 
+printf "📦 Configuring Completions in zsh...\n"
+# https://docs.brew.sh/Shell-Completion#configuring-completions-in-zsh
+brew cleanup && rm -f $ZSH_COMPDUMP && omz reload
+
 printf "📦 Installing essential danshan.env toolchains...\n"
 
 brew update
@@ -74,15 +79,12 @@ cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
     fi
 done
 
-printf "📦 Installing sdkman...\n"
-curl -s "https://get.sdkman.io" | bash
-
-printf "📦 Installing catppuccin themes...\n"
-git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
-git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
-git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
-git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
-git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
+# printf "📦 Installing catppuccin themes...\n"
+# git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
+# git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
+# git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
+# git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
+# git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
 
 printf "📦 Installing oh-my-tmux...\n"
 git clone https://github.com/gpakosz/.tmux.git ${HOME}/.config/oh-my-tmux 
