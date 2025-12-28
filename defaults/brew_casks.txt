@@ -5,31 +5,31 @@ wechat|WeChat
 telegram|Telegram
 feishu|Feishu
 intellij-idea|IntelliJ IDEA
-pycharm-ce|PyCharm CE
+pycharm|PyCharm
 kap|Kap
 appcleaner|AppCleaner
 keycastr|KeyCastr
 the-unarchiver|The Unarchiver
-bartender|Bartender 5
+bartender|Bartender 6
 vlc|VLC
 omnidisksweeper|OmniDiskSweeper
 qqmusic|QQMusic
-bitwarden|Bitwarden
 android-platform-tools
 bruno|Bruno
 zspace|极空间
 shottr|Shottr
 raycast|Raycast
-cursor|Cursor
-notion|Notion
-google-chrome|Google Chrome
 microsoft-excel|Microsoft Excel 
 microsoft-word|Microsoft Word
 microsoft-powerpoint|Microsoft PowerPoint
 microsoft-outlook|Microsoft Outlook
 zed|Zed
-baiduinput
 drawio|draw.io
 font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
+chatgpt|ChatGPT
+chatgpt-atlas|ChatGPT Altas
+obsidian|Obsidian
+1password|1Password
+antigravity|Antigravity

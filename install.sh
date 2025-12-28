@@ -123,16 +123,16 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_gitignore ${HOME}/.gitignore
 # Install configs
 ###################################################
 
-printf "⚙️  Configuring hammerspoon...\n"
-if [ -d "${HOME}/.hammerspoon" ]; then
-    printf "📦 Updating hammerspoon config...\n"
-    cd ${HOME}/.hammerspoon
-    git pull
-    cd -
-else
-    printf "📦 Installing hammerspoon config...\n"
-    git clone --depth=1 git@github.com:danshan/hammerspoon-config.git ${HOME}/.hammerspoon
-fi
+#printf "⚙️  Configuring hammerspoon...\n"
+#if [ -d "${HOME}/.hammerspoon" ]; then
+#    printf "📦 Updating hammerspoon config...\n"
+#    cd ${HOME}/.hammerspoon
+#    git pull
+#    cd -
+#else
+#    printf "📦 Installing hammerspoon config...\n"
+#    git clone --depth=1 git@github.com:danshan/hammerspoon-config.git ${HOME}/.hammerspoon
+#fi
 
 printf "⚙️  Configuring neovim...\n"
 if [ -d "${HOME}/.config/nvim" ]; then
