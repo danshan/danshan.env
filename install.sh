@@ -79,13 +79,6 @@ cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
     fi
 done
 
-# printf "📦 Installing catppuccin themes...\n"
-# git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
-# git clone --depth=1 https://github.com/catppuccin/sublime-text.git ${HOME}/.config/catppuccin-sublime
-# git clone --depth=1 https://github.com/catppuccin/Terminal.app.git ${HOME}/.config/catppuccin-terminal
-# git clone --depth=1 https://github.com/catppuccin/alacritty.git ${HOME}/.config/catppuccin-alacritty
-# git clone --depth=1 https://github.com/catppuccin/warp.git ${HOME}/.config/catppuccin-warp 
-
 printf "📦 Installing oh-my-tmux...\n"
 git clone https://github.com/gpakosz/.tmux.git ${HOME}/.config/oh-my-tmux 
 ln -f -s ${HOME}/.config/oh-my-tmux/.tmux.conf ${HOME}/.tmux.conf
@@ -126,17 +119,6 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_gitignore ${HOME}/.gitignore
 # Install configs
 ###################################################
 
-printf "⚙️  Configuring hammerspoon...\n"
-if [ -d "${HOME}/.hammerspoon" ]; then
-    printf "📦 Updating hammerspoon config...\n"
-    cd ${HOME}/.hammerspoon
-    git pull
-    cd -
-else
-    printf "📦 Installing hammerspoon config...\n"
-    git clone --depth=1 git@github.com:danshan/hammerspoon-config.git ${HOME}/.hammerspoon
-fi
-
 printf "⚙️  Configuring neovim...\n"
 if [ -d "${HOME}/.config/nvim" ]; then
     printf "📦 Updating neovim config...\n"
@@ -163,6 +145,36 @@ fi
 # mkdir -p ${HOME}/.warp/themes
 # cp -f ${HOME}/.config/catppuccin-warp/dist/*.yml ${HOME}/.warp/themes/
 
+
+###################################################
+# Install Developing Envornment
+###################################################
+
+source ~/.zshrc
+
+printf "⚙️  Configuring asdf java...\n"
+asdf plugin add java
+
+printf "⚙️  Configuring asdf maven...\n"
+asdf plugin add maven
+
+printf "⚙️  Configuring asdf nodejs...\n"
+asdf plugin add nodejs 22.20.0
+asdf install nodejs 22.20.0
+
+printf "⚙️  Configuring asdf python...\n"
+asdf plugin add python
+
+source ~/.zshrc
+
+printf "❇️  Configuring codex...\n"
+npm i -g @openai/codex
+printf "❇️  Configuring gemini-cli...\n"
+npm i -g @google/gemini-cli
+
+###################################################
+# Finished
+###################################################
+
 printf "🎉 danshan.env installation complete!\n"
 printf "💡 Don't forget to restart your terminal to tweak your preferences.\n"
-

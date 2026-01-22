@@ -18,6 +18,6 @@ tree
 scrcpy
 localsend
 coreutils
-bitwarden-cli
 im-select
 asdf
+gron
