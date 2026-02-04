@@ -158,3 +158,6 @@ export PATH="$PATH:/Users/honghao.shan/.lmstudio/bin"
 export PATH="/Users/honghao.shan/.antigravity/antigravity/bin:$PATH"
 
 
+
+# opencode
+export PATH=/Users/honghao.shan/.opencode/bin:$PATH
