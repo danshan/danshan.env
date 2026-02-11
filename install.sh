@@ -73,8 +73,8 @@ cat ${DANSHAN_ENV}/defaults/brew_casks.txt | while read -r pkg; do
     fi
 done
 
-printf "📦 Installing sdkman...\n"
-curl -s "https://get.sdkman.io" | bash
+#printf "📦 Installing sdkman...\n"
+#curl -s "https://get.sdkman.io" | bash
 
 printf "📦 Installing catppuccin themes...\n"
 git clone --depth=1 https://github.com/catppuccin/iterm.git ${HOME}/.config/catppuccin-iterm
@@ -134,7 +134,7 @@ ln -s -f ${DANSHAN_ENV}/dotfiles/_gitignore ${HOME}/.gitignore
 #    git clone --depth=1 git@github.com:danshan/hammerspoon-config.git ${HOME}/.hammerspoon
 #fi
 
-printf "⚙️  Configuring neovim...\n"
+printf "⚙️  Configuring Neovim...\n"
 if [ -d "${HOME}/.config/nvim" ]; then
     printf "📦 Updating neovim config...\n"
     cd ${HOME}/.config/nvim
@@ -144,7 +144,7 @@ else
     git clone --depth=1 git@github.com:danshan/lazyvim.git ${HOME}/.config/nvim
 fi
 
-printf "⚙️  Configuring zed...\n"
+printf "⚙️  Configuring Zed...\n"
 if [ -d "${HOME}/.config/zed" ]; then
     printf "📦 Updating zed config...\n"
     cd ${HOME}/.config/zed
@@ -160,6 +160,19 @@ fi
 # mkdir -p ${HOME}/.warp/themes
 # cp -f ${HOME}/.config/catppuccin-warp/dist/*.yml ${HOME}/.warp/themes/
 
+
+###################################################
+# Install Develop Environment
+###################################################
+
+printf "🧩 Configuring OpenCode...\n"
+curl -fsSL https://opencode.ai/install | bash
+
+printf "🧩 Configuring Oh-My-OpenCode...\n"
+npm install -g oh-my-opencode
+
+printf "🧩 Configuring Oh-My-OpenCode...\n"
+curl -fsSL https://claude.ai/install.sh | bash
+
 printf "🎉 danshan.env installation complete!\n"
 printf "💡 Don't forget to restart your terminal to tweak your preferences.\n"
-
