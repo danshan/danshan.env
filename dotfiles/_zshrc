@@ -172,3 +172,6 @@ export PATH=$PATH:/Applications/极空间.app/Contents/Resources/app.asar.unpack
 # Added by Antigravity
 export PATH="/Users/shanhonghao/.antigravity/antigravity/bin:$PATH"
 
+
+# opencode
+export PATH=/Users/shanhonghao/.opencode/bin:$PATH
