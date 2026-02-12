@@ -30,3 +30,4 @@ font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
 chatgpt|ChatGPT
 chatgpt-atlas|ChatGPT Atlas
+codex-app|Codex

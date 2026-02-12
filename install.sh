@@ -175,6 +175,8 @@ npm i -g @google/gemini-cli
 
 printf "❇️  Configuring opencode...\n"
 curl -fsSL https://opencode.ai/install | bash
+printf "❇️  Configuring oh-my-opencode...\n"
+npm install -g oh-my-opencode
 
 ###################################################
 # Finished
