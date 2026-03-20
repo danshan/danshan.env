@@ -161,3 +161,6 @@ export PATH="/Users/honghao.shan/.antigravity/antigravity/bin:$PATH"
 
 # opencode
 export PATH=/Users/honghao.shan/.opencode/bin:$PATH
+
+[[ ":$PATH:" != *":$HOME/.config/kaku/zsh/bin:"* ]] && export PATH="$HOME/.config/kaku/zsh/bin:$PATH" # Kaku PATH Integration
+[[ -f "$HOME/.config/kaku/zsh/kaku.zsh" ]] && source "$HOME/.config/kaku/zsh/kaku.zsh" # Kaku Shell Integration
