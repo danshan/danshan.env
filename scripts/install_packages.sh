@@ -18,29 +18,31 @@ brew cleanup && rm -f $ZSH_COMPDUMP && omz reload
 printf "📦 Installing essential danshan.env toolchains...\n"
 brew update
 
-cat "${PROJECT_ROOT}/defaults/brew_pkgs.txt" | while read -r pkg; do
+while IFS= read -r pkg; do
+    [[ -z "$pkg" ]] && continue
     printf "📦 Installing homebrew package: ${pkg}\n"
-    brew install "$pkg"
-done
+    brew install --quiet "$pkg" </dev/null
+done < "${PROJECT_ROOT}/defaults/brew_pkgs.txt"
 
-cat "${PROJECT_ROOT}/defaults/brew_casks.txt" | while read -r pkg; do
-    pkg_name="$(echo ${pkg} | awk -F '|' '{ print $1 }')"
-    app_name="$(echo ${pkg} | awk -F '|' '{ print $2 }')"
-    if [ -e "/Applications/${app_name}.app" ]; then
+while IFS= read -r pkg; do
+    [[ -z "$pkg" ]] && continue
+    pkg_name="$(echo "$pkg" | awk -F '|' '{ print $1 }')"
+    app_name="$(echo "$pkg" | awk -F '|' '{ print $2 }')"
+    if [ -n "$app_name" ] && [ -e "/Applications/${app_name}.app" ]; then
         printf "✅ Application ${app_name} exists.\n"
     else
         printf "📦 Installing ${pkg_name}...\n"
-        brew install --cask "$pkg_name"
+        brew install --quiet --cask "$pkg_name" </dev/null
     fi
-done
+done < "${PROJECT_ROOT}/defaults/brew_casks.txt"
 
 printf "📦 Installing oh-my-tmux...\n"
-git clone https://github.com/gpakosz/.tmux.git ${HOME}/.config/oh-my-tmux
-ln -f -s ${HOME}/.config/oh-my-tmux/.tmux.conf ${HOME}/.tmux.conf
-ln -s -f ${PROJECT_ROOT}/dotfiles/tmux/.tmux.conf.local ${HOME}/.tmux.conf.local
-tmux source-file ${HOME}/.tmux.conf
+git clone https://github.com/gpakosz/.tmux.git "${HOME}/.config/oh-my-tmux" </dev/null
+ln -f -s "${HOME}/.config/oh-my-tmux/.tmux.conf" "${HOME}/.tmux.conf"
+ln -s -f "${PROJECT_ROOT}/dotfiles/tmux/.tmux.conf.local" "${HOME}/.tmux.conf.local"
+tmux source-file "${HOME}/.tmux.conf" </dev/null
 
 printf "📦 Installing uv...\n"
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/install.sh | sh </dev/null
 
 printf "✅ Package installation complete.\n"

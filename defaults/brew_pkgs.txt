@@ -18,6 +18,8 @@ tree
 scrcpy
 localsend
 coreutils
+1password-cli
+adsf
 im-select
 asdf
 gron

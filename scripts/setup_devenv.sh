@@ -25,6 +25,9 @@ npm i -g @openai/codex
 printf "❇️  Configuring gemini-cli...\n"
 npm i -g @google/gemini-cli
 
+printf "❇️  Configuring claude-code...\n"
+curl -fsSL https://claude.ai/install.sh | bash
+
 printf "❇️  Configuring opencode...\n"
 curl -fsSL https://opencode.ai/install | bash
 

@@ -130,8 +130,8 @@ alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # Plugins are now managed through oh-my-zsh plugins array above
-# source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
@@ -157,19 +157,12 @@ export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
 fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
 autoload -Uz compinit && compinit
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/honghao.shan/.lmstudio/bin"
-# End of LM Studio CLI section
-
+# Cursor cli
 # Added by Antigravity
 export PATH="/Users/honghao.shan/.antigravity/antigravity/bin:$PATH"
-
-
 
 # opencode
 export PATH=/Users/honghao.shan/.opencode/bin:$PATH
 
-[[ ":$PATH:" != *":$HOME/.config/kaku/zsh/bin:"* ]] && export PATH="$HOME/.config/kaku/zsh/bin:$PATH" # Kaku PATH Integration
-[[ -f "$HOME/.config/kaku/zsh/kaku.zsh" ]] && source "$HOME/.config/kaku/zsh/kaku.zsh" # Kaku Shell Integration
-
+# Kiro
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"

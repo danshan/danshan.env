@@ -29,5 +29,7 @@ font-hack-nerd-font
 font-fira-code-nerd-font
 font-jetbrains-mono-nerd-font
 chatgpt|ChatGPT
-chatgpt-atlas|ChatGPT Atlas
-codex-app|Codex
+chatgpt-atlas|ChatGPT Altas
+obsidian|Obsidian
+1password|1Password
+antigravity|Antigravity
