@@ -166,3 +166,7 @@ export PATH=/Users/honghao.shan/.opencode/bin:$PATH
 
 # Kiro
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+
+# OpenClaw Completion
+source "${HOME}/.openclaw/completions/openclaw.zsh"
+
