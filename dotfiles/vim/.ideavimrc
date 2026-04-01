@@ -7,8 +7,10 @@ sethandler <C-w> n:vim
 set visualbell
 set noerrorbells
 
-" "set relativenumber
-set number
+set relativenumber
+"set number
+
+set jumpoptions=stack
 
 let mapleader = ","
 let g:mapleader = ","
@@ -25,3 +27,7 @@ nmap <C-l> <C-w>l
 nmap <S-L> gt
 nmap <S-H> gT
 
+nmap gi :action GotoImplementation<CR>
+
+set keep-english-in-normal
+let keep_input_source_in_normal="com.apple.keylayout.UnicodeHexInput"

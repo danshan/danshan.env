@@ -10,7 +10,6 @@ kap|Kap
 appcleaner|AppCleaner
 keycastr|KeyCastr
 the-unarchiver|The Unarchiver
-bartender|Bartender 6
 vlc|VLC
 omnidisksweeper|OmniDiskSweeper
 qqmusic|QQMusic
@@ -19,6 +18,7 @@ bruno|Bruno
 zspace|极空间
 shottr|Shottr
 raycast|Raycast
+google-chrome|Google Chrome
 microsoft-excel|Microsoft Excel 
 microsoft-word|Microsoft Word
 microsoft-powerpoint|Microsoft PowerPoint

@@ -20,8 +20,10 @@ export ZSH=${HOME}/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="robbyrussell"
-# ZSH_THEME=jispwoso
+#ZSH_THEME="robbyrussell"
+#ZSH_THEME=jispwoso
+#ZSH_THEME=amuse
+ZSH_THEME=refined
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -63,7 +65,7 @@ ZSH_CUSTOM="${HOME}/Library/CloudStorage/ZSpace/mac/.oh-my-zshrc"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git ssh-agent history extract zsh-autosuggestions oc kubectl helm)
-plugins=(git history extract zsh-autosuggestions mvn httpie aliases)
+plugins=(git history extract zsh-autosuggestions zsh-syntax-highlighting mvn httpie aliases asdf)
 
 # User configuration
 
@@ -75,6 +77,10 @@ export PATH="$PATH:/usr/local/go/bin"
 source $ZSH/oh-my-zsh.sh
 
 # Homebrew
+export BREW_CN=1
+export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+export HOMEBREW_INSTALL_FROM_API=1
 export HOMEBREW_NO_AUTO_UPDATE=true # no update when use brew
 eval $(/opt/homebrew/bin/brew shellenv)
 
@@ -113,23 +119,15 @@ alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 [ -f $(brew --prefix)/etc/profile.d/autojump.sh ] && . $(brew --prefix)/etc/profile.d/autojump.sh
 
 
-# rvm
-export PATH="$PATH:$HOME/.rvm/bin"
-
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+# Plugins are now managed through oh-my-zsh plugins array above
 source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
-
-# virtualenvwrapper
-export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=$HOMEBREW_PREFIX/bin/python3
-export VIRTUALENVWRAPPER_VIRTUALENV=$HOMEBREW_PREFIX/bin/virtualenv
-#source $HOMEBREW_PREFIX/bin/virtualenvwrapper.sh
 
 # maven
 export MVNW_VERBOSE=true
@@ -141,37 +139,23 @@ alias ungron="gron --ungron"
 # git-repo
 export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
 
-# nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# asdf
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-
-
-###_BEGIN_Completion_ae
-test -e "${HOME}/.completion/ae.completion.sh" &&  source "${HOME}/.completion/ae.completion.sh"
-###_END_Completion_ae
 
 # rust
 test -e "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
 
-# Added by Windsurf
-export PATH="/Users/honghao.shan/.codeium/windsurf/bin:$PATH"
+# ASDF https://asdf-vm.com/zh-hans/guide/getting-started.html
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
+autoload -Uz compinit && compinit
 
 # Cursor cli
-export PATH="$HOME/.local/bin:$PATH"
-
-export SCRCPY_SERVER_PATH=/Applications/极空间.app/Contents/Resources/app.asar.unpacked/bin/platform-tools/scrcpy-server
-export PATH=$PATH:/Applications/极空间.app/Contents/Resources/app.asar.unpacked/bin/platform-tools
-
 # Added by Antigravity
-export PATH="/Users/shanhonghao/.antigravity/antigravity/bin:$PATH"
-
+export PATH="/Users/honghao.shan/.antigravity/antigravity/bin:$PATH"
 
 # opencode
-export PATH=/Users/shanhonghao/.opencode/bin:$PATH
+export PATH=/Users/honghao.shan/.opencode/bin:$PATH
+
+# Kiro
+[[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"

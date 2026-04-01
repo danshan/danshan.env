@@ -83,3 +83,5 @@ node_modules
 
 homer-icons/
 .gitmodules
+
+.tool-versions

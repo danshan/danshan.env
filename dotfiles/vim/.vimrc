@@ -1460,3 +1460,8 @@ let g:airline#extensions#tabline#formatter = 'jsformatter'  " 设置默认tab栏
 "let g:indent_guides_auto_colors = 0 
 "autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=3 
 "autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=4
+
+"改变跳转列表行为的跳转列表
+set jumpoptions=stack
+
+nmap gi :action GotoImplementation<CR>
