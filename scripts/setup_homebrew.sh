@@ -2,12 +2,15 @@
 
 # Install and configure Homebrew
 
-printf "📦 Installing Homebrew...\n"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+printf "${COLOR_TITLE}📦 Installing Homebrew...${COLOR_RESET}\n"
 
 if test ! "$(command -v brew)"; then
-    printf "📦 Homebrew not installed. Installing.\n"
+    printf "${COLOR_SUBTITLE}📦 Homebrew not installed. Installing.${COLOR_RESET}\n"
     if [[ $(uname -s) = "Linux" ]] && [[ $(uname -m) = "aarch64" ]]; then
-        printf "⚠️  danshan.env doesn't support limited Linux-son-ARM yet."
+        printf "${COLOR_INFO}⚠️  danshan.env doesn't support limited Linux-son-ARM yet.${COLOR_RESET}"
         sleep 5
         exit
     elif [[ ${BREW_CN} ]]; then
@@ -19,7 +22,7 @@ if test ! "$(command -v brew)"; then
     fi
 fi
 
-printf "📦 Activating Homebrew on MacOS...\n"
+printf "${COLOR_SUBTITLE}📦 Activating Homebrew on MacOS...${COLOR_RESET}\n"
 if [[ $(uname -m) = "arm64" ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 else
@@ -29,4 +32,4 @@ fi
 brew tap localsend/localsend
 brew tap daipeihust/tap
 
-printf "✅ Homebrew setup complete.\n"
+printf "${COLOR_SUCCESS}✅ Homebrew setup complete.${COLOR_RESET}\n"

@@ -5,51 +5,49 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
-DOTFILES_DIR="${PROJECT_ROOT}/dotfiles"
-
-printf "⚙️  Configuring Shell...\n"
+printf "${COLOR_TITLE}⚙️  Configuring Shell...${COLOR_RESET}\n"
 case ${SHELL} in
 *zsh)
-    printf "⚙️  Configuring zsh...\n"
+    printf "${COLOR_SUBTITLE}⚙️  Configuring zsh...${COLOR_RESET}\n"
     pushd "${DOTFILES_DIR}"
     stow -v -R -t ~ zsh
     popd
     ;;
 *bash)
     if [[ $(bash --version | head -n1 | cut -d' ' -f4 | cut -d'.' -f1) -lt 5 ]]; then
-        printf "📦 Installing latest Bash...\n"
+        printf "${COLOR_SUBTITLE}📦 Installing latest Bash...${COLOR_RESET}\n"
         brew install bash bash-completion
     fi
-    printf "⚙️  Configuring bash...\n"
+    printf "${COLOR_SUBTITLE}⚙️  Configuring bash...${COLOR_RESET}\n"
     pushd "${DOTFILES_DIR}"
     stow -v -R -t ~ bash
     popd
     ;;
 esac
 
-printf "⚙️  Configuring vim...\n"
+printf "${COLOR_SUBTITLE}⚙️  Configuring vim...${COLOR_RESET}\n"
 pushd "${DOTFILES_DIR}"
 stow -v -R -t ~ vim
 popd
 
-printf "⚙️  Configuring fzf...\n"
+printf "${COLOR_SUBTITLE}⚙️  Configuring fzf...${COLOR_RESET}\n"
 pushd "${DOTFILES_DIR}"
 stow -v -R -t ~ fzf
 popd
 
-printf "⚙️  Configuring git...\n"
+printf "${COLOR_SUBTITLE}⚙️  Configuring git...${COLOR_RESET}\n"
 pushd "${DOTFILES_DIR}"
 stow -v -R -t ~ git
 popd
 
-printf "⚙️  Configuring screen...\n"
+printf "${COLOR_SUBTITLE}⚙️  Configuring screen...${COLOR_RESET}\n"
 pushd "${DOTFILES_DIR}"
 stow -v -R -t ~ screen
 popd
 
-printf "⚙️  Configuring neovim...\n"
+printf "${COLOR_SUBTITLE}⚙️  Configuring neovim...${COLOR_RESET}\n"
 if [ -d "${HOME}/.config/nvim" ]; then
-    printf "📦 Updating neovim config...\n"
+    printf "${COLOR_SUBTITLE}📦 Updating neovim config...${COLOR_RESET}\n"
     pushd ${HOME}/.config/nvim
     git pull
     popd
@@ -57,9 +55,9 @@ else
     git clone --depth=1 git@github.com:danshan/lazyvim.git ${HOME}/.config/nvim
 fi
 
-printf "⚙️  Configuring zed...\n"
+printf "${COLOR_SUBTITLE}⚙️  Configuring zed...${COLOR_RESET}\n"
 if [ -d "${HOME}/.config/zed" ]; then
-    printf "📦 Updating zed config...\n"
+    printf "${COLOR_SUBTITLE}📦 Updating zed config...${COLOR_RESET}\n"
     pushd ${HOME}/.config/zed
     git pull
     popd
@@ -67,25 +65,9 @@ else
     git clone --depth=1 git@github.com:danshan/zed-config.git ${HOME}/.config/zed
 fi
 
-printf "⚙️  Configuring pi...\n"
-pushd "${DOTFILES_DIR}"
-stow -v --no-fold -R -t ~ pi
-popd
-
-printf "⚙️  Configuring codex...\n"
-pushd "${DOTFILES_DIR}"
-stow -v --no-fold -R -t ~ codex
-popd
-
-printf "⚙️  Configuring claude...\n"
-pushd "${DOTFILES_DIR}"
-stow -v --no-fold -R -t ~ claude
-popd
-
-printf "⚙️  Configuring gemini...\n"
-pushd "${DOTFILES_DIR}"
-stow -v --no-fold -R -t ~ gemini
-popd
 
 
-printf "✅ Dotfiles configuration complete.\n"
+
+
+
+printf "${COLOR_SUCCESS}✅ Dotfiles configuration complete.${COLOR_RESET}\n"
