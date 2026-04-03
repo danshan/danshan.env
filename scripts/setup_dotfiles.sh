@@ -72,4 +72,20 @@ pushd "${DOTFILES_DIR}"
 stow -v --no-fold -R -t ~ pi
 popd
 
+printf "⚙️  Configuring codex...\n"
+pushd "${DOTFILES_DIR}"
+stow -v --no-fold -R -t ~ codex
+popd
+
+printf "⚙️  Configuring claude...\n"
+pushd "${DOTFILES_DIR}"
+stow -v --no-fold -R -t ~ claude
+popd
+
+printf "⚙️  Configuring gemini...\n"
+pushd "${DOTFILES_DIR}"
+stow -v --no-fold -R -t ~ gemini
+popd
+
+
 printf "✅ Dotfiles configuration complete.\n"
