@@ -123,15 +123,15 @@ alias fuckgfw='export https_proxy=http://127.0.0.1:6152;export http_proxy=http:/
 alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 
 # config for autojump
-[ -f $(brew --prefix)/etc/profile.d/autojump.sh ] && . $(brew --prefix)/etc/profile.d/autojump.sh
+test -e  $(brew --prefix)/etc/profile.d/autojump.sh && source $(brew --prefix)/etc/profile.d/autojump.sh
 
 
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # Plugins are now managed through oh-my-zsh plugins array above
-source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+test -e $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh && source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+test -e $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh && source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
@@ -168,5 +168,5 @@ export PATH=/Users/honghao.shan/.opencode/bin:$PATH
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
 
 # OpenClaw Completion
-source "${HOME}/.openclaw/completions/openclaw.zsh"
+test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.openclaw/completions/openclaw.zsh"
 
