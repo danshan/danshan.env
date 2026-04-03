@@ -4,6 +4,15 @@
 
 source ~/.zshrc 2>/dev/null || true
 
+printf "📦 Installing oh-my-tmux...\n"
+git clone https://github.com/gpakosz/.tmux.git "${HOME}/.config/oh-my-tmux" </dev/null
+ln -f -s "${HOME}/.config/oh-my-tmux/.tmux.conf" "${HOME}/.tmux.conf"
+ln -s -f "${PROJECT_ROOT}/dotfiles/tmux/.tmux.conf.local" "${HOME}/.tmux.conf.local"
+tmux source-file "${HOME}/.tmux.conf" </dev/null
+
+printf "📦 Installing uv...\n"
+curl -LsSf https://astral.sh/uv/install.sh | sh </dev/null
+
 printf "⚙️  Configuring asdf java...\n"
 asdf plugin add java
 

@@ -22,7 +22,7 @@ source "${SCRIPT_DIR}/scripts/setup_shell.sh"
 source "${SCRIPT_DIR}/scripts/install_packages.sh"
 
 # Step 4: Dotfiles configuration
-source "${SCRIPT_DIR}/scripts/configure_dotfiles.sh"
+source "${SCRIPT_DIR}/scripts/setup_dotfiles.sh"
 
 # Step 5: Development environment (asdf, npm tools)
 source "${SCRIPT_DIR}/scripts/setup_devenv.sh"
