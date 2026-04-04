@@ -1,7 +1,7 @@
 #!/bin/zsh #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
-source "${SCRIPT_DIR}/scripts/common.sh"
+INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
+source "${INSTALL_DIR}/scripts/common.sh"
 
 printf "${COLOR_TITLE}📦 Installing danshan.env${COLOR_RESET}\n"
 
@@ -14,19 +14,19 @@ else
 fi
 
 # Step 1: Homebrew
-source "${SCRIPT_DIR}/scripts/setup_homebrew.sh"
+source "${PROJECT_ROOT}/scripts/setup_homebrew.sh"
 
 # Step 2: Shell environment (oh-my-zsh)
-source "${SCRIPT_DIR}/scripts/setup_shell.sh"
+source "${PROJECT_ROOT}/scripts/setup_shell.sh"
 
 # Step 3: Packages (brew pkgs/casks, oh-my-tmux, uv)
-source "${SCRIPT_DIR}/scripts/install_packages.sh"
+source "${PROJECT_ROOT}/scripts/install_packages.sh"
 
 # Step 4: Dotfiles configuration
-source "${SCRIPT_DIR}/scripts/setup_dotfiles.sh"
+source "${PROJECT_ROOT}/scripts/setup_dotfiles.sh"
 
 # Step 5: Development environment (asdf, npm tools)
-source "${SCRIPT_DIR}/scripts/setup_devenv.sh"
+source "${PROJECT_ROOT}/scripts/setup_devenv.sh"
 
 ###################################################
 # Finished
