@@ -13,3 +13,8 @@ unfocused-split-opacity = 0.4
 scrollback-limit = 10000
 
 shell-integration-features = ssh-terminfo
+
+keybind=super+alt+j=goto_split:down
+keybind=super+alt+k=goto_split:up
+keybind=super+alt+h=goto_split:left
+keybind=super+alt+l=goto_split:right
