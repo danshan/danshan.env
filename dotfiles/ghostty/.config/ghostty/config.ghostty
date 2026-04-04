@@ -1,0 +1,15 @@
+theme = Catppuccin Frappe
+
+font-family = JetBrains Mono
+font-size = 16
+
+auto-update = off
+auto-update-channel = stable
+
+# Opacity for unfocused splits (0.0 to 1.0)
+unfocused-split-opacity = 0.4
+
+# Number of lines to keep in scrollback buffer
+scrollback-limit = 10000
+
+shell-integration-features = ssh-terminfo

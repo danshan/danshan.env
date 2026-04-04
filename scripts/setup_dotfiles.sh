@@ -65,9 +65,14 @@ else
     git clone --depth=1 git@github.com:danshan/zed-config.git ${HOME}/.config/zed
 fi
 
+printf "${COLOR_SUBTITLE}⚙️  Configuring ghostty...${COLOR_RESET}\n"
+pushd "${DOTFILES_DIR}"
+stow -v -R -t ~ ghostty
+popd
 
-
-
-
+printf "${COLOR_SUBTITLE}⚙️  Configuring cmux...${COLOR_RESET}\n"
+pushd "${DOTFILES_DIR}"
+stow -v -R -t ~ cmux
+popd
 
 printf "${COLOR_SUCCESS}✅ Dotfiles configuration complete.${COLOR_RESET}\n"

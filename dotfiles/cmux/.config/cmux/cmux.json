@@ -1,0 +1,13 @@
+{
+    "commands": [
+        {
+            "name": "fmq",
+            "keywords": [
+                "omo",
+                "opencode"
+            ],
+            "command": "cd ~/workspace/nio/fmq/fmq-workspace && cmux omo -c",
+            "confirm": true
+        }
+    ]
+}
