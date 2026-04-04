@@ -9,7 +9,7 @@ compinit
 #
 # install Command Line Tools
 # xcode-select --install
-# 
+#
 # install software manager homebrew(maybe very slowly - you can use cellular)
 #
 # /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -170,3 +170,5 @@ export PATH=/Users/honghao.shan/.opencode/bin:$PATH
 # OpenClaw Completion
 test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.openclaw/completions/openclaw.zsh"
 
+# Starship
+eval "$(starship init zsh)"

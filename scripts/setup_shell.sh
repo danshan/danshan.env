@@ -12,4 +12,11 @@ else
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
+printf "${COLOR_TITLE}📦 Installing starship...${COLOR_RESET}\n"
+brew install --quiet starship </dev/null
+printf "${COLOR_SUBTITLE}⚙️  Configuring statship...${COLOR_RESET}\n"
+pushd "${DOTFILES_DIR}"
+stow -v -R -t ~ starship
+popd
+
 printf "${COLOR_SUCCESS}✅ Shell environment setup complete.${COLOR_RESET}\n"

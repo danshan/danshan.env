@@ -24,3 +24,4 @@ im-select
 asdf
 gron
 stow
+starship
