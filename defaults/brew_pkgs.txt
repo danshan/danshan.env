@@ -25,3 +25,5 @@ asdf
 gron
 stow
 starship
+gh
+agent-browser

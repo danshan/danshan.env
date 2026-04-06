@@ -80,6 +80,7 @@ export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export PATH="$PATH:$HOME/.bin"
 export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:/usr/local/go/bin"
+export PATH="$PATH:$HOME/.bun/bin"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -172,3 +173,5 @@ test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.opencla
 
 # Starship
 eval "$(starship init zsh)"
+
+

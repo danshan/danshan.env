@@ -85,3 +85,11 @@ homer-icons/
 .gitmodules
 
 .tool-versions
+
+
+# APM dependencies
+apm_modules/
+.github
+.codex
+.claude
+.gemini
