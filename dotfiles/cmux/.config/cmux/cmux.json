@@ -1,13 +1,125 @@
 {
     "commands": [
         {
-            "name": "fmq",
+            "name": "Standard",
             "keywords": [
-                "omo",
-                "opencode"
+                "standards",
+                "nio"
             ],
-            "command": "cd ~/workspace/nio/fmq/fmq-workspace && cmux omo -c",
-            "confirm": true
+            "comfirm": true,
+            "workspace": {
+                "name": "Standards",
+                "cwd": "~/workspace/nio/qst/standards/standards-workspace",
+                "layout": {
+                    "direction": "horizontal",
+                    "split": 0.5,
+                    "children": [
+                        {
+                            "pane": {
+                                "surfaces": [
+                                    {
+                                        "type": "terminal",
+                                        "name": "Claude Code",
+                                        "command": "claude",
+                                        "focus": true
+                                    },
+                                    {
+                                        "type": "terminal",
+                                        "name": "Codex",
+                                        "command": "codex"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "direction": "vertical",
+                            "split": 0.5,
+                            "children": [
+                                {
+                                    "pane": {
+                                        "surfaces": [
+                                            {
+                                                "type": "terminal",
+                                                "name": "Yazi",
+                                                "command": "yazi"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "pane": {
+                                        "surfaces": [
+                                            {
+                                                "type": "terminal",
+                                                "name": "LazyGit",
+                                                "command": "lazygit"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "FMQ",
+            "keywords": [
+                "fmq",
+                "nio"
+            ],
+            "comfirm": true,
+            "workspace": {
+                "name": "FMQ",
+                "cwd": "~/workspace/nio/qst/fmq/fmq-workspace",
+                "layout": {
+                    "direction": "horizontal",
+                    "split": 0.5,
+                    "children": [
+                        {
+                            "pane": {
+                                "surfaces": [
+                                    {
+                                        "type": "terminal",
+                                        "name": "Claude Code",
+                                        "command": "claude",
+                                        "focus": true
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "direction": "vertical",
+                            "split": 0.5,
+                            "children": [
+                                {
+                                    "pane": {
+                                        "surfaces": [
+                                            {
+                                                "type": "terminal",
+                                                "name": "Yazi",
+                                                "command": "yazi"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "pane": {
+                                        "surfaces": [
+                                            {
+                                                "type": "terminal",
+                                                "name": "LazyGit",
+                                                "command": "lazygit"
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
         }
     ]
 }

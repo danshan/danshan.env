@@ -1,7 +1,8 @@
-theme = Catppuccin Frappe
+#theme = Catppuccin Frappe
+#theme = Dracula
 
 font-family = JetBrains Mono
-font-size = 16
+font-size = 14
 
 auto-update = off
 auto-update-channel = stable
@@ -10,11 +11,16 @@ auto-update-channel = stable
 unfocused-split-opacity = 0.4
 
 # Number of lines to keep in scrollback buffer
-scrollback-limit = 10000
+scrollback-limit = 10000000
 
 shell-integration-features = ssh-terminfo
+shell-integration = zsh
+quick-terminal-animation-duration = 0.1
 
 keybind=super+alt+j=goto_split:down
 keybind=super+alt+k=goto_split:up
 keybind=super+alt+h=goto_split:left
 keybind=super+alt+l=goto_split:right
+
+keybind=ctrl+backquote=toggle_quick_terminal
+

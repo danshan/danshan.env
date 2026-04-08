@@ -1375,6 +1375,10 @@ Plugin 'vim-airline/vim-airline-themes'	" 主题插件
 Plugin 'w0ng/vim-hybrid'
 Plugin 'catppuccin/vim'
 
+" auto pairs
+Plugin 'jiangmiao/auto-pairs'
+
+
 " vim-scripts repos
 "Bundle 'L9'
 "Bundle 'FuzzyFinder'

@@ -98,4 +98,11 @@ pushd "${DOTFILES_DIR}"
 stow -v --no-fold -R -t ~ pi
 popd
 
+# install context7
+bun install -g ctx7
+ctx7 setup --cli --universal
+
+
+
 printf "${COLOR_SUCCESS}✅ Development environment setup complete.${COLOR_RESET}\n"
+
