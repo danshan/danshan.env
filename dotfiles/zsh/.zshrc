@@ -171,5 +171,3 @@ test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.opencla
 # Starship
 eval "$(starship init zsh)"
 
-
-alias claudesidian='(cd "/Users/honghao.shan/Documents/claudesidian" && (claude --resume 2>/dev/null || claude))'

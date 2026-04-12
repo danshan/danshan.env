@@ -1,5 +1,4 @@
 sublime-text|Sublime Text
-iterm2|iTerm 
 surge|Surge
 wechat|WeChat
 telegram|Telegram
