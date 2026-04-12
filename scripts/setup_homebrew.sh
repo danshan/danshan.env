@@ -29,7 +29,4 @@ else
     eval "$(/usr/local/Homebrew/bin/brew shellenv)"
 fi
 
-brew tap localsend/localsend
-brew tap daipeihust/tap
-
 printf "${COLOR_SUCCESS}✅ Homebrew setup complete.${COLOR_RESET}\n"

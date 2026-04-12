@@ -33,4 +33,4 @@ chatgpt-atlas|ChatGPT Altas
 obsidian|Obsidian
 1password|1Password
 antigravity|Antigravity
-
+ghostty|Ghostty

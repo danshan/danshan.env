@@ -16,11 +16,11 @@ diff-so-fancy
 lazygit
 tree
 scrcpy
-localsend
+localsend/localsend/localsend
 coreutils
 1password-cli
 adsf
-im-select
+daipeihust/tap/im-select
 asdf
 gron
 stow
