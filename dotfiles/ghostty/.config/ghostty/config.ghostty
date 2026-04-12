@@ -3,6 +3,7 @@
 
 font-family = JetBrains Mono
 font-size = 14
+font-thicken = true
 
 auto-update = off
 auto-update-channel = stable

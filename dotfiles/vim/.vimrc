@@ -1378,6 +1378,8 @@ Plugin 'catppuccin/vim'
 " auto pairs
 Plugin 'jiangmiao/auto-pairs'
 
+" theme
+Plugin 'ThorstenRhau/token'
 
 " vim-scripts repos
 "Bundle 'L9'
