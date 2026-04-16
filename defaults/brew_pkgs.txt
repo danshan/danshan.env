@@ -27,3 +27,4 @@ stow
 starship
 gh
 agent-browser
+fastfetch
