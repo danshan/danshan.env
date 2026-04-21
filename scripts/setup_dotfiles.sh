@@ -23,6 +23,14 @@ case ${SHELL} in
     stow -v -R -t ~ bash
     popd
     ;;
+*fish)
+    printf "${COLOR_SUBTITLE}⚙️  Configuring fish...${COLOR_RESET}\n"
+    pushd "${DOTFILES_DIR}"
+    stow -v -R -t ~ fish
+    popd
+    # install fisher https://github.com/jorgebucaran/fisher
+    fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
+    ;;
 esac
 
 printf "${COLOR_SUBTITLE}⚙️  Configuring vim...${COLOR_RESET}\n"
@@ -80,9 +88,10 @@ pushd "${DOTFILES_DIR}"
 stow -v -R -t ~ fastfetch
 popd
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring fish...${COLOR_RESET}\n"
+printf "${COLOR_SUBTITLE}⚙️  Configuring bat...${COLOR_RESET}\n"
 pushd "${DOTFILES_DIR}"
-stow -v -R -t ~ fish
+stow -v -R -t ~ bat
 popd
+
 
 printf "${COLOR_SUCCESS}✅ Dotfiles configuration complete.${COLOR_RESET}\n"
