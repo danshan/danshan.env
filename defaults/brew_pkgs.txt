@@ -28,3 +28,7 @@ starship
 gh
 agent-browser
 fastfetch
+fish
+zoxide
+fd
+bat

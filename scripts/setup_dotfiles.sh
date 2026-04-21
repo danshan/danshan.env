@@ -75,4 +75,14 @@ pushd "${DOTFILES_DIR}"
 stow -v -R -t ~ cmux
 popd
 
+printf "${COLOR_SUBTITLE}⚙️  Configuring fastfetch...${COLOR_RESET}\n"
+pushd "${DOTFILES_DIR}"
+stow -v -R -t ~ fastfetch
+popd
+
+printf "${COLOR_SUBTITLE}⚙️  Configuring fish...${COLOR_RESET}\n"
+pushd "${DOTFILES_DIR}"
+stow -v -R -t ~ fish
+popd
+
 printf "${COLOR_SUCCESS}✅ Dotfiles configuration complete.${COLOR_RESET}\n"

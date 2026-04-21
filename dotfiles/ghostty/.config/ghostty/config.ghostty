@@ -1,4 +1,4 @@
-#theme = Catppuccin Frappe
+theme = Catppuccin Frappe
 #theme = Dracula
 
 font-family = JetBrains Mono
@@ -15,7 +15,7 @@ unfocused-split-opacity = 0.4
 scrollback-limit = 10000000
 
 shell-integration-features = ssh-terminfo
-shell-integration = zsh
+shell-integration = fish
 quick-terminal-animation-duration = 0.1
 
 keybind=super+alt+j=goto_split:down

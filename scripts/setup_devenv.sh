@@ -103,5 +103,9 @@ printf "${COLOR_SUBTITLE}⚙️  Configuring context7...${COLOR_RESET}\n"
 bun install -g ctx7
 ctx7 setup --cli --universal
 
+printf "${COLOR_SUBTITLE}⚙️  Configuring playwright-cli...${COLOR_RESET}\n"
+npm install -g @playwright/cli@latest
+
+
 printf "${COLOR_SUCCESS}✅ Development environment setup complete.${COLOR_RESET}\n"
 

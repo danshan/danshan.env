@@ -171,3 +171,5 @@ test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.opencla
 # Starship
 eval "$(starship init zsh)"
 
+# claude 
+alias claude="claude --dangerously-skip-permissions"
