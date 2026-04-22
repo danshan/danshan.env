@@ -336,77 +336,6 @@ if has("gui_running")
     set guioptions-=L   " 关闭垂直分隔窗口左边滚动条
     set guioptions-=r   " 关闭右边滚动条
     set guioptions-=R   " 关闭垂直分隔窗口右边滚动条
-
-    if MySys()=="win32"
-        " "autocmd" / "au" 定义自动命令
-        "注意: ":autocmd" 命令不能有其他命令紧跟其后,因为"|"
-        "命令是该命令的一个组成部分.
-        "
-        " ":au[tocmd] [group] {event} {pat} [nested] {cmd}"
-        "把 {cmd} 加到 Vim 在匹配 {pat} 模式的文件执行 {event}
-        "事件时自动执行的命令列表.Vim 把 {cmd} 加到已有的自动
-        "命令之后,从而使自动命令的执行顺序与其定义的顺序相同.
-        "关于 [nested],参见 "autocmd-nested".
-
-        "注意 ":autocmd" 的参数里的特殊字符 (例如, "%", "<cword>")
-        "在定义时不会被扩展,而是在事件发生并执行 {cmd} 的时候才
-        "进行.唯一的例外是 "<sfile>" 在定义时扩展.
-        "
-        " "GUIEnter" 成功启动 GUI 并打开窗口后自动命令事件.用
-        " gvim 的时候,它在 VimEnter 之前发生.在 .gvimrc 里可用
-        " 它来定位窗口:
-        "   ":autocmd GUIEnter * winpos 100 50"
-        "
-        " "si" / "simalt" 模拟 Alt-{key} 组合键.
-        " ":si[malt] {key}"
-        " {仅适用 Win32 版本}
-        "
-        "正常情况下,为了增加键映射 (map) 的数量,Vim 控制所有
-        "Alt-{key} 组合键.但是这样做可能与用 Alt-{key} 访问菜单
-        "的标准方法冲突.一个快速的解决办法是:设置 "winaltkeys"
-        "选项的值为 "yes".但是这样阻止了所有与Alt 键有关的映射.
-        "另一个办法是:设置 "winaltkeys" 选项为 "menu".这样与菜
-        "单有关的快捷键有 Windows 管理,其余的与 Alt 相关的映射
-        "仍然好用.但这样又产生了对当前状态的依赖性.
-        "要解决这个问题,就要用 ":simalt" 命令告诉 Vim
-        "( "winaltkeys" 不要设置为 "yes") 虚拟一个 Windows 风
-        "格的 Alt 按键行为.你可以用它来映射 Alt 组合键 (或者任
-        "何其它键) 来产生标准的 Windows 操作.下面是一些例子:
-        "   ":map <M-f> :simalt f<CR>"
-        "这个命令通过把 Alt-F 映射为模拟按键的 Alt 和 F,使你按
-        "下 Alt-F 时弹出 "文件" 菜单 (对于缺省的 Menu.vim 而言)
-        "   ":map <M-Space> :simalt ~<CR>"
-        "这个命令通过映射 Alt-Space 弹出 Vim 窗口的系统菜单.
-        "注意: ~ 在 simalt 命令里代表 <Space> (空格).
-        "   ":map <C-n> :simalt ~n<CR>"
-        "把 CTRL-N 映射成 Alt-Space + N.也就是打开窗口的系统菜
-        "单,然后按 N,最小化 Vim窗口
-        "
-        "这个选项是模拟弹出菜单中使用最大化的快捷键 "x"
-        if has("autocmd")
-            au GUIEnter * simalt ~x
-        endif
-
-    endif " end of if MySys()=="win32"
-
-    " "colorscheme" / "colo" 载入色彩方案
-    " ":colo[rscheme] {name}"
-    "载入色彩方案 {name}.
-    "它会在 'runtimepath' 里搜索 "colors/{name}.vim",载入第一
-    "个找到的文件.
-    "要看到当前激活的色彩方案的名字 (如果有的话):
-    "   ":echo g:colors_name"
-    "它不能递归调用,所以你不能在色彩方案脚本里使用 ":colorscheme"
-    "色彩方案载入后"激活 "ColorScheme" 自动命令事件.关于如何
-    "编写色彩方案文件的信息:
-    "   ":edit $VIMRUNTIME/colors/README.txt"
-    if v:version > 601
-        colorscheme torte
-    endif
-else
-    if v:version > 601
-        colorscheme torte
-    endif
 endif "end of if has("gui_running")
 
 "当打开的文档中含有多种语言的时候,单一使用某一种文件类型的高亮
@@ -1426,6 +1355,7 @@ call vundle#end() " required
 map <leader>e :NERDTreeToggle<CR>
 
 " airline
+let g:airline_theme = 'catppuccin_frappe'
 let g:airline#extensions#tabline#enabled = 1                " 设置开启tab样式
 let g:airline#extensions#tabline#formatter = 'jsformatter'  " 设置默认tab栏样式
 
