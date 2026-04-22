@@ -57,3 +57,9 @@ alias copilot="copilot --yolo"
 alias subl="'/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl'"
 # VSCode
 alias code="'/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code'"
+
+# history
+function history
+    builtin history --show-time="%F %T " $argv
+end
+
