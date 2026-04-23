@@ -1,6 +1,6 @@
 #!/bin/zsh #!/bin/bash
 
-# Install brew packages, casks, oh-my-tmux, and uv
+# Install brew casks
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
@@ -12,17 +12,7 @@ else
     eval "$(/usr/local/Homebrew/bin/brew shellenv)" 2>/dev/null || true
 fi
 
-printf "${COLOR_TITLE}📦 Configuring Completions in zsh...${COLOR_RESET}\n"
-brew cleanup && rm -f $ZSH_COMPDUMP && omz reload
-
-printf "${COLOR_TITLE}📦 Installing essential danshan.env toolchains...${COLOR_RESET}\n"
-brew update
-
-while IFS= read -r pkg; do
-    [[ -z "$pkg" ]] && continue
-    printf "${COLOR_INFO}📦 Installing homebrew package: ${pkg}${COLOR_RESET}\n"
-    brew install --quiet "$pkg" </dev/null
-done < "${PROJECT_ROOT}/defaults/brew_pkgs.txt"
+printf "${COLOR_TITLE}📦 Installing homebrew casks...${COLOR_RESET}\n"
 
 while IFS= read -r pkg; do
     [[ -z "$pkg" ]] && continue
@@ -36,4 +26,4 @@ while IFS= read -r pkg; do
     fi
 done < "${PROJECT_ROOT}/defaults/brew_casks.txt"
 
-printf "${COLOR_SUCCESS}✅ Package installation complete.${COLOR_RESET}\n"
+printf "${COLOR_SUCCESS}✅ Homebrew casks installation complete.${COLOR_RESET}\n"
