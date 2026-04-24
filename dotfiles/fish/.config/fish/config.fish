@@ -1,7 +1,7 @@
 set fish_greeting
 
 if status is-interactive
-    eval (zellij setup --generate-auto-start fish | string collect)
+    #eval (zellij setup --generate-auto-start fish | string collect)
 end
 
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
@@ -14,6 +14,8 @@ export PATH="$PATH:$HOME/.bun/bin"
 export HOMEBREW_INSTALL_FROM_API=1
 export HOMEBREW_NO_AUTO_UPDATE=true # no update when use brew
 eval $(/opt/homebrew/bin/brew shellenv)
+
+
 
 # ASDF https://asdf-vm.com/
 if test -z $ASDF_DATA_DIR
@@ -37,6 +39,7 @@ zoxide init fish | source
 
 # fzf https://github.com/junegunn/fzf
 fzf --fish | source
+set fzf_history_time_format '%Y-%m-%d %H:%M:%S'
 
 # Http Proxy
 function fuckgfw
@@ -62,4 +65,7 @@ alias code="'/Applications/Visual Studio Code.app/Contents/Resources/app/bin/cod
 function history
     builtin history --show-time="%F %T " $argv
 end
+
+# fzf.fish https://github.com/PatrickF1/fzf.fish
+fzf_configure_bindings --directory=ctrl-f
 
