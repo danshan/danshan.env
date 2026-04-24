@@ -72,5 +72,8 @@ stow -v -R -t ~ bat
 printf "${COLOR_SUBTITLE}⚙️  Configuring zellij...${COLOR_RESET}\n"
 stow -v -R -t ~ zellij
 
+printf "${COLOR_SUBTITLE}⚙️  Configuring fd...${COLOR_RESET}\n"
+stow -v -R -t ~ fd
+
 popd
 printf "${COLOR_SUCCESS}✅ Dotfiles configuration complete.${COLOR_RESET}\n"
