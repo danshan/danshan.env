@@ -20,7 +20,8 @@ source "${PROJECT_ROOT}/scripts/setup_homebrew.sh"
 source "${PROJECT_ROOT}/scripts/setup_shell.sh"
 
 # Step 3: Packages (brew pkgs/casks, oh-my-tmux, uv)
-source "${PROJECT_ROOT}/scripts/install_packages.sh"
+source "${PROJECT_ROOT}/scripts/install_brew_pkgs.sh"
+source "${PROJECT_ROOT}/scripts/install_brew_casks.sh"
 
 # Step 4: Dotfiles configuration
 source "${PROJECT_ROOT}/scripts/setup_dotfiles.sh"

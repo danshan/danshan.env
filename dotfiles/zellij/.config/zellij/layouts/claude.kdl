@@ -1,0 +1,12 @@
+layout {
+    pane split_direction="vertical" {
+        pane {
+            command "claude"
+            args "-c"
+        }
+        pane split_direction="horizontal" {
+            pane command="yazi"
+            pane
+        }
+    }
+}
