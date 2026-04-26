@@ -106,6 +106,10 @@ ctx7 setup --cli --universal
 printf "${COLOR_SUBTITLE}⚙️  Configuring playwright-cli...${COLOR_RESET}\n"
 npm install -g @playwright/cli@latest
 
+printf "${COLOR_SUBTITLE}⚙️  Configuring neovim...${COLOR_RESET}\n"
+pushd "${DOTFILES_DIR}"
+stow -v -R -t ~ nvim
+popd
 
 printf "${COLOR_SUCCESS}✅ Development environment setup complete.${COLOR_RESET}\n"
 
