@@ -311,7 +311,7 @@ theme "catppuccin-frappe"
 // The folder in which Zellij will look for layouts
 // (Requires restart)
 // 
-// layout_dir ""
+// layout_dir "/Users/shanhonghao/.config/zellij/layouts"
  
 // The folder in which Zellij will look for themes
 // (Requires restart)

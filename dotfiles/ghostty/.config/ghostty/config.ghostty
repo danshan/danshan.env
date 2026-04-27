@@ -25,4 +25,6 @@ keybind=super+alt+l=goto_split:right
 
 keybind=ctrl+backquote=toggle_quick_terminal
 
+# https://github.com/KroneCorylus/ghostty-shader-playground/
 custom-shader = "~/.config/ghostty/shaders/cursor_smear.glsl"
+
