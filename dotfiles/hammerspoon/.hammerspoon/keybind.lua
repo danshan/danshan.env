@@ -1,0 +1,69 @@
+local wm = require("modules/windows")
+local hk = require("hs.hotkey")
+
+-- launch and focus applications with below shortkey
+hs.fnutils.each({
+	{ key = "`", app = "Ghostty" },
+	{ key = ",", app = "Obsidian" },
+	{ key = ".", app = "Superset" },
+	{ key = "/", app = "Finder" },
+	{ key = "1", app = "Google Chrome" },
+	{ key = "2", app = "Safari" },
+	{ key = "3", app = "Feishu" },
+	{ key = "4", app = "WeChat" },
+	{ key = "5", app = "Discord" },
+
+	{ key = "d", app = "WebStorm" },
+	{ key = "e", app = "Sublime Text" },
+	{ key = "m", app = "QQMusic" },
+	{ key = "n", app = "Telegram" },
+	{ key = "p", app = "PyCharm" },
+	{ key = "s", app = "IntelliJ IDEA" },
+	{ key = "v", app = "Visual Studio Code" },
+	-- { key = "w", app = "KeePassXC" },
+	-- { key = "w", app = "Strongbox" },
+	{ key = "w", app = "1Password" },
+	{ key = "z", app = "极空间" },
+}, function(object)
+	launchApp(KEYS.app, object)
+end)
+
+-- reload hammerspoon config
+hs.hotkey.bind(KEYS.app, "b", function()
+	hs.reload()
+end)
+
+local function windowBind(hyper, keyFuncTable)
+	hs.fnutils.each(keyFuncTable, function(object)
+		hk.bind(hyper, object.key, object.module)
+	end)
+end
+
+------------------------------------------------------------
+-- Window resize
+------------------------------------------------------------
+
+windowBind(KEYS.resize, {
+	{ key = "m", module = wm.maximizeWindow },
+	{ key = "left", module = wm.leftHalfWindow },
+	{ key = "h", module = wm.leftHalfWindow },
+	{ key = "right", module = wm.rightHalfWindow },
+	{ key = "l", module = wm.rightHalfWindow },
+	{ key = "up", module = wm.upHalfWindow },
+	{ key = "k", module = wm.upHalfWindow },
+	{ key = "down", module = wm.downHalfWindow },
+	{ key = "j", module = wm.downHalfWindow },
+	{ key = "-", module = wm.smallerWindow },
+	{ key = "=", module = wm.largeWindow },
+})
+
+------------------------------------------------------------
+-- Window movement
+------------------------------------------------------------
+
+windowBind(KEYS.movement, {
+	{ key = "h", module = wm.moveToLeftScreen },
+	{ key = "l", module = wm.moveToRightScreen },
+	{ key = "k", module = wm.moveToUpScreen },
+	{ key = "j", module = wm.moveToDownScreen },
+})

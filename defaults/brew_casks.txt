@@ -1,7 +1,6 @@
 sublime-text|Sublime Text
 surge|Surge
 wechat|WeChat
-telegram|Telegram
 feishu|Feishu
 intellij-idea|IntelliJ IDEA
 pycharm|PyCharm

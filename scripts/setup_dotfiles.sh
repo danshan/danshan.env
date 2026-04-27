@@ -75,5 +75,8 @@ stow -v -R -t ~ zellij
 printf "${COLOR_SUBTITLE}⚙️  Configuring fd...${COLOR_RESET}\n"
 stow -v -R -t ~ fd
 
+printf "${COLOR_SUBTITLE}⚙️  Configuring hammerspoon...${COLOR_RESET}\n"
+stow -v -R -t ~ hammerspoon
+
 popd
 printf "${COLOR_SUCCESS}✅ Dotfiles configuration complete.${COLOR_RESET}\n"
