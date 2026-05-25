@@ -32,3 +32,4 @@ fish
 zoxide
 fd
 bat
+witr

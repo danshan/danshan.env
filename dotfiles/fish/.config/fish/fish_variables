@@ -10,3 +10,4 @@ SETUVAR --export fifc_editor:vim
 SETUVAR fifc_fd_opts:\x2d\x2dhidden
 SETUVAR fifc_keybinding:\x18
 SETUVAR fifc_open_keybinding:ctrl\x2do
+SETUVAR fish_user_paths:/Users/honghao\x2eshan/\x2eantigravity\x2dide/antigravity\x2dide/bin

@@ -31,3 +31,5 @@ obsidian|Obsidian
 1password|1Password
 antigravity|Antigravity
 ghostty|Ghostty
+detachhead/tap/rebased|Rebased
+

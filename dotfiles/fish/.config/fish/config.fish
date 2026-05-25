@@ -69,3 +69,9 @@ end
 # fzf.fish https://github.com/PatrickF1/fzf.fish
 fzf_configure_bindings --directory=ctrl-f
 
+# OpenSpec
+export OPENSPEC_TELEMETRY=0
+
+
+# Added by Antigravity IDE
+fish_add_path /Users/honghao.shan/.antigravity-ide/antigravity-ide/bin
