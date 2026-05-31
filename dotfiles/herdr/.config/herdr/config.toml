@@ -1,3 +1,5 @@
+# https://herdr.dev/docs/configuration/#agent-session-restore
+
 onboarding = false
 
 [theme]
@@ -10,6 +12,12 @@ show_agent_labels_on_pane_borders = false
 [worktrees]
 directory = "~/.Documents/worktrees"
 
+[experimental]
+pane_history = true
+
+[session]
+resume_agents_on_restore = true
+
 [[keys.command]]
 key = "prefix+g"
 type = "pane"
@@ -19,3 +27,5 @@ command = "lazygit"
 key = "prefix+y"
 type = "pane"
 command = "yazi"
+
+
