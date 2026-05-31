@@ -75,3 +75,31 @@ export OPENSPEC_TELEMETRY=0
 
 # Added by Antigravity IDE
 fish_add_path /Users/honghao.shan/.antigravity-ide/antigravity-ide/bin
+
+# Codex app proxy
+function codex-app
+    set -x ALL_PROXY http://127.0.0.1:6152
+    set -x all_proxy http://127.0.0.1:6152
+    set -x http_proxy http://127.0.0.1:6152
+    set -x https_proxy http://127.0.0.1:6152
+    set -x HTTP_PROXY http://127.0.0.1:6152
+    set -x HTTPS_PROXY http://127.0.0.1:6152
+    set -x npm_config_proxy http://127.0.0.1:6152
+    set -x npm_config_https_proxy http://127.0.0.1:6152
+
+    nohup /Applications/Codex.app/Contents/MacOS/Codex >/dev/null 2>&1 &
+end
+
+function chatgpt-app 
+    set -x ALL_PROXY http://127.0.0.1:6152
+    set -x all_proxy http://127.0.0.1:6152
+    set -x http_proxy http://127.0.0.1:6152
+    set -x https_proxy http://127.0.0.1:6152
+    set -x HTTP_PROXY http://127.0.0.1:6152
+    set -x HTTPS_PROXY http://127.0.0.1:6152
+    set -x npm_config_proxy http://127.0.0.1:6152
+    set -x npm_config_https_proxy http://127.0.0.1:6152
+
+    nohup /Applications/ChatGPT/Contents/MacOS/ChatGPT >/dev/null 2>&1 &
+end
+

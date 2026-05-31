@@ -1,0 +1,21 @@
+onboarding = false
+
+[theme]
+name = "catppuccin"
+
+[ui]
+agent_panel_scope = "all"
+show_agent_labels_on_pane_borders = false
+
+[worktrees]
+directory = "~/.Documents/worktrees"
+
+[[keys.command]]
+key = "prefix+g"
+type = "pane"
+command = "lazygit"
+
+[[keys.command]]
+key = "prefix+y"
+type = "pane"
+command = "yazi"

@@ -90,7 +90,7 @@ printf "${COLOR_SUBTITLE}📦 Install Oh-My-OpenAgent...${COLOR_RESET}\n"
 bun add -g oh-my-openagent@latest
 
 # install pi-coding-agent
-printf "${COLOR_TITLE}📦 Configuring PI...${COLOR_RESET}\n"
+printf "${COLOR_TITLE}⚙️  Install PI...${COLOR_RESET}\n"
 bun add -g @mariozechner/pi-coding-agent@latest
 
 printf "${COLOR_SUBTITLE}⚙️  Configuring pi...${COLOR_RESET}\n"
@@ -99,16 +99,27 @@ stow -v --no-fold -R -t ~ pi
 popd
 
 # install context7
-printf "${COLOR_SUBTITLE}⚙️  Configuring context7...${COLOR_RESET}\n"
+printf "${COLOR_SUBTITLE}⚙️  Install context7...${COLOR_RESET}\n"
 bun install -g ctx7
+printf "${COLOR_SUBTITLE}⚙️  Configuring context7...${COLOR_RESET}\n"
 ctx7 setup --cli --universal
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring playwright-cli...${COLOR_RESET}\n"
+printf "${COLOR_SUBTITLE}⚙️  Install playwright-cli...${COLOR_RESET}\n"
 npm install -g @playwright/cli@latest
 
 printf "${COLOR_SUBTITLE}⚙️  Configuring neovim...${COLOR_RESET}\n"
 pushd "${DOTFILES_DIR}"
 stow -v -R -t ~ nvim
+popd
+
+
+# install herdr
+printf "${COLOR_TITLE}📦 Install herdr...${COLOR_RESET}\n"
+curl -fsSL https://herdr.dev/install.sh | sh
+
+printf "${COLOR_SUBTITLE}⚙️  Configuring herdr...${COLOR_RESET}\n"
+pushd "${DOTFILES_DIR}"
+stow -v --no-fold -R -t ~ herdr
 popd
 
 printf "${COLOR_SUCCESS}✅ Development environment setup complete.${COLOR_RESET}\n"
