@@ -49,7 +49,7 @@ function fuckgfw
     set -gx no_proxy localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
 end
 function noproxy
-    unset http_proxy https_proxy all_proxy no_proxy
+    set -e http_proxy https_proxy all_proxy no_proxy
 end
 
 # Claude Code

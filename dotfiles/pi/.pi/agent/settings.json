@@ -1,6 +1,17 @@
 {
-  "lastChangelogVersion": "0.65.2",
+  "lastChangelogVersion": "0.73.0",
   "theme": "dark",
   "defaultProvider": "custom-endpoint",
-  "defaultModel": "glm-4.5-air"
+  "defaultModel": "glm-4.5-air",
+  "packages": [
+    "npm:context-mode",
+    "npm:pi-web-access",
+    "npm:pi-subagents",
+    "npm:pi-mcp-adapter",
+    "npm:pi-simplify",
+    "npm:pi-lens",
+    "npm:@narumitw/pi-statusline",
+    "npm:pi-agent-browser-native",
+    "npm:pi-chrome"
+  ]
 }
