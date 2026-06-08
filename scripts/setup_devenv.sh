@@ -91,7 +91,7 @@ bun add -g oh-my-openagent@latest
 
 # install pi-coding-agent
 printf "${COLOR_TITLE}⚙️  Install PI...${COLOR_RESET}\n"
-bun add -g @mariozechner/pi-coding-agent@latest
+bun add -g @earendil-works/pi-coding-agent
 
 printf "${COLOR_SUBTITLE}⚙️  Configuring pi...${COLOR_RESET}\n"
 pushd "${DOTFILES_DIR}"

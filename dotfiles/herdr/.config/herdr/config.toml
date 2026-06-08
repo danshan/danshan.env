@@ -18,6 +18,10 @@ pane_history = true
 [session]
 resume_agents_on_restore = true
 
+[keys]
+split_vertical = "prefix+ctrl+v"
+split_horizontal = "prefix+ctrl+h"
+
 [[keys.command]]
 key = "prefix+ctrl+g"
 type = "pane"

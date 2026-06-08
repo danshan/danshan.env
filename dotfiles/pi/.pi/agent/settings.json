@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.73.0",
+  "lastChangelogVersion": "0.78.0",
   "theme": "dark",
   "defaultProvider": "custom-endpoint",
   "defaultModel": "glm-4.5-air",
