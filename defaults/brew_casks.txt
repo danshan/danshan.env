@@ -33,4 +33,4 @@ antigravity|Antigravity
 ghostty|Ghostty
 detachhead/tap/rebased|Rebased
 muxy-app/tap/muxy|Muxy
-
+thaw/Thaw
