@@ -14,6 +14,7 @@ directory = "~/.Documents/worktrees"
 
 [experimental]
 pane_history = true
+switch_ascii_input_source_in_prefix = true
 
 [session]
 resume_agents_on_restore = true
@@ -32,4 +33,6 @@ key = "prefix+ctrl+y"
 type = "pane"
 command = "yazi"
 
+[advanced]
+scrollback_limit_bytes = 10485760
 
