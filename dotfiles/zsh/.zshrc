@@ -173,3 +173,4 @@ eval "$(starship init zsh)"
 
 # claude 
 alias claude="claude --dangerously-skip-permissions"
+
