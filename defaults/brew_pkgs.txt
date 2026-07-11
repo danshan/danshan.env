@@ -21,7 +21,6 @@ coreutils
 1password-cli
 adsf
 daipeihust/tap/im-select
-asdf
 gron
 stow
 starship
