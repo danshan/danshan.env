@@ -72,7 +72,7 @@ ZSH_CUSTOM="${HOME}/Library/CloudStorage/ZSpace/mac/.oh-my-zshrc"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git ssh-agent history extract zsh-autosuggestions oc kubectl helm)
-plugins=(git history extract zsh-autosuggestions zsh-syntax-highlighting mvn httpie aliases asdf)
+plugins=(git history extract zsh-autosuggestions zsh-syntax-highlighting mvn httpie aliases)
 
 # User configuration
 
@@ -134,6 +134,9 @@ test -e $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh 
 export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
 
+# mise 
+eval "$(mise activate zsh)"
+
 # maven
 export MVNW_VERBOSE=true
 
@@ -149,15 +152,6 @@ export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
 
 # rust
 test -e "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
-
-# ASDF https://asdf-vm.com/zh-hans/guide/getting-started.html
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
-fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
-autoload -Uz compinit && compinit
-
-# Cursor cli
-# Added by Antigravity
-export PATH="/Users/honghao.shan/.antigravity/antigravity/bin:$PATH"
 
 # opencode
 export PATH=/Users/honghao.shan/.opencode/bin:$PATH

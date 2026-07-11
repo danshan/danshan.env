@@ -1,6 +1,6 @@
 #!/bin/zsh #!/bin/bash
 
-# Install development environment: asdf plugins and global npm tools
+# Install development environment: mise plugins and global npm tools
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"

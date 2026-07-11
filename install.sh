@@ -26,7 +26,7 @@ source "${PROJECT_ROOT}/scripts/install_brew_casks.sh"
 # Step 4: Dotfiles configuration
 source "${PROJECT_ROOT}/scripts/setup_dotfiles.sh"
 
-# Step 5: Development environment (asdf, npm tools)
+# Step 5: Development environment (npm tools)
 source "${PROJECT_ROOT}/scripts/setup_devenv.sh"
 
 ###################################################
