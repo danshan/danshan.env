@@ -33,26 +33,25 @@ popd
 printf "${COLOR_TITLE}📦 Installing uv...${COLOR_RESET}\n"
 curl -LsSf https://astral.sh/uv/install.sh | sh </dev/null
 
-# install asdf and plugins
-printf "${COLOR_TITLE}📦 Installing asdf...${COLOR_RESET}\n"
-brew install --quiet "asdf" </dev/null
+# install mise
+printf "${COLOR_TITLE}📦 Installing mise...${COLOR_RESET}\n"
+curl https://mise.run | sh
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring asdf java...${COLOR_RESET}\n"
-asdf plugin add java
+printf "${COLOR_SUBTITLE}⚙️  Configuring mise java...${COLOR_RESET}\n"
+mise use --global java@zulu-17.66.19.0
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring asdf maven...${COLOR_RESET}\n"
-asdf plugin add maven
+printf "${COLOR_SUBTITLE}⚙️  Configuring mise maven...${COLOR_RESET}\n"
+mise use --global maven@3.9.9
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring asdf nodejs...${COLOR_RESET}\n"
-asdf plugin add nodejs
-asdf install nodejs 22.20.0
+printf "${COLOR_SUBTITLE}⚙️  Configuring mise nodejs...${COLOR_RESET}\n"
+mise use --global  node@24.18.0
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring asdf python...${COLOR_RESET}\n"
-asdf plugin add python
+printf "${COLOR_SUBTITLE}⚙️  Configuring mise python...${COLOR_RESET}\n"
+mise use python@3.12.12
 
 # install bun
-printf "${COLOR_TITLE}📦 Installing Bun...${COLOR_RESET}\n"
-npm -i -g bun@latest
+printf "${COLOR_SUBTITLE}⚙️  Configuring mise bun...${COLOR_RESET}\n"
+mise use --global bun@1.3.14
 
 # install codex
 printf "${COLOR_TITLE}📦 Install Codex...${COLOR_RESET}\n"
@@ -102,7 +101,7 @@ popd
 printf "${COLOR_SUBTITLE}⚙️  Install context7...${COLOR_RESET}\n"
 bun install -g ctx7
 printf "${COLOR_SUBTITLE}⚙️  Configuring context7...${COLOR_RESET}\n"
-ctx7 setup --cli --universal
+ctx7 setup 
 
 printf "${COLOR_SUBTITLE}⚙️  Install playwright-cli...${COLOR_RESET}\n"
 npm install -g @playwright/cli@latest
