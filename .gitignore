@@ -70,6 +70,7 @@ nohup.out
 misc.prop
 tags
 *.bak
+*.bak.*
 *.log
 .logs
 
