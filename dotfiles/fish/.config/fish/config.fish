@@ -102,3 +102,7 @@ if test -n "$OTTY_SHELL_INTEGRATION" -a -r "$OTTY_SHELL_INTEGRATION/otty-integra
     source "$OTTY_SHELL_INTEGRATION/otty-integration.fish"
 end
 # <<< otty shell integration <<<
+
+# >>> grok installer >>>
+fish_add_path $HOME/.grok/bin
+# <<< grok installer <<<
