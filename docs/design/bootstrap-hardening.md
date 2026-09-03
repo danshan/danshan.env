@@ -49,11 +49,13 @@ Manifest 中的每个条目按以下规则处理:
 
 | State | Action |
 |---|---|
-| Missing | `brew install`; App Cask 使用 `--adopt` 接管严格一致的既有 artifact |
+| Missing, App absent | `brew install` |
+| Missing, App present, `preserve` | 保留外部 App 并 skip Homebrew adoption |
+| Missing, App present, `adopt` | `brew install --cask --adopt` |
 | Installed and outdated | `brew upgrade` |
 | Installed and current | Skip with an explicit log message |
 
-Tap-qualified 名称比较时使用末段 token 的 lowercase 规范化形式, 避免已安装的 tap package 被重复识别为 missing. Cask 是否安装以 Homebrew inventory 为准, 不使用 `/Applications` 文件名推断. 对 manifest 中声明 App 名称的 missing Cask, 安装时传入 `--adopt`: 只有目标 bundle 与 Cask artifact 版本一致时 Homebrew 才接管; 不一致时保持失败, 不允许通过 `--force` 覆盖用户已有 App.
+Tap-qualified 名称比较时使用末段 token 的 lowercase 规范化形式, 避免已安装的 tap package 被重复识别为 missing. Cask 的 Homebrew ownership 以 inventory 为准, App availability 由 manifest 中的 App 名称辅助判断. Manifest 第三列是既有 App 策略, 默认 `preserve`; 只有显式声明 `adopt` 的条目才允许 Homebrew 接管既有 artifact. App 不存在时始终执行普通 install. Adoption 校验或 post-install metadata 写入失败时保持失败, 不允许通过 `--force` 覆盖用户已有 App.
 
 ## Tool pinning
 

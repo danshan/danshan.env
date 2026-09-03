@@ -38,7 +38,8 @@ shellcheck install.sh scripts/*.sh tests/*.sh
 
 | Test | Coverage |
 |---|---|
-| `test_brew_reconcile.sh` | Formula/Cask missing, current, outdated, App Cask adoption, tap name normalization, bounded inventory calls |
+| `test_brew_reconcile.sh` | Formula/Cask missing, current, outdated, empty inventory, external App preservation, explicit adoption, invalid policy, tap name normalization, bounded inventory calls |
+| `test_brew_trust.sh` | Package-level trust missing/current/empty state, exact package qualification, error propagation |
 | `test_install_failure.sh` | Stage failure propagation and success-banner suppression |
 | `test_gtest_stash.sh` | No-staged-change rejection and existing stash preservation |
 | `test_repository_policy.sh` | Shell syntax, Fish syntax when available, secret markers, mutable package references, remote script pipelines |

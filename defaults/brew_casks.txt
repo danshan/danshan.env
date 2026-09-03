@@ -17,7 +17,7 @@ zspace|极空间
 shottr|Shottr
 raycast|Raycast
 google-chrome|Google Chrome
-microsoft-excel|Microsoft Excel 
+microsoft-excel|Microsoft Excel
 microsoft-word|Microsoft Word
 microsoft-powerpoint|Microsoft PowerPoint
 microsoft-outlook|Microsoft Outlook
@@ -34,4 +34,4 @@ ghostty|Ghostty
 detachhead/tap/rebased|Rebased
 muxy-app/tap/muxy|Muxy
 thaw|Thaw
-localsend/localsend/localsend|LocalSend
+localsend/localsend/localsend|LocalSend|adopt

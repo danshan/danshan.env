@@ -32,7 +32,8 @@ bash install.sh
 - 未授权但出现在 `defaults/brew_trust.txt` 的第三方 Formula/Cask: 仅授予该 package trust.
 - 已安装且不是 outdated: 输出 skip, 不下载或重装.
 - 已安装且 outdated: 执行 upgrade.
-- 未安装: 执行 install. 对声明 App 名称的 Cask 使用 `--adopt`, 仅接管与下载 artifact 版本一致的既有 App.
+- 未安装且 App 不存在: 执行 install.
+- 未安装但 App 已存在: 默认保留外部安装并 skip; 只有 manifest 显式声明 `adopt` 时才请求 Homebrew 接管.
 
 完整执行只刷新一次 Homebrew metadata. 在离线诊断或明确接受本地 metadata 可能过期时, 可以跳过刷新:
 
@@ -73,7 +74,7 @@ chmod 600 dotfiles/fish/.config/fish/conf.d/secrets.local.fish
 
 Stow 遇到普通文件或指向其他来源的 symlink 时会失败. 安装脚本不会自动覆盖. 处理前先确认内容和所有权, 将旧文件移动到明确的备份路径, 然后重新执行安装.
 
-Homebrew inventory 中缺失的 App Cask 若已存在于 `/Applications`, Bootstrap 会尝试 `--adopt`. 版本一致时保留现有 App 并纳入 Homebrew 管理; 版本不一致时安装失败且不覆盖. 此时应先确认 App 来源和数据备份, 再人工决定保留现有安装还是迁移到 Homebrew, 不要使用 `--force` 绕过检查.
+Homebrew inventory 中缺失的 App Cask 若已存在于 `/Applications`, Bootstrap 默认保留现有 App, 不尝试修改其 ownership 或 metadata. `defaults/brew_casks.txt` 第三列可显式设为 `adopt`; 此时 Homebrew 可能执行 bundle 比较和 `xattr` metadata 写入. 任一步失败都会终止安装且不覆盖 App. 应先确认 App 来源, macOS App Management 权限和数据备份, 不要使用 `--force` 绕过检查.
 
 Pinned Git dependency 存在未提交修改时会失败. 应先提交, stash 或明确丢弃这些修改, 再重试. 安装脚本不会替操作者清理 worktree.
 

@@ -73,7 +73,7 @@ while IFS='|' read -r package_name _application_name || [[ -n "${package_name}" 
         fail "Tap-qualified cask lacks explicit trust: ${package_name}"
 done < "${PROJECT_ROOT}/defaults/brew_casks.txt"
 
-grep -Fqx 'localsend/localsend/localsend|LocalSend' "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
+grep -Fqx 'localsend/localsend/localsend|LocalSend|adopt' "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
     fail "LocalSend must be classified as a cask."
 if grep -Fqx 'localsend/localsend/localsend' "${PROJECT_ROOT}/defaults/brew_pkgs.txt"; then
     fail "LocalSend must not be classified as a formula."

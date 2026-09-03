@@ -10,11 +10,11 @@ activate_homebrew
 load_brew_state cask
 
 log_title "Reconciling Homebrew casks."
-while IFS='|' read -r package_name application_name || [[ -n "${package_name}" ]]; do
+while IFS='|' read -r package_name application_name existing_app_policy || [[ -n "${package_name}" ]]; do
     case "${package_name}" in
         ''|'#'*) continue ;;
     esac
-    reconcile_brew_package cask "${package_name}" "${application_name}"
+    reconcile_brew_package cask "${package_name}" "${application_name}" "${existing_app_policy:-preserve}"
 done < "${PROJECT_ROOT}/defaults/brew_casks.txt"
 
 print_brew_summary "Cask"

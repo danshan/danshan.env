@@ -38,6 +38,13 @@ brew() {
     esac
 }
 
+application_bundle_exists() {
+    case "$1" in
+        'Existing App'|'Adopted App') return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 load_brew_state formula
 reconcile_brew_package formula current-package
 reconcile_brew_package formula outdated-package
@@ -59,15 +66,24 @@ load_brew_state cask
 reconcile_brew_package cask current-app
 reconcile_brew_package cask outdated-app
 reconcile_brew_package cask missing-app 'Missing App'
+reconcile_brew_package cask external-app 'Existing App'
+reconcile_brew_package cask adopted-app 'Adopted App' adopt
 reconcile_brew_package cask thaw
 
-assert_equals 1 "${BREW_INSTALLED_COUNT}" "Cask install count"
+assert_equals 2 "${BREW_INSTALLED_COUNT}" "Cask install count"
 assert_equals 1 "${BREW_UPGRADED_COUNT}" "Cask upgrade count"
-assert_equals 2 "${BREW_SKIPPED_COUNT}" "Cask skip count"
+assert_equals 3 "${BREW_SKIPPED_COUNT}" "Cask skip count"
 assert_contains 'upgrade --quiet --cask outdated-app' "${BREW_CALL_LOG}" "Outdated cask upgrade"
-assert_contains 'install --quiet --cask --adopt missing-app' "${BREW_CALL_LOG}" "Missing app cask adopt"
+assert_contains 'install --quiet --cask missing-app' "${BREW_CALL_LOG}" "Missing app cask install"
+assert_not_contains 'install --quiet --cask external-app' "${BREW_CALL_LOG}" "Existing external app preserve"
+assert_contains 'install --quiet --cask --adopt adopted-app' "${BREW_CALL_LOG}" "Explicit app cask adopt"
+assert_not_contains 'install --quiet --cask --adopt missing-app' "${BREW_CALL_LOG}" "Absent app adopt forbidden"
 assert_not_contains 'install --quiet --cask --adopt thaw' "${BREW_CALL_LOG}" "Non-app cask install"
 assert_not_contains 'install --quiet --cask current-app' "${BREW_CALL_LOG}" "Current cask skip"
+
+if reconcile_brew_package cask invalid-policy 'Invalid App' overwrite; then
+    fail "Unsupported existing App policy must fail."
+fi
 
 formula_list_calls="$(grep -Fc 'list --formula -1' "${BREW_CALL_LOG}")"
 formula_outdated_calls="$(grep -Fc 'outdated --quiet --formula' "${BREW_CALL_LOG}")"
@@ -77,3 +93,8 @@ assert_equals 1 "${formula_list_calls}" "Formula installed inventory call count"
 assert_equals 1 "${formula_outdated_calls}" "Formula outdated inventory call count"
 assert_equals 1 "${cask_list_calls}" "Cask installed inventory call count"
 assert_equals 1 "${cask_outdated_calls}" "Cask outdated inventory call count"
+
+BREW_INSTALLED_ITEMS=()
+BREW_OUTDATED_ITEMS=()
+reconcile_brew_package cask empty-inventory-app 'Absent App'
+assert_contains 'install --quiet --cask empty-inventory-app' "${BREW_CALL_LOG}" "Empty inventory install"

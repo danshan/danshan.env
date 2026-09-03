@@ -79,6 +79,11 @@ array_contains() {
     return 1
 }
 
+application_bundle_exists() {
+    local application_name="$1"
+    [[ -d "/Applications/${application_name}.app" ]]
+}
+
 BREW_INSTALLED_ITEMS=()
 BREW_OUTDATED_ITEMS=()
 BREW_INSTALLED_COUNT=0
@@ -153,14 +158,16 @@ reconcile_brew_trust() {
 
     case "${package_type}" in
         formula)
-            if array_contains "${normalized_name}" "${BREW_TRUSTED_FORMULAE[@]}"; then
+            if [[ "${#BREW_TRUSTED_FORMULAE[@]}" -gt 0 ]] &&
+                array_contains "${normalized_name}" "${BREW_TRUSTED_FORMULAE[@]}"; then
                 log_success "Skipping trusted formula: ${package_name}"
                 BREW_TRUST_SKIPPED_COUNT=$((BREW_TRUST_SKIPPED_COUNT + 1))
                 return
             fi
             ;;
         cask)
-            if array_contains "${normalized_name}" "${BREW_TRUSTED_CASKS[@]}"; then
+            if [[ "${#BREW_TRUSTED_CASKS[@]}" -gt 0 ]] &&
+                array_contains "${normalized_name}" "${BREW_TRUSTED_CASKS[@]}"; then
                 log_success "Skipping trusted cask: ${package_name}"
                 BREW_TRUST_SKIPPED_COUNT=$((BREW_TRUST_SKIPPED_COUNT + 1))
                 return
@@ -210,25 +217,45 @@ reconcile_brew_package() {
     local package_type="$1"
     local package_name="$2"
     local application_name="${3:-}"
+    local existing_app_policy="${4:-preserve}"
     local normalized_name
     normalized_name="$(normalize_brew_name "${package_name}")"
 
-    if ! array_contains "${normalized_name}" "${BREW_INSTALLED_ITEMS[@]}"; then
-        log_info "Installing missing ${package_type}: ${package_name}"
+    if [[ "${package_type}" == cask ]]; then
+        case "${existing_app_policy}" in
+            preserve|adopt) ;;
+            *)
+                die "Unsupported existing App policy for ${package_name}: ${existing_app_policy}"
+                return 1
+                ;;
+        esac
+    fi
+
+    if [[ "${#BREW_INSTALLED_ITEMS[@]}" -eq 0 ]] ||
+        ! array_contains "${normalized_name}" "${BREW_INSTALLED_ITEMS[@]}"; then
         if [[ "${package_type}" == cask ]]; then
-            if [[ -n "${application_name}" ]]; then
+            if [[ -n "${application_name}" ]] && application_bundle_exists "${application_name}"; then
+                if [[ "${existing_app_policy}" == preserve ]]; then
+                    log_success "Skipping Homebrew adoption for existing application: ${application_name}.app"
+                    BREW_SKIPPED_COUNT=$((BREW_SKIPPED_COUNT + 1))
+                    return
+                fi
+                log_info "Adopting existing cask: ${package_name}"
                 brew install --quiet --cask --adopt "${package_name}" </dev/null
             else
+                log_info "Installing missing cask: ${package_name}"
                 brew install --quiet --cask "${package_name}" </dev/null
             fi
         else
+            log_info "Installing missing formula: ${package_name}"
             brew install --quiet "${package_name}" </dev/null
         fi
         BREW_INSTALLED_COUNT=$((BREW_INSTALLED_COUNT + 1))
         return
     fi
 
-    if array_contains "${normalized_name}" "${BREW_OUTDATED_ITEMS[@]}"; then
+    if [[ "${#BREW_OUTDATED_ITEMS[@]}" -gt 0 ]] &&
+        array_contains "${normalized_name}" "${BREW_OUTDATED_ITEMS[@]}"; then
         log_info "Upgrading outdated ${package_type}: ${package_name}"
         if [[ "${package_type}" == cask ]]; then
             brew upgrade --quiet --cask "${package_name}" </dev/null

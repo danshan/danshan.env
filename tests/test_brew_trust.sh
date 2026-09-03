@@ -78,3 +78,11 @@ fi
 if reconcile_brew_trust tap failing/tap; then
     fail "Unsupported trust type must fail."
 fi
+
+BREW_TRUSTED_FORMULAE=()
+BREW_TRUSTED_CASKS=()
+brew() {
+    printf '%s\n' "$*" >> "${BREW_CALL_LOG}"
+}
+reconcile_brew_trust cask empty/tap/app
+assert_contains 'trust --cask empty/tap/app' "${BREW_CALL_LOG}" "Empty trust inventory"
