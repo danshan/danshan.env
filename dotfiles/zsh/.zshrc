@@ -1,6 +1,6 @@
 # OPENSPEC:START
 # OpenSpec shell completions configuration
-fpath=("/Users/honghao.shan/.oh-my-zsh/custom/completions" $fpath)
+fpath=("${HOME}/.oh-my-zsh/custom/completions" $fpath)
 autoload -Uz compinit
 compinit
 # OPENSPEC:END
@@ -77,10 +77,7 @@ plugins=(git history extract zsh-autosuggestions zsh-syntax-highlighting mvn htt
 # User configuration
 
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-export PATH="$PATH:$HOME/.bin"
-export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:/usr/local/go/bin"
-export PATH="$PATH:$HOME/.bun/bin"
+export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.bin:/usr/local/go/bin:$PATH"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -154,7 +151,7 @@ export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
 test -e "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
 
 # opencode
-export PATH=/Users/honghao.shan/.opencode/bin:$PATH
+export PATH="${HOME}/.opencode/bin:${PATH}"
 
 # Kiro
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
@@ -165,6 +162,5 @@ test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.opencla
 # Starship
 eval "$(starship init zsh)"
 
-# claude 
-alias claude="claude --dangerously-skip-permissions"
-
+# Explicit unsafe alias
+alias claude-unsafe="claude --dangerously-skip-permissions"

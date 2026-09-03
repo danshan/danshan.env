@@ -16,14 +16,15 @@ diff-so-fancy
 lazygit
 tree
 scrcpy
-localsend/localsend/localsend
 coreutils
 1password-cli
-adsf
 daipeihust/tap/im-select
 gron
 stow
 starship
+mise
+uv
+herdr
 gh
 agent-browser
 fastfetch

@@ -94,3 +94,6 @@ apm_modules/
 .codex
 .claude
 .gemini
+
+# Machine-local shell secrets
+dotfiles/fish/.config/fish/conf.d/*.local.fish

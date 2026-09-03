@@ -1,37 +1,42 @@
-#!/bin/zsh #!/bin/bash
+#!/usr/bin/env bash
 
-INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
+set -Eeuo pipefail
+
+INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/common.sh
 source "${INSTALL_DIR}/scripts/common.sh"
 
-printf "${COLOR_TITLE}📦 Installing danshan.env${COLOR_RESET}\n"
+run_stage() {
+    local stage_name="$1"
+    local script_path="$2"
 
-# Check if .bin directory exists, create if not
-if [ ! -d "${HOME}/.bin" ]; then
-    printf "${COLOR_SUBTITLE}📦 Creating ${HOME}/.bin directory${COLOR_RESET}\n"
+    log_title "Running Bootstrap Stage: ${stage_name}"
+    bash "${script_path}"
+}
+
+on_error() {
+    local exit_code=$?
+    printf '%bInstallation failed with exit code %s.%b\n' "${COLOR_ERROR}" "${exit_code}" "${COLOR_RESET}" >&2
+    exit "${exit_code}"
+}
+trap on_error ERR
+
+log_title "Installing danshan.env"
+
+if [[ ! -d "${HOME}/.bin" ]]; then
+    log_notice "Creating ${HOME}/.bin directory."
     mkdir -p "${HOME}/.bin"
 else
-    printf "${COLOR_SUCCESS}✅ ${HOME}/.bin directory already exists${COLOR_RESET}\n"
+    log_success "Skipping existing directory: ${HOME}/.bin"
 fi
 
-# Step 1: Homebrew
-source "${PROJECT_ROOT}/scripts/setup_homebrew.sh"
+run_stage "Homebrew" "${PROJECT_ROOT}/scripts/setup_homebrew.sh"
+run_stage "Homebrew package trust" "${PROJECT_ROOT}/scripts/setup_brew_trust.sh"
+run_stage "Homebrew formulae" "${PROJECT_ROOT}/scripts/install_brew_pkgs.sh"
+run_stage "Homebrew casks" "${PROJECT_ROOT}/scripts/install_brew_casks.sh"
+run_stage "Shell framework" "${PROJECT_ROOT}/scripts/setup_shell.sh"
+run_stage "Dotfiles" "${PROJECT_ROOT}/scripts/setup_dotfiles.sh"
+run_stage "Development environment" "${PROJECT_ROOT}/scripts/setup_devenv.sh"
 
-# Step 2: Shell environment (oh-my-zsh)
-source "${PROJECT_ROOT}/scripts/setup_shell.sh"
-
-# Step 3: Packages (brew pkgs/casks, oh-my-tmux, uv)
-source "${PROJECT_ROOT}/scripts/install_brew_pkgs.sh"
-source "${PROJECT_ROOT}/scripts/install_brew_casks.sh"
-
-# Step 4: Dotfiles configuration
-source "${PROJECT_ROOT}/scripts/setup_dotfiles.sh"
-
-# Step 5: Development environment (npm tools)
-source "${PROJECT_ROOT}/scripts/setup_devenv.sh"
-
-###################################################
-# Finished
-###################################################
-
-printf "${COLOR_TITLE}🎉 danshan.env installation complete!${COLOR_RESET}\n"
-printf "💡 Don't forget to restart your terminal to tweak your preferences.\n"
+log_title "danshan.env installation complete."
+printf '%s\n' "Restart the terminal to load the updated environment."

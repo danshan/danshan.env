@@ -1,32 +1,73 @@
-#!/bin/zsh #!/bin/bash
+#!/usr/bin/env bash
 
-# Install and configure Homebrew
+set -Eeuo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/common.sh
 source "${SCRIPT_DIR}/common.sh"
+load_tool_versions
 
-printf "${COLOR_TITLE}📦 Installing Homebrew...${COLOR_RESET}\n"
+HOMEBREW_INSTALL_DIRECTORY=""
 
-if test ! "$(command -v brew)"; then
-    printf "${COLOR_SUBTITLE}📦 Homebrew not installed. Installing.${COLOR_RESET}\n"
-    if [[ $(uname -s) = "Linux" ]] && [[ $(uname -m) = "aarch64" ]]; then
-        printf "${COLOR_INFO}⚠️  danshan.env doesn't support limited Linux-son-ARM yet.${COLOR_RESET}"
-        sleep 5
-        exit
-    elif [[ ${BREW_CN} ]]; then
-        git clone --depth=1 https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/install.git /tmp/brew-install
-        /bin/bash /tmp/brew-install/install.sh
-        rm -rf /tmp/brew-install
-    else
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+cleanup_homebrew_installer() {
+    if [[ -n "${HOMEBREW_INSTALL_DIRECTORY}" && -d "${HOMEBREW_INSTALL_DIRECTORY}" ]]; then
+        rm -rf -- "${HOMEBREW_INSTALL_DIRECTORY}"
     fi
+}
+
+install_homebrew() {
+    local install_directory
+    local install_repository
+    local install_script
+    local install_url
+
+    install_directory="$(mktemp -d "${TMPDIR:-/tmp}/danshan-homebrew.XXXXXX")"
+    HOMEBREW_INSTALL_DIRECTORY="${install_directory}"
+    trap cleanup_homebrew_installer EXIT
+
+    if [[ -n "${BREW_CN:-}" ]]; then
+        require_command git
+        install_repository="${install_directory}/repository"
+        log_info "Cloning the Homebrew installer mirror at pinned revision ${HOMEBREW_INSTALL_REF}."
+        git clone --filter=blob:none --no-checkout \
+            "https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/install.git" \
+            "${install_repository}"
+        git -C "${install_repository}" fetch --depth=1 origin "${HOMEBREW_INSTALL_REF}"
+        git -C "${install_repository}" checkout --detach "${HOMEBREW_INSTALL_REF}"
+        install_script="${install_repository}/install.sh"
+    else
+        require_command curl
+        install_script="${install_directory}/install.sh"
+        install_url="https://raw.githubusercontent.com/Homebrew/install/${HOMEBREW_INSTALL_REF}/install.sh"
+        log_info "Downloading pinned Homebrew installer revision ${HOMEBREW_INSTALL_REF}."
+        curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+            --output "${install_script}" "${install_url}"
+    fi
+
+    /bin/bash "${install_script}"
+    cleanup_homebrew_installer
+    trap - EXIT
+}
+
+log_title "Configuring Homebrew."
+
+if [[ "$(uname -s)" != Darwin ]]; then
+    die "This bootstrap currently supports macOS only."
 fi
 
-printf "${COLOR_SUBTITLE}📦 Activating Homebrew on MacOS...${COLOR_RESET}\n"
-if [[ $(uname -m) = "arm64" ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+if command -v brew >/dev/null 2>&1 || [[ -x /opt/homebrew/bin/brew ]] || [[ -x /usr/local/bin/brew ]]; then
+    log_success "Skipping Homebrew installation: Homebrew is already available."
 else
-    eval "$(/usr/local/Homebrew/bin/brew shellenv)"
+    install_homebrew
 fi
 
-printf "${COLOR_SUCCESS}✅ Homebrew setup complete.${COLOR_RESET}\n"
+activate_homebrew
+
+if [[ "${DANSHAN_SKIP_BREW_UPDATE:-0}" == 1 ]]; then
+    log_notice "Skipping Homebrew metadata update by request."
+else
+    log_info "Refreshing Homebrew metadata once."
+    brew update --quiet
+fi
+
+log_success "Homebrew setup complete."

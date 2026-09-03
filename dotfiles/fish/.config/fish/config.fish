@@ -5,10 +5,7 @@ if status is-interactive
 end
 
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-export PATH="$PATH:$HOME/.bin"
-export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:/usr/local/go/bin"
-export PATH="$PATH:$HOME/.bun/bin"
+export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.bin:/usr/local/go/bin:$PATH"
 
 # Homebrew
 export HOMEBREW_INSTALL_FROM_API=1
@@ -43,10 +40,9 @@ function noproxy
     set -e http_proxy https_proxy all_proxy no_proxy
 end
 
-# Claude Code
-alias claude="claude --dangerously-skip-permissions"
-# Github Copilot
-alias copilot="copilot --yolo"
+# Explicit unsafe aliases
+alias claude-unsafe="claude --dangerously-skip-permissions"
+alias copilot-unsafe="copilot --yolo"
 # Sublime
 alias subl="'/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl'"
 # VSCode
@@ -65,7 +61,7 @@ export OPENSPEC_TELEMETRY=0
 
 
 # Added by Antigravity IDE
-fish_add_path /Users/honghao.shan/.antigravity-ide/antigravity-ide/bin
+fish_add_path "$HOME/.antigravity-ide/antigravity-ide/bin"
 
 # Codex app proxy
 function codex-app
@@ -91,9 +87,8 @@ function chatgpt-app
     set -x npm_config_proxy http://127.0.0.1:6152
     set -x npm_config_https_proxy http://127.0.0.1:6152
 
-    nohup /Applications/ChatGPT/Contents/MacOS/ChatGPT >/dev/null 2>&1 &
+    nohup /Applications/ChatGPT.app/Contents/MacOS/ChatGPT >/dev/null 2>&1 &
 end
-
 
 # >>> otty shell integration >>>
 # Added by Otty — toggle in Settings > Shell > Shell Integration.

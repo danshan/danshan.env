@@ -1,82 +1,74 @@
-#!/bin/zsh #!/bin/bash
+#!/usr/bin/env bash
 
-# Configure dotfiles using stow, and set up neovim/zed/pi
+set -Eeuo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/common.sh
 source "${SCRIPT_DIR}/common.sh"
 
-pushd "${DOTFILES_DIR}"
+activate_homebrew
+require_command git
+require_command stow
 
-printf "${COLOR_TITLE}⚙️  Configuring Shell...${COLOR_RESET}\n"
-case ${SHELL} in
-*zsh)
-    printf "${COLOR_SUBTITLE}⚙️  Configuring zsh...${COLOR_RESET}\n"
-    stow -v -R -t ~ zsh
-    ;;
-*bash)
-    if [[ $(bash --version | head -n1 | cut -d' ' -f4 | cut -d'.' -f1) -lt 5 ]]; then
-        printf "${COLOR_SUBTITLE}📦 Installing latest Bash...${COLOR_RESET}\n"
-        brew install bash bash-completion
+stow_package() {
+    local package_name="$1"
+    local package_path="${DOTFILES_DIR}/${package_name}"
+
+    [[ -d "${package_path}" ]] || {
+        die "Dotfile package not found: ${package_name}"
+        return 1
+    }
+    if [[ -z "$(find "${package_path}" -type f -print -quit)" ]]; then
+        log_notice "Skipping empty dotfile package: ${package_name}"
+        return
     fi
-    printf "${COLOR_SUBTITLE}⚙️  Configuring bash...${COLOR_RESET}\n"
-    stow -v -R -t ~ bash
-    ;;
-*fish)
-    printf "${COLOR_SUBTITLE}⚙️  Configuring fish...${COLOR_RESET}\n"
-    stow -v -R -t ~ fish
-    # install fisher https://github.com/jorgebucaran/fisher
-    fish -c "curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher"
-    ;;
+
+    log_info "Applying dotfile package: ${package_name}"
+    stow --dir "${DOTFILES_DIR}" --target "${HOME}" --restow --verbose "${package_name}"
+}
+
+log_title "Configuring dotfiles."
+
+case "${SHELL:-}" in
+    */zsh)
+        stow_package zsh
+        ;;
+    */bash)
+        stow_package bash
+        ;;
+    */fish)
+        stow_package fish
+        ;;
+    *)
+        die "Unsupported or unset login shell: ${SHELL:-unset}"
+        ;;
 esac
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring vim...${COLOR_RESET}\n"
-stow -v -R -t ~ vim
+for package_name in \
+    vim \
+    fzf \
+    git \
+    screen \
+    starship \
+    tmux \
+    nvim \
+    ghostty \
+    cmux \
+    fastfetch \
+    zellij \
+    fd \
+    hammerspoon \
+    codex \
+    gemini \
+    claude \
+    pi \
+    herdr; do
+    stow_package "${package_name}"
+done
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring fzf...${COLOR_RESET}\n"
-stow -v -R -t ~ fzf
+ensure_tracking_git_repository \
+    "Zed configuration" \
+    "git@github.com:danshan/zed-config.git" \
+    "${HOME}/.config/zed"
 
-printf "${COLOR_SUBTITLE}⚙️  Configuring git...${COLOR_RESET}\n"
-stow -v -R -t ~ git
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring screen...${COLOR_RESET}\n"
-stow -v -R -t ~ screen
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring neovim...${COLOR_RESET}\n"
-if [ -d "${HOME}/.config/nvim" ]; then
-    printf "${COLOR_SUBTITLE}📦 Updating neovim config...${COLOR_RESET}\n"
-    git pull
-else
-    git clone --depth=1 git@github.com:danshan/lazyvim.git ${HOME}/.config/nvim
-fi
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring zed...${COLOR_RESET}\n"
-if [ -d "${HOME}/.config/zed" ]; then
-    printf "${COLOR_SUBTITLE}📦 Updating zed config...${COLOR_RESET}\n"
-    git pull
-else
-    git clone --depth=1 git@github.com:danshan/zed-config.git ${HOME}/.config/zed
-fi
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring ghostty...${COLOR_RESET}\n"
-stow -v -R -t ~ ghostty
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring cmux...${COLOR_RESET}\n"
-stow -v -R -t ~ cmux
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring fastfetch...${COLOR_RESET}\n"
-stow -v -R -t ~ fastfetch
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring bat...${COLOR_RESET}\n"
-stow -v -R -t ~ bat
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring zellij...${COLOR_RESET}\n"
-stow -v -R -t ~ zellij
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring fd...${COLOR_RESET}\n"
-stow -v -R -t ~ fd
-
-printf "${COLOR_SUBTITLE}⚙️  Configuring hammerspoon...${COLOR_RESET}\n"
-stow -v -R -t ~ hammerspoon
-
-popd
-printf "${COLOR_SUCCESS}✅ Dotfiles configuration complete.${COLOR_RESET}\n"
+log_success "Dotfiles configuration complete."

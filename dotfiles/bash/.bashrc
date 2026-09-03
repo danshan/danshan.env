@@ -2,6 +2,8 @@
 
 BASH_SILENCE_DEPRECATION_WARNING=1
 
+export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.bin:/usr/local/go/bin:$PATH"
+
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 
@@ -22,5 +24,5 @@ export NVM_DIR="$HOME/.nvm"
 eval "$(starship init bash)"
 
 ###_BEGIN_Completion_ae
-test -e "/Users/honghao.shan/.completion/ae.completion.sh" &&  source "/Users/honghao.shan/.completion/ae.completion.sh"
+test -e "${HOME}/.completion/ae.completion.sh" && source "${HOME}/.completion/ae.completion.sh"
 ###_END_Completion_ae

@@ -1,22 +1,27 @@
-#!/bin/zsh #!/bin/bash
+#!/usr/bin/env bash
 
-# Install oh-my-zsh
+set -Eeuo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=scripts/common.sh
 source "${SCRIPT_DIR}/common.sh"
+load_tool_versions
 
-printf "${COLOR_TITLE}📦 Installing oh-my-zsh...${COLOR_RESET}\n"
-if [[ ${BREW_CN} ]]; then
-    sh -c "$(curl -fsSL https://gitee.com/shmhlsy/oh-my-zsh-install.sh/raw/master/install.sh)"
-else
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-fi
+log_title "Configuring shell frameworks."
+ensure_pinned_git_repository \
+    "Oh My Zsh" \
+    "https://github.com/ohmyzsh/ohmyzsh.git" \
+    "${HOME}/.oh-my-zsh" \
+    "${OH_MY_ZSH_REF}"
 
-printf "${COLOR_TITLE}📦 Installing starship...${COLOR_RESET}\n"
-brew install --quiet starship </dev/null
-printf "${COLOR_SUBTITLE}⚙️  Configuring statship...${COLOR_RESET}\n"
-pushd "${DOTFILES_DIR}"
-stow -v -R -t ~ starship
-popd
+ensure_pinned_git_repository \
+    "oh-my-tmux" \
+    "https://github.com/gpakosz/.tmux.git" \
+    "${HOME}/.config/oh-my-tmux" \
+    "${OH_MY_TMUX_REF}"
 
-printf "${COLOR_SUCCESS}✅ Shell environment setup complete.${COLOR_RESET}\n"
+ensure_symlink \
+    "${HOME}/.config/oh-my-tmux/.tmux.conf" \
+    "${HOME}/.tmux.conf"
+
+log_success "Shell framework setup complete."
