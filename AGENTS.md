@@ -14,6 +14,12 @@
 - 涉及 Git 更新时必须显式指定工作目录, 使用 fast-forward-only 策略, 并在变更前验证目标是 Git worktree.
 - 不得隐式修改调用者当前目录中的配置. 所有持久化写入必须指定明确的目标路径或 global scope.
 - Codex Hook 只能作为 repository-local 配置加入 `.codex/hooks.json`. 不得创建或修改全局 `~/.codex/hooks.json`, 也不得引用用户绝对路径中的 executable.
+- 既有字体迁移只能由 Cask manifest 的显式 `migrate` policy 启用. 必须从 Homebrew metadata 读取精确 font target, 且只允许 `${HOME}/Library/Fonts` 的直接 `.ttf` 或 `.otf` 子项.
+- 字体迁移必须先创建 Migration Snapshot, 再按 batch 安装并验证全部 Cask. 任一 install 或 verify 失败时必须整体 Rollback, 保留失败产物和状态记录, 不得使用 `--force`, 宽泛 glob 或不可恢复删除.
+- 成功的 Migration Snapshot 必须保留在 `${HOME}/Library/Application Support/danshan.env/font-backups`, 不得由 Bootstrap 自动清理.
+- 既有 App bundle 只有在 Cask manifest 显式声明 `migrate` 时才允许转移 ownership. 必须先将精确 `/Applications/<name>.app` target 移入 Migration Snapshot, 再执行普通 Cask install 和 ownership verification; 任一失败必须隔离新 artifact 并恢复原 App.
+- `adopt` 只能用于 Homebrew 判定为 identical 的既有 artifact. 不得在 `adopt` 失败后隐式升级为 `migrate`, 也不得使用 `--force` 绕过版本或内容差异.
+- Cask 的平台限制必须在 manifest 第四列显式声明为正整数 `minimum_macos_major`. Cask stage 只读取一次 `sw_vers -productVersion`, 并在 install, upgrade 或 migration 前 skip 不兼容资源; 不得通过捕获任意 Homebrew failure 推断平台不兼容.
 
 ## Documentation
 
@@ -35,4 +41,7 @@
 - 修改 Shell 脚本时, 至少执行语法检查和 `tests/run.sh`.
 - 测试必须使用临时 `HOME` 和 stub executable, 禁止真实安装软件或修改用户环境.
 - 新增分支逻辑时, 至少覆盖 missing, current, outdated 和 command failure.
+- 新增 migration transaction 时, 必须覆盖 success, repeat execution, install failure, verify failure, artifact preservation, Rollback 和 rollback-incomplete contract.
+- 修改字体迁移时, 还必须覆盖 exact target validation, batch success, repeat execution, partial install failure, Rollback 和 backup state marker.
+- 修改 Cask 平台 gating 时, 必须覆盖 below-minimum, at-minimum, installed, outdated, invalid manifest value 和 `sw_vers` command failure.
 - 提交前确认工作树中不存在凭据, 临时文件或未登记文档.

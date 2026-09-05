@@ -2,9 +2,12 @@
 title: Bootstrap Hardening Design
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-04
+last_updated: 2026-09-06
 related:
   - ../adr/0001-bash-bootstrap-and-state-reconciliation.md
+  - ../adr/0002-transactional-homebrew-font-migration.md
+  - ../adr/0003-platform-gated-homebrew-casks.md
+  - ../adr/0004-transactional-homebrew-app-migration.md
   - ../standards/documentation.md
 ---
 
@@ -49,13 +52,41 @@ Manifest 中的每个条目按以下规则处理:
 
 | State | Action |
 |---|---|
+| Platform Constraint not satisfied | Skip before mutation |
 | Missing, App absent | `brew install` |
 | Missing, App present, `preserve` | 保留外部 App 并 skip Homebrew adoption |
 | Missing, App present, `adopt` | `brew install --cask --adopt` |
+| Missing, App present, `migrate` | 进入 per-cask snapshot, install, verify transaction |
+| Missing, font cask, `migrate` | 进入 batch snapshot, install, verify transaction |
 | Installed and outdated | `brew upgrade` |
 | Installed and current | Skip with an explicit log message |
 
-Tap-qualified 名称比较时使用末段 token 的 lowercase 规范化形式, 避免已安装的 tap package 被重复识别为 missing. Cask 的 Homebrew ownership 以 inventory 为准, App availability 由 manifest 中的 App 名称辅助判断. Manifest 第三列是既有 App 策略, 默认 `preserve`; 只有显式声明 `adopt` 的条目才允许 Homebrew 接管既有 artifact. App 不存在时始终执行普通 install. Adoption 校验或 post-install metadata 写入失败时保持失败, 不允许通过 `--force` 覆盖用户已有 App.
+Tap-qualified 名称比较时使用末段 token 的 lowercase 规范化形式, 避免已安装的 tap package 被重复识别为 missing. Cask 的 Homebrew ownership 以 inventory 为准, App availability 由 manifest 中的 App 名称辅助判断. Manifest 第三列是 existing artifact policy, 默认 `preserve`; `adopt` 只允许 Homebrew 接管内容相同的既有 App artifact, `migrate` 则显式授权可恢复的 ownership transition. Adoption failure 不会自动升级为 migration, 且所有 policy 都禁止通过 `--force` 覆盖用户已有 App.
+
+Manifest 第四列是 optional `minimum_macos_major`. Bootstrap 在 Cask stage 读取一次 numeric product-version major. 空值表示没有额外 gate; 正整数表示当前 major 必须大于或等于该值. 不兼容项计入 skip, 不执行 install, upgrade, adoption 或 migration. 非数字, 0, 缺失 `sw_vers` 或读取失败属于 invalid Observed/Desired State, 必须在 Cask mutation 前终止. Homebrew command failure 不得被重新分类为 platform skip.
+
+### Transactional font migration
+
+无 App name 的 `migrate` 适用于纯 font cask. 所有 missing font `migrate` 条目形成单一 transaction:
+
+1. Inspect Homebrew JSON metadata, 验证每个 artifact 都是 user Fonts directory 的直接 font target.
+2. Classify 每个 exact target 为 present 或 absent, 将清单写入 Migration Snapshot.
+3. Move present target 到 snapshot, 然后以普通 `brew install --cask` 安装全部 missing font cask.
+4. Verify 全部 cask inventory 和全部 target.
+5. 成功时保留 snapshot 并标记 `completed`; 失败时卸载本批次 cask, 隔离新 artifact, 恢复 present target.
+
+Transaction 不使用 filename glob 推导 ownership, 不删除 snapshot, 不使用 `--force`, 也不把普通 App cask 隐式升级为 migration policy. `rolled-back` 表示先前 Observed State 已恢复; `rollback-incomplete` 要求操作者检查 snapshot 后再继续 Bootstrap.
+
+### Transactional application migration
+
+带 App name 的 `migrate` 是单 Cask transaction. Bootstrap 只处理 manifest 声明的精确 `/Applications/<name>.app`, 并按以下顺序收敛:
+
+1. Validate App name, 创建唯一 snapshot 并记录 package, target 与原始 presence.
+2. Move 原 bundle 到 snapshot, 再以普通 `brew install --cask` 安装当前 Cask.
+3. Verify Homebrew inventory 已登记且 App target directory 已存在.
+4. 成功时保留 snapshot; 失败时卸载已登记 Cask, 隔离新 artifact, 恢复原 bundle.
+
+该 transaction 不迁移 App 外部的 preferences, caches 或 user data, 因为这些内容不属于 Cask App artifact. 每个 App 独立提交或回滚, 不与 font family 的 batch atomicity 合并.
 
 ## Tool pinning
 
@@ -75,6 +106,7 @@ Homebrew package 版本由 Homebrew metadata 管理. 这是有意选择的滚动
 - Git 更新只允许 fast-forward, 避免安装脚本隐式创建 merge commit.
 - 已存在但不是 Git worktree 的目标目录必须 fail closed.
 - 已存在且未由 stow 管理的目标文件必须报告冲突, 不自动覆盖.
+- App 或 font migration failure 必须在当前 Cask stage 内完成 Rollback; Rollback 不完整时报告 snapshot path 并停止.
 - 重试安装前先修复失败原因, 再重新执行顶层入口. 已满足步骤会自动跳过.
 
 ## Verification
@@ -82,6 +114,7 @@ Homebrew package 版本由 Homebrew metadata 管理. 这是有意选择的滚动
 测试使用临时 `HOME` 和 stub commands, 不访问网络, 不调用真实 Homebrew, 不修改用户配置. 关键覆盖包括:
 
 - Formula/Cask 的 missing, current 和 outdated 分流.
+- Existing App 的 `preserve`, identical `adopt` 与 differing `migrate` 分流, 以及 App migration 的 install/verify failure Rollback.
 - Formula/Cask trust 的 missing, current 和 command failure 分流, 以及 whole-tap bypass policy.
 - 任一阶段失败时顶层非零退出且不输出完成提示.
 - Git 更新使用正确工作目录和 fast-forward-only 参数.

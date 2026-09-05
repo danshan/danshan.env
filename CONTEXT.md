@@ -32,9 +32,25 @@ _Avoid_: New item
 Observed State 中存在, 但版本低于 Desired State 或受信 metadata 所声明当前版本的资源.
 _Avoid_: Old item, update candidate
 
+**Platform Constraint**:
+Managed Resource 成为当前主机 Desired State 所必须满足的操作系统版本条件. 不满足时资源应明确 skip, 而不是尝试变更后忽略失败.
+_Avoid_: Install workaround, ignored error
+
 **Managed Resource**:
 所有权和更新策略由本仓库明确声明的资源. 自动变更只允许作用于 Managed Resource.
 _Avoid_: Config file, installed thing
+
+**Migration Snapshot**:
+在改变外部 artifact 所有权之前, 按精确目标清单创建并持续保留的可恢复副本和状态记录.
+_Avoid_: Temp backup, copied files
+
+**Ownership Migration**:
+通过显式 policy 将外部 artifact 转换为 Managed Resource 的 transaction. 必须先创建 Migration Snapshot, 再执行 install, verify 和必要的 Rollback.
+_Avoid_: Force install, overwrite
+
+**Rollback**:
+批次 reconciliation 失败后, 撤销本批次新建的 Managed Resource, 保留失败产物, 并从 Migration Snapshot 恢复先前 Observed State 的过程.
+_Avoid_: Cleanup, retry
 
 **Bootstrap Stage**:
 具有独立前置条件, reconciliation 范围和失败边界的一组操作.

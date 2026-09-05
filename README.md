@@ -18,7 +18,7 @@ git pull --ff-only
 bash install.sh
 ```
 
-安装过程会先收敛显式的第三方 Homebrew package trust, 再跳过已安装的最新 Formula 和 Cask, 只安装 missing 项并升级 outdated 项. 不会信任整个 tap 或关闭 trust check. 任一阶段失败时, 顶层返回非零状态且不会输出完成提示.
+安装过程会先收敛显式的第三方 Homebrew package trust, 再按当前 macOS major 跳过不兼容 Cask, 跳过已安装的最新 Formula 和 Cask, 只安装 missing 项并升级 outdated 项. Manifest 可使用 `adopt` 接管内容相同的 App artifact, 或使用 `migrate` 对不同版本的既有 App 执行 snapshot, install, verify 和自动 Rollback. Nerd Font 使用独立的 batch migration transaction. 不会信任整个 tap, 关闭 trust check 或使用 `--force` 覆盖冲突. 任一阶段失败时, 顶层返回非零状态且不会输出完成提示.
 
 ## Documentation
 

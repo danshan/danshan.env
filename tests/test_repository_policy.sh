@@ -33,6 +33,10 @@ if rg -n 'HOMEBREW_NO_REQUIRE_TAP_TRUST|(^|[^[:alnum:]_])brew trust[[:space:]]+[
     fail "Broad Homebrew trust bypass found."
 fi
 
+if rg -n 'brew (install|upgrade).*--force' "${PROJECT_ROOT}/scripts"; then
+    fail "Homebrew force installation bypass found."
+fi
+
 while IFS='|' read -r package_type package_name || [[ -n "${package_type}${package_name}" ]]; do
     case "${package_type}" in
         ''|'#'*) continue ;;
@@ -73,8 +77,17 @@ while IFS='|' read -r package_name _application_name || [[ -n "${package_name}" 
         fail "Tap-qualified cask lacks explicit trust: ${package_name}"
 done < "${PROJECT_ROOT}/defaults/brew_casks.txt"
 
-grep -Fqx 'localsend/localsend/localsend|LocalSend|adopt' "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
-    fail "LocalSend must be classified as a cask."
+grep -Fqx 'localsend/localsend/localsend|LocalSend|migrate' "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
+    fail "LocalSend must migrate an existing application transactionally."
+grep -Fqx 'thaw|Thaw|preserve|26' "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
+    fail "Thaw must require macOS 26 or newer."
+for font_cask in \
+    font-hack-nerd-font \
+    font-fira-code-nerd-font \
+    font-jetbrains-mono-nerd-font; do
+    grep -Fqx "${font_cask}||migrate" "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
+        fail "Nerd Font cask must migrate existing artifacts transactionally: ${font_cask}"
+done
 if grep -Fqx 'localsend/localsend/localsend' "${PROJECT_ROOT}/defaults/brew_pkgs.txt"; then
     fail "LocalSend must not be classified as a formula."
 fi

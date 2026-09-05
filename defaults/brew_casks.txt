@@ -23,9 +23,9 @@ microsoft-powerpoint|Microsoft PowerPoint
 microsoft-outlook|Microsoft Outlook
 zed|Zed
 drawio|draw.io
-font-hack-nerd-font
-font-fira-code-nerd-font
-font-jetbrains-mono-nerd-font
+font-hack-nerd-font||migrate
+font-fira-code-nerd-font||migrate
+font-jetbrains-mono-nerd-font||migrate
 chatgpt|ChatGPT
 obsidian|Obsidian
 1password|1Password
@@ -33,5 +33,5 @@ antigravity|Antigravity
 ghostty|Ghostty
 detachhead/tap/rebased|Rebased
 muxy-app/tap/muxy|Muxy
-thaw|Thaw
-localsend/localsend/localsend|LocalSend|adopt
+thaw|Thaw|preserve|26
+localsend/localsend/localsend|LocalSend|migrate
