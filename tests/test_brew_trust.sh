@@ -86,3 +86,10 @@ brew() {
 }
 reconcile_brew_trust cask empty/tap/app
 assert_contains 'trust --cask empty/tap/app' "${BREW_CALL_LOG}" "Empty trust inventory"
+
+calls_before_plan="$(wc -l < "${BREW_CALL_LOG}" | tr -d ' ')"
+DANSHAN_MODE=plan
+reconcile_brew_trust formula planned/tap/tool
+assert_equals "${calls_before_plan}" "$(wc -l < "${BREW_CALL_LOG}" | tr -d ' ')" \
+    "Trust plan mutation"
+unset DANSHAN_MODE

@@ -7,7 +7,7 @@ PROJECT_ROOT="$(cd "${TEST_DIR}/.." && pwd)"
 # shellcheck source=tests/test_helper.sh
 source "${TEST_DIR}/test_helper.sh"
 
-bash -n "${PROJECT_ROOT}/install.sh" "${PROJECT_ROOT}"/scripts/*.sh
+bash -n "${PROJECT_ROOT}/install.sh" "${PROJECT_ROOT}"/scripts/*.sh "${PROJECT_ROOT}"/scripts/lib/*.sh
 
 while IFS= read -r fish_file; do
     if command -v fish >/dev/null 2>&1; then
@@ -35,6 +35,43 @@ fi
 
 if rg -n 'brew (install|upgrade).*--force' "${PROJECT_ROOT}/scripts"; then
     fail "Homebrew force installation bypass found."
+fi
+
+if rg -n '(bun add|npm install).*(--global|-g)' "${PROJECT_ROOT}/scripts"; then
+    fail "Direct Bun or NPM global package ownership found."
+fi
+
+for mise_owned_formula in yarn starship uv agent-browser; do
+    if grep -Fqx "${mise_owned_formula}" "${PROJECT_ROOT}/defaults/brew_pkgs.txt"; then
+        fail "Mise-owned tool remains in the Homebrew manifest: ${mise_owned_formula}"
+    fi
+done
+
+if grep -Fqx 1password-cli "${PROJECT_ROOT}/defaults/brew_pkgs.txt"; then
+    fail "Cask-only package remains in the Homebrew Formula manifest: 1password-cli"
+fi
+grep -Fqx 1password-cli "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
+    fail "Missing Homebrew Cask package: 1password-cli"
+
+for mise_tool in \
+    '"aqua:astral-sh/uv" = "0.12.10"' \
+    '"aqua:starship/starship" = "1.26.0"' \
+    '"npm:@openai/codex" = "0.153.0"' \
+    '"npm:oh-my-openagent" = { version = "4.19.1", trust_policy_excludes = ["effect@4.0.0-beta.66"] }' \
+    '"npm:agent-browser" = "0.36.0"'; do
+    grep -Fqx "${mise_tool}" "${PROJECT_ROOT}/dotfiles/mise/.config/mise/config.toml" ||
+        fail "Missing pinned Mise tool: ${mise_tool}"
+done
+
+if rg -n 'trust_policy_excludes = \["effect"\]' \
+    "${PROJECT_ROOT}/dotfiles/mise/.config/mise/config.toml"; then
+    fail "Unbounded Mise NPM trust-policy exception found."
+fi
+
+[[ -f "${PROJECT_ROOT}/dotfiles/mise/.config/mise/mise.lock" ]] ||
+    fail "Missing Mise lockfile."
+if rg -n 'eval echo -- \$token' "${PROJECT_ROOT}/dotfiles/fish"; then
+    fail "Fish command-line input is evaluated as code."
 fi
 
 while IFS='|' read -r package_type package_name || [[ -n "${package_type}${package_name}" ]]; do

@@ -10,23 +10,36 @@ export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.bin:/usr/local/go/bin:$PATH"
 # Homebrew
 export HOMEBREW_INSTALL_FROM_API=1
 export HOMEBREW_NO_AUTO_UPDATE=true # no update when use brew
-eval $(/opt/homebrew/bin/brew shellenv)
+set -l brew_executable (command -v brew)
+if test -z "$brew_executable"
+  for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew
+    if test -x "$candidate"
+      set brew_executable "$candidate"
+      break
+    end
+  end
+end
+if test -n "$brew_executable"
+  env SHELL=(status fish-path) "$brew_executable" shellenv | source
+end
 
 # mise https://mise.jdx.dev/ide-integration.html
-if status is-interactive
-  mise activate fish | source
-else
-  mise activate fish --shims | source
+if command -q mise
+  if status is-interactive
+    mise activate fish | source
+  else
+    mise activate fish --shims | source
+  end
 end
 
 # Starfish https://starship.rs/
-starship init fish | source
+command -q starship; and starship init fish | source
 
 # zoxide https://github.com/ajeetdsouza/zoxide
-zoxide init fish | source
+command -q zoxide; and zoxide init fish | source
 
 # fzf https://github.com/junegunn/fzf
-fzf --fish | source
+command -q fzf; and fzf --fish | source
 set fzf_history_time_format '%Y-%m-%d %H:%M:%S'
 
 # Http Proxy
@@ -54,7 +67,7 @@ function history
 end
 
 # fzf.fish https://github.com/PatrickF1/fzf.fish
-fzf_configure_bindings --directory=ctrl-f
+functions -q fzf_configure_bindings; and fzf_configure_bindings --directory=ctrl-f
 
 # OpenSpec
 export OPENSPEC_TELEMETRY=0

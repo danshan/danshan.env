@@ -9,37 +9,18 @@ COMMON_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(cd "${COMMON_SCRIPT_DIR}/.." && pwd)"
 readonly DOTFILES_DIR="${PROJECT_ROOT}/dotfiles"
 
-readonly COLOR_TITLE=$'\033[1;36m'
-readonly COLOR_SUBTITLE=$'\033[1;33m'
-readonly COLOR_SUCCESS=$'\033[0;32m'
-readonly COLOR_INFO=$'\033[0;34m'
-readonly COLOR_ERROR=$'\033[0;31m'
-readonly COLOR_RESET=$'\033[0m'
-
-log_title() {
-    printf '%b%s%b\n' "${COLOR_TITLE}" "$1" "${COLOR_RESET}"
-}
-
-log_notice() {
-    printf '%b%s%b\n' "${COLOR_SUBTITLE}" "$1" "${COLOR_RESET}"
-}
-
-log_info() {
-    printf '%b%s%b\n' "${COLOR_INFO}" "$1" "${COLOR_RESET}"
-}
-
-log_success() {
-    printf '%b%s%b\n' "${COLOR_SUCCESS}" "$1" "${COLOR_RESET}"
-}
-
-die() {
-    printf '%bERROR: %s%b\n' "${COLOR_ERROR}" "$1" "${COLOR_RESET}" >&2
-    return 1
-}
-
-require_command() {
-    command -v "$1" >/dev/null 2>&1 || die "Required command not found: $1"
-}
+# shellcheck source=scripts/lib/core.sh
+source "${COMMON_SCRIPT_DIR}/lib/core.sh"
+# shellcheck source=scripts/lib/runtime.sh
+source "${COMMON_SCRIPT_DIR}/lib/runtime.sh"
+# shellcheck source=scripts/lib/git.sh
+source "${COMMON_SCRIPT_DIR}/lib/git.sh"
+# shellcheck source=scripts/lib/migration_state.sh
+source "${COMMON_SCRIPT_DIR}/lib/migration_state.sh"
+# shellcheck source=scripts/lib/dotfiles.sh
+source "${COMMON_SCRIPT_DIR}/lib/dotfiles.sh"
+# shellcheck source=scripts/lib/manifest.sh
+source "${COMMON_SCRIPT_DIR}/lib/manifest.sh"
 
 activate_homebrew() {
     local brew_executable
@@ -191,6 +172,11 @@ reconcile_brew_trust() {
     esac
 
     log_info "Trusting explicit ${package_type}: ${package_name}"
+    if is_read_only_mode; then
+        log_planned_action "trust Homebrew ${package_type}: ${package_name}."
+        BREW_TRUST_ADDED_COUNT=$((BREW_TRUST_ADDED_COUNT + 1))
+        return
+    fi
     if ! brew trust "--${package_type}" "${package_name}" </dev/null; then
         die "Failed to trust Homebrew ${package_type}: ${package_name}"
         return 1
@@ -237,12 +223,28 @@ validate_brew_cask_manifest() {
     local application_name
     local existing_artifact_policy
     local minimum_macos_major
+    local extra_field
+    local normalized_name
+    local seen_items=()
 
-    while IFS='|' read -r package_name application_name existing_artifact_policy minimum_macos_major ||
-        [[ -n "${package_name}${application_name}${existing_artifact_policy}${minimum_macos_major}" ]]; do
+    while IFS='|' read -r package_name application_name existing_artifact_policy minimum_macos_major extra_field ||
+        [[ -n "${package_name}${application_name}${existing_artifact_policy}${minimum_macos_major}${extra_field}" ]]; do
         case "${package_name}" in
             ''|'#'*) continue ;;
         esac
+        [[ -z "${extra_field}" ]] || {
+            die "Unexpected Homebrew cask manifest field: ${package_name}"
+            return 1
+        }
+        if ! validate_brew_package_name "${package_name}" "Homebrew cask"; then
+            return 1
+        fi
+        normalized_name="$(normalize_brew_name "${package_name}")"
+        if [[ "${#seen_items[@]}" -gt 0 ]] && array_contains "${normalized_name}" "${seen_items[@]}"; then
+            die "Duplicate Homebrew cask manifest entry: ${package_name}"
+            return 1
+        fi
+        seen_items+=("${normalized_name}")
         if ! validate_brew_application_name "${package_name}" "${application_name}"; then
             return 1
         fi
@@ -265,7 +267,7 @@ validate_brew_application_name() {
 
     case "${application_name}" in
         '' ) return ;;
-        '.'|'..'|*/*)
+        '.'|'..'|*/*|*'|'*)
             die "Invalid application name for ${package_name}: ${application_name}"
             return 1
             ;;
@@ -507,41 +509,41 @@ migrate_existing_brew_app_cask() {
     original_path="${backup_dir}/originals/${application_name}.app"
 
     if ! printf '%s|%s|present\n' "${package_name}" "${application_path}" > "${backup_dir}/manifest.txt" ||
-        ! printf '%s\n' prepared > "${backup_dir}/state" ||
+        ! write_migration_state "${backup_dir}" prepared ||
         ! mkdir -p -- "${original_path%/*}"; then
         die "Failed to prepare application migration snapshot: ${backup_dir}"
         return 1
     fi
-    if ! printf '%s\n' snapshotting > "${backup_dir}/state" ||
+    if ! write_migration_state "${backup_dir}" snapshotting ||
         ! mv -- "${application_path}" "${original_path}"; then
-        printf '%s\n' snapshot-failed > "${backup_dir}/state" 2>/dev/null || true
+        write_migration_state "${backup_dir}" snapshot-failed 2>/dev/null || true
         die "Failed to snapshot existing application: ${application_path}; inspect ${backup_dir}"
         return 1
     fi
 
     log_info "Installing migrated Homebrew cask: ${package_name}"
-    if ! printf '%s\n' installing > "${backup_dir}/state"; then
+    if ! write_migration_state "${backup_dir}" installing; then
         failure_message="Failed to persist application migration install state: ${backup_dir}"
     elif ! brew install --quiet --cask "${package_name}" </dev/null; then
         failure_message="Failed to install migrated Homebrew cask: ${package_name}"
-    elif ! printf '%s\n' verifying > "${backup_dir}/state"; then
+    elif ! write_migration_state "${backup_dir}" verifying; then
         failure_message="Failed to persist application migration verify state: ${backup_dir}"
     elif ! brew list --cask "${package_name}" >/dev/null 2>&1; then
         failure_message="Homebrew did not register migrated application cask: ${package_name}"
     elif [[ ! -d "${application_path}" ]]; then
         failure_message="Migrated application target is missing: ${application_path}"
-    elif ! printf '%s\n' completed > "${backup_dir}/state"; then
+    elif ! write_migration_state "${backup_dir}" completed; then
         failure_message="Failed to persist completed application migration state: ${backup_dir}"
     fi
 
     if [[ -n "${failure_message}" ]]; then
         if ! rollback_brew_app_migration \
             "${backup_dir}" "${package_name}" "${application_path}" "${original_path}"; then
-            printf '%s\n' rollback-incomplete > "${backup_dir}/state" 2>/dev/null || true
+            write_migration_state "${backup_dir}" rollback-incomplete 2>/dev/null || true
             die "${failure_message}; rollback is incomplete, inspect ${backup_dir}"
             return 1
         fi
-        printf '%s\n' rolled-back > "${backup_dir}/state"
+        write_migration_state "${backup_dir}" rolled-back
         die "${failure_message}; previous application was restored from ${backup_dir}"
         return 1
     fi
@@ -613,6 +615,17 @@ migrate_missing_brew_font_casks() {
         fi
     done < "${target_manifest}"
 
+    if is_read_only_mode; then
+        rm -f -- "${target_manifest}"
+        for package_name in "${migration_casks[@]}"; do
+            normalized_name="$(normalize_brew_name "${package_name}")"
+            BREW_RECONCILED_ITEMS+=("${normalized_name}")
+            BREW_INSTALLED_COUNT=$((BREW_INSTALLED_COUNT + 1))
+            log_planned_action "migrate Homebrew font cask: ${package_name}."
+        done
+        return
+    fi
+
     migration_id="$(date '+%Y%m%dT%H%M%S')-$$"
     backup_dir="${backup_root}/${migration_id}"
     if ! mkdir -p -- "${backup_root}" || ! mkdir -- "${backup_dir}"; then
@@ -622,7 +635,7 @@ migrate_missing_brew_font_casks() {
     fi
     BREW_FONT_MIGRATION_BACKUP_DIR="${backup_dir}"
     migration_manifest="${backup_dir}/manifest.txt"
-    if ! printf '%s\n' prepared > "${backup_dir}/state" || ! : > "${migration_manifest}"; then
+    if ! write_migration_state "${backup_dir}" prepared || ! : > "${migration_manifest}"; then
         rm -f -- "${target_manifest}"
         die "Failed to create font migration manifest: ${migration_manifest}"
         return 1
@@ -642,7 +655,7 @@ migrate_missing_brew_font_casks() {
     done < "${target_manifest}"
     rm -f -- "${target_manifest}"
 
-    if ! printf '%s\n' snapshotting > "${backup_dir}/state"; then
+    if ! write_migration_state "${backup_dir}" snapshotting; then
         die "Failed to persist font migration snapshot state: ${backup_dir}"
         return 1
     fi
@@ -658,7 +671,7 @@ migrate_missing_brew_font_casks() {
     done < "${migration_manifest}"
 
     if [[ -z "${failure_message}" ]]; then
-        if ! printf '%s\n' installing > "${backup_dir}/state"; then
+        if ! write_migration_state "${backup_dir}" installing; then
             failure_message="Failed to persist font migration install state: ${backup_dir}"
         fi
     fi
@@ -673,7 +686,7 @@ migrate_missing_brew_font_casks() {
     fi
 
     if [[ -z "${failure_message}" ]]; then
-        if ! printf '%s\n' verifying > "${backup_dir}/state"; then
+        if ! write_migration_state "${backup_dir}" verifying; then
             failure_message="Failed to persist font migration verify state: ${backup_dir}"
         fi
     fi
@@ -695,18 +708,18 @@ migrate_missing_brew_font_casks() {
         done < "${migration_manifest}"
     fi
     if [[ -z "${failure_message}" ]] &&
-        ! printf '%s\n' completed > "${backup_dir}/state"; then
+        ! write_migration_state "${backup_dir}" completed; then
         failure_message="Failed to persist completed font migration state: ${backup_dir}"
     fi
 
     if [[ -n "${failure_message}" ]]; then
         if ! rollback_brew_font_migration \
             "${backup_dir}" "${migration_manifest}" "${migration_casks[@]}"; then
-            printf '%s\n' rollback-incomplete > "${backup_dir}/state"
+            write_migration_state "${backup_dir}" rollback-incomplete
             die "${failure_message}; rollback is incomplete, inspect ${backup_dir}"
             return 1
         fi
-        printf '%s\n' rolled-back > "${backup_dir}/state"
+        write_migration_state "${backup_dir}" rolled-back
         die "${failure_message}; previous fonts were restored from ${backup_dir}"
         return 1
     fi
@@ -765,12 +778,22 @@ reconcile_brew_package() {
                 fi
                 if [[ "${existing_artifact_policy}" == migrate ]]; then
                     log_info "Migrating existing application into Homebrew ownership: ${package_name}"
+                    if is_read_only_mode; then
+                        log_planned_action "migrate existing application into Homebrew ownership: ${package_name}."
+                        BREW_INSTALLED_COUNT=$((BREW_INSTALLED_COUNT + 1))
+                        return
+                    fi
                     if ! migrate_existing_brew_app_cask \
                         "${package_name}" "${application_name}" "${application_migration_backup_root}"; then
                         return 1
                     fi
                 else
                     log_info "Adopting existing cask: ${package_name}"
+                    if is_read_only_mode; then
+                        log_planned_action "adopt existing Homebrew cask: ${package_name}."
+                        BREW_INSTALLED_COUNT=$((BREW_INSTALLED_COUNT + 1))
+                        return
+                    fi
                     if ! brew install --quiet --cask --adopt "${package_name}" </dev/null; then
                         die "Failed to adopt Homebrew cask: ${package_name}"
                         return 1
@@ -778,12 +801,22 @@ reconcile_brew_package() {
                 fi
             elif [[ "${existing_artifact_policy}" == adopt ]]; then
                 log_info "Installing or adopting cask: ${package_name}"
+                if is_read_only_mode; then
+                    log_planned_action "install or adopt Homebrew cask: ${package_name}."
+                    BREW_INSTALLED_COUNT=$((BREW_INSTALLED_COUNT + 1))
+                    return
+                fi
                 if ! brew install --quiet --cask --adopt "${package_name}" </dev/null; then
                     die "Failed to install or adopt Homebrew cask: ${package_name}"
                     return 1
                 fi
             else
                 log_info "Installing missing cask: ${package_name}"
+                if is_read_only_mode; then
+                    log_planned_action "install missing Homebrew cask: ${package_name}."
+                    BREW_INSTALLED_COUNT=$((BREW_INSTALLED_COUNT + 1))
+                    return
+                fi
                 if ! brew install --quiet --cask "${package_name}" </dev/null; then
                     die "Failed to install Homebrew cask: ${package_name}"
                     return 1
@@ -791,6 +824,11 @@ reconcile_brew_package() {
             fi
         else
             log_info "Installing missing formula: ${package_name}"
+            if is_read_only_mode; then
+                log_planned_action "install missing Homebrew formula: ${package_name}."
+                BREW_INSTALLED_COUNT=$((BREW_INSTALLED_COUNT + 1))
+                return
+            fi
             if ! brew install --quiet "${package_name}" </dev/null; then
                 die "Failed to install Homebrew formula: ${package_name}"
                 return 1
@@ -803,6 +841,11 @@ reconcile_brew_package() {
     if [[ "${#BREW_OUTDATED_ITEMS[@]}" -gt 0 ]] &&
         array_contains "${normalized_name}" "${BREW_OUTDATED_ITEMS[@]}"; then
         log_info "Upgrading outdated ${package_type}: ${package_name}"
+        if is_read_only_mode; then
+            log_planned_action "upgrade outdated ${package_type}: ${package_name}."
+            BREW_UPGRADED_COUNT=$((BREW_UPGRADED_COUNT + 1))
+            return
+        fi
         if [[ "${package_type}" == cask ]]; then
             if ! brew upgrade --quiet --cask "${package_name}" </dev/null; then
                 die "Failed to upgrade Homebrew cask: ${package_name}"
@@ -825,116 +868,4 @@ reconcile_brew_package() {
 print_brew_summary() {
     local package_type="$1"
     log_success "${package_type} summary: installed=${BREW_INSTALLED_COUNT}, upgraded=${BREW_UPGRADED_COUNT}, skipped=${BREW_SKIPPED_COUNT}"
-}
-
-load_tool_versions() {
-    local version_file="${PROJECT_ROOT}/defaults/tool_versions.env"
-    [[ -f "${version_file}" ]] || die "Tool version manifest not found: ${version_file}"
-    # shellcheck disable=SC1090
-    source "${version_file}"
-}
-
-git_worktree_is_clean() {
-    local repository_path="$1"
-    [[ -z "$(git -C "${repository_path}" status --porcelain)" ]]
-}
-
-ensure_pinned_git_repository() {
-    local repository_name="$1"
-    local repository_url="$2"
-    local repository_path="$3"
-    local repository_ref="$4"
-    local actual_url
-    local current_ref
-
-    if [[ ! -e "${repository_path}" ]]; then
-        log_info "Cloning ${repository_name} at pinned revision ${repository_ref}."
-        git clone --filter=blob:none "${repository_url}" "${repository_path}"
-    fi
-
-    git -C "${repository_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
-        die "Existing path is not a Git worktree: ${repository_path}"
-        return 1
-    }
-    actual_url="$(git -C "${repository_path}" remote get-url origin)"
-    if [[ "${actual_url}" != "${repository_url}" ]]; then
-        die "Unexpected origin for ${repository_name}: ${actual_url}"
-        return 1
-    fi
-
-    if ! git_worktree_is_clean "${repository_path}"; then
-        die "Refusing to update dirty Git worktree: ${repository_path}"
-        return 1
-    fi
-
-    current_ref="$(git -C "${repository_path}" rev-parse HEAD 2>/dev/null || true)"
-    if [[ "${current_ref}" == "${repository_ref}" ]]; then
-        log_success "Skipping current ${repository_name}: ${repository_ref}"
-        return
-    fi
-
-    log_info "Updating ${repository_name} to pinned revision ${repository_ref}."
-    git -C "${repository_path}" fetch --depth=1 origin "${repository_ref}"
-    git -C "${repository_path}" checkout --detach "${repository_ref}"
-}
-
-update_git_repository() {
-    local repository_name="$1"
-    local repository_path="$2"
-
-    git -C "${repository_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
-        die "Existing path is not a Git worktree: ${repository_path}"
-        return 1
-    }
-
-    log_info "Fast-forwarding ${repository_name}."
-    git -C "${repository_path}" pull --ff-only
-}
-
-ensure_tracking_git_repository() {
-    local repository_name="$1"
-    local repository_url="$2"
-    local repository_path="$3"
-    local actual_url
-
-    if [[ ! -e "${repository_path}" ]]; then
-        log_info "Cloning ${repository_name}."
-        git clone "${repository_url}" "${repository_path}"
-        return
-    fi
-
-    git -C "${repository_path}" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
-        die "Existing path is not a Git worktree: ${repository_path}"
-        return 1
-    }
-    actual_url="$(git -C "${repository_path}" remote get-url origin)"
-    if [[ "${actual_url}" != "${repository_url}" ]]; then
-        die "Unexpected origin for ${repository_name}: ${actual_url}"
-        return 1
-    fi
-
-    update_git_repository "${repository_name}" "${repository_path}"
-}
-
-ensure_symlink() {
-    local source_path="$1"
-    local target_path="$2"
-    local current_target
-
-    if [[ -L "${target_path}" ]]; then
-        current_target="$(readlink "${target_path}")"
-        if [[ "${current_target}" == "${source_path}" ]]; then
-            log_success "Skipping current symlink: ${target_path}"
-            return
-        fi
-        die "Refusing to replace existing symlink: ${target_path} -> ${current_target}"
-        return 1
-    fi
-    if [[ -e "${target_path}" ]]; then
-        die "Refusing to replace existing path: ${target_path}"
-        return 1
-    fi
-
-    ln -s "${source_path}" "${target_path}"
-    log_success "Created symlink: ${target_path}"
 }

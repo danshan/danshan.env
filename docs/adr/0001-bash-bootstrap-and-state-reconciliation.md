@@ -20,7 +20,7 @@ related:
 - 顶层以独立子进程运行 Bootstrap Stage, 各 Stage 自行建立 Homebrew 和 mise 环境.
 - Managed Resource 使用 inspect, classify, reconcile, verify 模型.
 - Homebrew 使用批量 Observed State inventory, Satisfied Resource 明确跳过.
-- Homebrew 管理的系统 package 跟随 metadata, runtime 和全局 CLI 使用仓库内 version manifest 固定.
+- Homebrew 管理的系统 package 跟随 metadata, runtime 和 global CLI 使用 repository-managed Mise config 固定.
 - Git repository update 使用显式 `git -C` 和 `--ff-only`.
 
 ## Consequences

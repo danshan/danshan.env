@@ -152,3 +152,18 @@ if reconcile_brew_package cask failing-font '' adopt; then
     fail "Failed cask adoption must propagate a non-zero status."
 fi
 assert_equals "${installed_count_before_failure}" "${BREW_INSTALLED_COUNT}" "Failed cask adoption install count"
+
+calls_before_plan="$(wc -l < "${BREW_CALL_LOG}" | tr -d ' ')"
+DANSHAN_MODE=plan
+BREW_INSTALLED_ITEMS=()
+BREW_OUTDATED_ITEMS=()
+reconcile_brew_package formula planned-formula
+calls_after_plan="$(wc -l < "${BREW_CALL_LOG}" | tr -d ' ')"
+assert_equals "${calls_before_plan}" "${calls_after_plan}" "Formula plan mutation"
+
+BREW_INSTALLED_ITEMS=(planned-outdated)
+BREW_OUTDATED_ITEMS=(planned-outdated)
+reconcile_brew_package cask planned-outdated
+assert_equals "${calls_before_plan}" "$(wc -l < "${BREW_CALL_LOG}" | tr -d ' ')" \
+    "Cask plan mutation"
+unset DANSHAN_MODE

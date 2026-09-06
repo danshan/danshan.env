@@ -11,7 +11,7 @@
 | `standards/` | 文档结构, 命名和生命周期规范 | [Documentation Standard](standards/documentation.md) |
 | `architecture/` | 当前系统边界, 组件和执行流 | [Bootstrap Architecture](architecture/bootstrap.md) |
 | `design/` | 已批准或正在评审的功能设计 | [Bootstrap Hardening](design/bootstrap-hardening.md) |
-| `adr/` | 不可变更号的 Architecture Decision Records | [ADR 0001](adr/0001-bash-bootstrap-and-state-reconciliation.md), [ADR 0002](adr/0002-transactional-homebrew-font-migration.md), [ADR 0003](adr/0003-platform-gated-homebrew-casks.md), [ADR 0004](adr/0004-transactional-homebrew-app-migration.md) |
+| `adr/` | 不可变更号的 Architecture Decision Records | [ADR 0001](adr/0001-bash-bootstrap-and-state-reconciliation.md), [ADR 0002](adr/0002-transactional-homebrew-font-migration.md), [ADR 0003](adr/0003-platform-gated-homebrew-casks.md), [ADR 0004](adr/0004-transactional-homebrew-app-migration.md), [ADR 0005](adr/0005-homebrew-and-mise-tool-ownership.md), [ADR 0006](adr/0006-recoverable-bootstrap-execution.md), [ADR 0007](adr/0007-reviewed-npm-trust-policy-exception.md) |
 | `development/` | 本地开发, 测试和贡献流程 | [Testing Guide](development/testing.md) |
 | `operations/` | 安装, 升级, 故障恢复和安全操作 | [Installation Runbook](operations/installation.md) |
 | `reviews/` | 带日期的 code review 和验证记录 | [Bootstrap Remediation](reviews/2026-09-03-bootstrap-remediation.md) |

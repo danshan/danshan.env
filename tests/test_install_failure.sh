@@ -25,5 +25,5 @@ exit_code=$?
 set -e
 
 assert_equals 17 "${exit_code}" "Top-level failure propagation"
-assert_contains 'Installation failed with exit code 17.' "${output_file}" "Failure message"
+assert_contains 'Installation failed in stage preflight with exit code 17.' "${output_file}" "Failure message"
 assert_not_contains 'danshan.env installation complete.' "${output_file}" "Success banner after failure"

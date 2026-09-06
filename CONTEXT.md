@@ -56,6 +56,30 @@ _Avoid_: Cleanup, retry
 具有独立前置条件, reconciliation 范围和失败边界的一组操作.
 _Avoid_: Step, script
 
+**Preflight**:
+在任何 mutation 前验证平台, manifest, Shell 和配置来源的只读阶段.
+_Avoid_: Setup check, best-effort validation
+
+**Execution Plan**:
+只读计算并展示 Reconciliation 预计动作的执行模式, 不改变 Managed State.
+_Avoid_: Dry install, partial apply
+
+**Tool Owner**:
+对工具的安装位置, 版本选择, 更新和卸载承担唯一责任的 package manager 或仓库层.
+_Avoid_: Preferred installer, available manager
+
+**Installation Backend**:
+Mise 为获取某类工具调用的上游 package transport. Backend 不取得 Tool Owner 身份.
+_Avoid_: Package owner, second manager
+
+**Migration Lock**:
+保护 Cask Ownership Migration 的单主机互斥记录. 活跃 owner 阻止并发执行, stale owner 可在验证后恢复.
+_Avoid_: Temp directory, process marker
+
+**Interrupted Migration**:
+进程在 Migration Snapshot 已建立但尚未进入终态时退出所留下的可恢复 transaction.
+_Avoid_: Failed install, incomplete backup
+
 **External Action**:
 需要仓库权限边界之外的服务端权限, 协作者协调或破坏性确认才能完成的动作.
 _Avoid_: Manual fix, follow-up

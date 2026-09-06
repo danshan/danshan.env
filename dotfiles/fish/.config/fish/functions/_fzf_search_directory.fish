@@ -7,8 +7,8 @@ function _fzf_search_directory --description "Search the current directory. Repl
 
     set -f fzf_arguments --multi --ansi $fzf_directory_opts
     set -f token (commandline --current-token)
-    # expand any variables or leading tilde (~) in the token
-    set -f expanded_token (eval echo -- $token)
+    # Expand only the leading home-directory marker. Never evaluate command-line input.
+    set -f expanded_token (string replace -r '^~' "$HOME" -- "$token")
     # unescape token because it's already quoted so backslashes will mess up the path
     set -f unescaped_exp_token (string unescape -- $expanded_token)
 

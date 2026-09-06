@@ -29,9 +29,9 @@ related:
 | Stow and mise ordering | Formula stage precedes shell/dotfiles, explicit mise activation | Complete |
 | Oh My Zsh `.zshrc` conflict | 移除 remote installer, 使用 pinned repository checkout | Complete |
 | Wrong Neovim and Zed `git pull` directory | Neovim 归属 stow, Zed 使用 verified explicit repository path | Complete |
-| Ambient mise project mutation | 全部 runtime 使用 `--global` | Complete |
+| Ambient Mise project mutation | Runtime 与 global CLI 使用 repository-managed global config | Superseded by ADR 0005 |
 | Mutable remote installers and `@latest` | 工具迁移到 Homebrew 或固定 package version, Homebrew installer 固定 commit | Complete |
-| `gtest` pops unrelated stash | 要求 staged changes 并验证 created stash OID | Complete |
+| `gtest` pops unrelated stash | 使用 detached temporary worktree 执行 staged snapshot, 不操作 caller stash | Superseded by ADR 0006 |
 | Remote branch deleted before replacement push | 先 push replacement, 再删除旧 remote branch | Complete |
 | Hard-coded user and ChatGPT paths | 使用 `${HOME}` 并修复 `.app` bundle path | Complete |
 | Permission-bypass aliases are implicit | 重命名为显式 `*-unsafe` aliases | Complete |

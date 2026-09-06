@@ -20,6 +20,11 @@
 - 既有 App bundle 只有在 Cask manifest 显式声明 `migrate` 时才允许转移 ownership. 必须先将精确 `/Applications/<name>.app` target 移入 Migration Snapshot, 再执行普通 Cask install 和 ownership verification; 任一失败必须隔离新 artifact 并恢复原 App.
 - `adopt` 只能用于 Homebrew 判定为 identical 的既有 artifact. 不得在 `adopt` 失败后隐式升级为 `migrate`, 也不得使用 `--force` 绕过版本或内容差异.
 - Cask 的平台限制必须在 manifest 第四列显式声明为正整数 `minimum_macos_major`. Cask stage 只读取一次 `sw_vers -productVersion`, 并在 install, upgrade 或 migration 前 skip 不兼容资源; 不得通过捕获任意 Homebrew failure 推断平台不兼容.
+- Homebrew 只管理 macOS system package 和 Cask, Mise 管理 language runtime 与固定版本的 global CLI. Bun 和 NPM 只管理 project dependency, 不得直接安装 global package.
+- App 和 font Ownership Migration 必须持有 repository-defined Migration Lock, 原子更新 state, 并在开始新 transaction 前恢复可识别的 Interrupted Migration.
+- 无 `state` 的 legacy font snapshot 只有在 manifest, exact target, retained backup 和 Homebrew ownership 全部验证通过时才能视为 completed. 不得改写该 snapshot; 其他 stateless snapshot 必须 fail closed.
+- 旧 Bootstrap 生成的 Mise global config 只有在其 `[tools]` 内容是 repository config 的严格可验证子集时才允许迁移到 Stow ownership. 必须先保留 snapshot, 并覆盖 success, repeat, install failure, verify failure, Rollback, rollback-incomplete 和 interrupted recovery.
+- `plan` 和 `status` 模式必须是只读的. 新增 mutation 时必须同时提供对应的预览或状态行为.
 
 ## Documentation
 
@@ -44,4 +49,5 @@
 - 新增 migration transaction 时, 必须覆盖 success, repeat execution, install failure, verify failure, artifact preservation, Rollback 和 rollback-incomplete contract.
 - 修改字体迁移时, 还必须覆盖 exact target validation, batch success, repeat execution, partial install failure, Rollback 和 backup state marker.
 - 修改 Cask 平台 gating 时, 必须覆盖 below-minimum, at-minimum, installed, outdated, invalid manifest value 和 `sw_vers` command failure.
+- 修改顶层阶段或执行模式时, 必须覆盖完整隔离执行, plan/status 无 mutation, `--stage`, `--from` 和 stage failure propagation.
 - 提交前确认工作树中不存在凭据, 临时文件或未登记文档.

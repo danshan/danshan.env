@@ -8,6 +8,10 @@ related:
   - ../adr/0001-bash-bootstrap-and-state-reconciliation.md
   - ../adr/0002-transactional-homebrew-font-migration.md
   - ../adr/0003-platform-gated-homebrew-casks.md
+  - ../adr/0004-transactional-homebrew-app-migration.md
+  - ../adr/0005-homebrew-and-mise-tool-ownership.md
+  - ../adr/0006-recoverable-bootstrap-execution.md
+  - ../adr/0007-reviewed-npm-trust-policy-exception.md
   - ../reviews/2026-09-03-bootstrap-remediation.md
 ---
 
@@ -27,6 +31,22 @@ git clone git@github.com:danshan/danshan.env.git "$HOME/.config/danshan.env"
 cd "$HOME/.config/danshan.env"
 bash install.sh
 ```
+
+首次 apply 或变更 manifest 前, 先执行只读检查:
+
+```bash
+bash install.sh plan
+bash install.sh status
+```
+
+限制执行范围时使用:
+
+```bash
+bash install.sh status --stage devenv
+bash install.sh apply --from dotfiles
+```
+
+Stage 顺序为 `base`, `homebrew`, `trust`, `formulae`, `casks`, `shell`, `dotfiles`, `devenv`. `--stage` 和 `--from` 互斥, preflight 始终执行. `--no-color` 可生成稳定的纯文本日志.
 
 重复执行相同命令即可更新. Homebrew reconciliation 行为如下:
 
@@ -57,10 +77,21 @@ brew trust --json=v1
 
 正常情况下, `muxy-app/tap/muxy` 只出现在 `casks` 数组中. Trust stage 必须早于 Formula/Cask inventory, 因而后续批量状态读取不会重复产生同一 tap warning.
 
-Context7 的交互配置默认不在 Bootstrap 中运行. 需要时显式启用:
+## Package manager ownership
+
+- Homebrew 管理 macOS system package 和 Cask. Formula 与 Cask 跟随已刷新 metadata.
+- Mise 管理 language runtime, Bun, uv, Starship 和 global CLI. Desired State 与精确版本位于 `dotfiles/mise/.config/mise/config.toml`.
+- `mise.lock` 为支持 locking 的 backend 固定 macOS artifact 与 checksum. NPM backend 仍只保证 config 中的精确 package version, 不具备相同的 artifact lock 强度.
+- Bun 和 NPM 只允许在具体项目中按项目 lockfile 管理 dependency. 不直接执行 global install, 避免 PATH 与 upgrade ownership 冲突.
+
+`npm:oh-my-openagent@4.19.1` 当前包含一个经过审查的精确 Aube exception: `effect@4.0.0-beta.66`. 它只忽略该版本的 publisher/repository trust transition, 不关闭 npm signature, integrity 或其他 dependency 的 trust-policy 检查. Evidence 和移除条件记录在 ADR 0007. 若 dependency graph 不再选择该精确版本, 应删除 exception, 重新生成 lockfile 并执行完整测试.
+
+升级 Mise-managed 工具时, 修改 repository config 后重新生成 lockfile 并验证:
 
 ```bash
-DANSHAN_RUN_CONTEXT7_SETUP=1 bash install.sh
+MISE_GLOBAL_CONFIG_FILE="$PWD/dotfiles/mise/.config/mise/config.toml" \
+  mise lock --global --platform macos-arm64,macos-x64
+bash install.sh plan --stage devenv
 ```
 
 ## Local secrets
@@ -78,7 +109,9 @@ chmod 600 dotfiles/fish/.config/fish/conf.d/secrets.local.fish
 
 ## Conflict handling
 
-Stow 遇到普通文件或指向其他来源的 symlink 时会失败. 安装脚本不会自动覆盖. 处理前先确认内容和所有权, 将旧文件移动到明确的备份路径, 然后重新执行安装.
+Stow 遇到普通文件或指向其他来源的 symlink 时通常会失败. 安装脚本不会使用 `--adopt` 或覆盖未知内容. 处理前先确认内容和所有权, 将旧文件移动到明确的备份路径, 然后重新执行安装.
+
+旧 Bootstrap 直接生成的 `~/.config/mise/config.toml` 是显式兼容项. 若其 `[tools]` key/version 全部被新的 repository config 包含, Bootstrap 会把原文件保留到 `${HOME}/Library/Application Support/danshan.env/dotfile-backups`, 再由 Stow 创建 config 和 lockfile symlink. Stow 或 verify 失败会恢复原文件. 若存在额外 tool, section, comment 或不同 version, 自动迁移会拒绝执行, 需要人工合并后重试.
 
 Homebrew inventory 中缺失的 Cask 可以在 `defaults/brew_casks.txt` 第三列声明 existing artifact policy. App Cask 若已存在于 `/Applications`, 默认 `preserve` 并 skip. 显式 `adopt` 会执行 `brew install --cask --adopt`, Homebrew 只接管内容相同的目标 App artifact. 显式 `migrate` 用于版本或内容不同但确实需要转入 Homebrew ownership 的 App. 不要在 adoption failure 后改用 `--force`.
 
@@ -111,9 +144,19 @@ Hack, Fira Code 和 JetBrains Mono Nerd Font 显式声明 `migrate`. 当 cask �
 
 Bootstrap 不自动删除历史 snapshot. 清理前必须确认当前字体可用且不再需要回滚.
 
+## Interrupted migration recovery
+
+Cask stage 使用 `${HOME}/Library/Application Support/danshan.env/locks/cask-migration.lock` 阻止并发 migration. 若 owner PID 仍存活, 当前执行会失败并报告 lock. 若 PID 已退出且 lock 结构符合 contract, Bootstrap 会清理 stale lock 后继续. 不要手工删除 active lock.
+
+新 transaction 前会扫描 App 与 font snapshot. `prepared`, `snapshotting`, `snapshot-failed`, `installing` 或 `verifying` 会自动进入 Rollback, 成功后写入 `rolled-back`. `rollback-incomplete` 或未知 state 不会自动猜测, 必须根据报告路径检查 `manifest.txt`, `originals` 和 failed artifact 后处理.
+
+旧版 font migration 可能只有三列 `manifest.txt`, 没有 `state`. Bootstrap 会验证每个 target, snapshot path, original file 和 Homebrew Cask ownership; 全部满足时将其作为已完成的 legacy snapshot 跳过, 且不写入历史目录. 任一验证失败都会停止, 不会假定成功或自动 Rollback.
+
 Pinned Git dependency 存在未提交修改时会失败. 应先提交, stash 或明确丢弃这些修改, 再重试. 安装脚本不会替操作者清理 worktree.
 
 Zed config path 存在但 origin 不匹配时会失败. 应人工确认正确 repository, 不得直接修改脚本绕过 origin 验证.
+
+Zed repository 的 worktree 和 origin identity 在任何 Bootstrap mutation 前由 preflight 检查. Dirty worktree 会明确 skip remote update, 但不阻止其他 Bootstrap Stage. 安装脚本不会自动 commit, stash 或丢弃修改.
 
 ## Codex hook ownership
 
@@ -131,4 +174,4 @@ Zed config path 存在但 origin 不匹配时会失败. 应人工确认正确 re
 
 ## Failure recovery
 
-顶层显示 `Installation failed` 时, 使用第一个失败阶段的日志定位问题. App 或 font migration 若报告 `rolled-back`, 可以修复外部原因后重新运行完整入口; 若报告 `rollback-incomplete`, 必须先检查报告的 snapshot. 其他失败修复外部状态后重新运行完整入口. 已满足的 Homebrew package, pinned repository 和 global CLI 会跳过, 不需要手工从中断阶段继续.
+顶层显示 `Installation failed in stage` 时, 使用 stage 名称和其前面的首个错误定位问题. App 或 font migration 若报告 `rolled-back`, 可以修复外部原因后重新运行完整入口; 若报告 `rollback-incomplete`, 必须先检查报告的 snapshot. 其他失败修复外部状态后重新运行完整入口. 已满足的 Homebrew package, pinned repository 和 Mise tool 会跳过. 已确认前置阶段满足时, 可用 `--from` 缩短重试路径.

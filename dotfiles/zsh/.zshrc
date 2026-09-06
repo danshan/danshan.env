@@ -79,12 +79,22 @@ plugins=(git history extract zsh-autosuggestions zsh-syntax-highlighting mvn htt
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.bin:/usr/local/go/bin:$PATH"
 
-source $ZSH/oh-my-zsh.sh
+[[ -r "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
 # Homebrew
 export HOMEBREW_INSTALL_FROM_API=1
 export HOMEBREW_NO_AUTO_UPDATE=true # no update when use brew
-eval $(/opt/homebrew/bin/brew shellenv)
+brew_executable="${commands[brew]:-}"
+if [[ -z "$brew_executable" ]]; then
+  for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+    if [[ -x "$candidate" ]]; then
+      brew_executable="$candidate"
+      break
+    fi
+  done
+fi
+[[ -n "$brew_executable" ]] && eval "$("$brew_executable" shellenv)"
+unset brew_executable candidate
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -118,7 +128,11 @@ alias fuckgfw='export https_proxy=http://127.0.0.1:6152;export http_proxy=http:/
 alias noproxy='unset http_proxy https_proxy all_proxy no_proxy'
 
 # config for autojump
-test -e  $(brew --prefix)/etc/profile.d/autojump.sh && source $(brew --prefix)/etc/profile.d/autojump.sh
+if (( $+commands[brew] )); then
+  autojump_init="$(brew --prefix)/etc/profile.d/autojump.sh"
+  [[ -r "$autojump_init" ]] && source "$autojump_init"
+  unset autojump_init
+fi
 
 
 # iTerm2 shell integration
@@ -132,7 +146,7 @@ export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
 export PATH="/usr/local/opt/ruby/bin:$PATH"
 
 # mise 
-eval "$(mise activate zsh)"
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
 
 # maven
 export MVNW_VERBOSE=true
@@ -160,7 +174,7 @@ export PATH="${HOME}/.opencode/bin:${PATH}"
 test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.openclaw/completions/openclaw.zsh"
 
 # Starship
-eval "$(starship init zsh)"
+(( $+commands[starship] )) && eval "$(starship init zsh)"
 
 # Explicit unsafe alias
 alias claude-unsafe="claude --dangerously-skip-permissions"

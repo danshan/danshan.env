@@ -29,6 +29,7 @@ font-jetbrains-mono-nerd-font||migrate
 chatgpt|ChatGPT
 obsidian|Obsidian
 1password|1Password
+1password-cli
 antigravity|Antigravity
 ghostty|Ghostty
 detachhead/tap/rebased|Rebased

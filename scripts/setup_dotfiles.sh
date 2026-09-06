@@ -13,6 +13,7 @@ require_command stow
 stow_package() {
     local package_name="$1"
     local package_path="${DOTFILES_DIR}/${package_name}"
+    local migration_exit_code
 
     [[ -d "${package_path}" ]] || {
         die "Dotfile package not found: ${package_name}"
@@ -24,10 +25,27 @@ stow_package() {
     fi
 
     log_info "Applying dotfile package: ${package_name}"
-    stow --dir "${DOTFILES_DIR}" --target "${HOME}" --restow --verbose "${package_name}"
+    if [[ "${package_name}" == mise ]]; then
+        if migrate_legacy_stow_file \
+            "${package_name}" ".config/mise/config.toml" \
+            "${HOME}/Library/Application Support/danshan.env/dotfile-backups"; then
+            return
+        else
+            migration_exit_code=$?
+            [[ "${migration_exit_code}" -eq 2 ]] || return "${migration_exit_code}"
+        fi
+    fi
+    if is_read_only_mode; then
+        stow --dir "${DOTFILES_DIR}" --target "${HOME}" --restow --simulate "${package_name}"
+    else
+        stow --dir "${DOTFILES_DIR}" --target "${HOME}" --restow --verbose "${package_name}"
+    fi
 }
 
 log_title "Configuring dotfiles."
+
+recover_interrupted_stow_migrations \
+    "${HOME}/Library/Application Support/danshan.env/dotfile-backups"
 
 case "${SHELL:-}" in
     */zsh)
@@ -44,27 +62,12 @@ case "${SHELL:-}" in
         ;;
 esac
 
-for package_name in \
-    vim \
-    fzf \
-    git \
-    screen \
-    starship \
-    tmux \
-    nvim \
-    ghostty \
-    cmux \
-    fastfetch \
-    zellij \
-    fd \
-    hammerspoon \
-    codex \
-    gemini \
-    claude \
-    pi \
-    herdr; do
+while IFS= read -r package_name || [[ -n "${package_name}" ]]; do
+    case "${package_name}" in
+        ''|'#'*) continue ;;
+    esac
     stow_package "${package_name}"
-done
+done < "${PROJECT_ROOT}/defaults/dotfile_pkgs.txt"
 
 ensure_tracking_git_repository \
     "Zed configuration" \

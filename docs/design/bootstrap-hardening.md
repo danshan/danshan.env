@@ -8,6 +8,9 @@ related:
   - ../adr/0002-transactional-homebrew-font-migration.md
   - ../adr/0003-platform-gated-homebrew-casks.md
   - ../adr/0004-transactional-homebrew-app-migration.md
+  - ../adr/0005-homebrew-and-mise-tool-ownership.md
+  - ../adr/0006-recoverable-bootstrap-execution.md
+  - ../adr/0007-reviewed-npm-trust-policy-exception.md
   - ../standards/documentation.md
 ---
 
@@ -25,19 +28,23 @@ related:
 
 ## Execution model
 
-顶层入口使用 Bash 3.2, 每个阶段作为独立进程运行. 阶段之间不依赖隐式 Shell 状态, 所需 PATH 和配置必须在各阶段内显式建立.
+顶层入口使用 Bash 3.2, 每个阶段作为独立进程运行. 阶段之间不依赖隐式 Shell 状态, 所需 PATH 和配置必须在各阶段内显式建立. 每次执行先完成无 mutation 的 preflight, 包括既有 Zed repository 的 worktree 和 origin identity 检查. Dirty tracking repository 由更新阶段保留并 skip.
 
 执行顺序如下:
 
-1. Install or activate Homebrew, then refresh metadata once.
-2. Reconcile explicit package-level trust grants for third-party Homebrew sources.
-3. Reconcile required formulae, including `stow`, `mise`, and `uv`.
-4. Reconcile casks.
-5. Install pinned shell frameworks without creating unmanaged dotfiles.
-6. Apply stow packages and update managed Git repositories with explicit working directories.
-7. Activate mise in the current stage, reconcile pinned runtimes, then install pinned global CLI packages.
+1. Validate host, manifests, login Shell and Mise source configuration.
+2. Create the explicit base directory when missing.
+3. Install or activate Homebrew, then refresh metadata once.
+4. Reconcile explicit package-level trust grants for third-party Homebrew sources.
+5. Reconcile required formulae, including `stow` and `mise`.
+6. Reconcile casks under platform and ownership policies.
+7. Install pinned shell frameworks without creating unmanaged dotfiles.
+8. Apply manifest-declared stow packages and update managed Git repositories with explicit working directories.
+9. Activate Mise in the current stage and reconcile repository-pinned runtimes and global CLI packages.
 
 顶层只有在全部阶段成功后才输出完成提示. 任一阶段失败立即返回非零状态.
+
+`apply` 是默认 mutation mode. `plan` 只展示预计 reconciliation, `status` 只展示 Observed State. `--stage` 运行单个 Bootstrap Stage, `--from` 从指定 Stage 继续. Read-only mode 不刷新 Homebrew metadata, 不写 trust, 不安装 package, 不移动 migration artifact, 不更新 Git repository, 并对 Stow 使用 simulation.
 
 ## Homebrew reconciliation
 
@@ -88,9 +95,21 @@ Transaction 不使用 filename glob 推导 ownership, 不删除 snapshot, 不使
 
 该 transaction 不迁移 App 外部的 preferences, caches 或 user data, 因为这些内容不属于 Cask App artifact. 每个 App 独立提交或回滚, 不与 font family 的 batch atomicity 合并.
 
-## Tool pinning
+## Tool ownership and pinning
 
-Runtime 和全局 CLI 版本集中保存在 `defaults/tool_versions.env`. 脚本不得使用 `@latest`. 更新版本时必须同时更新 operations 文档和 remediation review.
+每个工具只能有一个 Tool Owner:
+
+| Owner | Scope |
+|---|---|
+| Homebrew | macOS system package, Shell integration dependency 和 GUI Cask |
+| Mise | Java, Maven, Node.js, Python, Bun, uv, Starship 和固定版本的 global CLI |
+| Bun or NPM | 具体 repository 的 project dependency, 由该项目 lockfile 管理 |
+
+Mise Desired State 位于 `dotfiles/mise/.config/mise/config.toml`. Aqua 或 NPM 只作为 Mise Installation Backend, 不形成第二套 global ownership. 配置使用精确版本且不得出现 `latest`. 支持 artifact locking 的 backend 同步写入 `mise.lock`; NPM backend 依赖精确 package version 和 registry integrity, 不声称具有 artifact checksum lock.
+
+Aube `no-downgrade` failure 默认视为供应链 blocker. Exception 只能在 npm attestation, official source repository, signed source commit, package manifest version, publisher transition 和 tarball digest 完整核验后加入. Scope 必须同时限定 top-level tool 与精确 transitive dependency version; 禁止 bare package exception 和 `npm.shell_out=true` 全局绕过.
+
+`defaults/tool_versions.env` 只保存 Homebrew installer 与 pinned Git dependency revision, 不再保存 runtime 或 CLI version. 更新版本时必须同时更新 Mise config, lockfile 和相关测试.
 
 Homebrew package 版本由 Homebrew metadata 管理. 这是有意选择的滚动更新边界, 与固定版本的语言 runtime 和 agent CLI 分离.
 
@@ -106,7 +125,9 @@ Homebrew package 版本由 Homebrew metadata 管理. 这是有意选择的滚动
 - Git 更新只允许 fast-forward, 避免安装脚本隐式创建 merge commit.
 - 已存在但不是 Git worktree 的目标目录必须 fail closed.
 - 已存在且未由 stow 管理的目标文件必须报告冲突, 不自动覆盖.
+- 旧 Mise config 只有在 `[tools]` 是 repository config 的可验证子集时才通过 snapshot, Stow, verify transaction 转移 ownership; 禁止使用 `--adopt`.
 - App 或 font migration failure 必须在当前 Cask stage 内完成 Rollback; Rollback 不完整时报告 snapshot path 并停止.
+- Cask migration 使用 PID lock 串行化. State marker 通过 atomic rename 更新; 新 transaction 前自动恢复已知 non-terminal state.
 - 重试安装前先修复失败原因, 再重新执行顶层入口. 已满足步骤会自动跳过.
 
 ## Verification
@@ -118,5 +139,8 @@ Homebrew package 版本由 Homebrew metadata 管理. 这是有意选择的滚动
 - Formula/Cask trust 的 missing, current 和 command failure 分流, 以及 whole-tap bypass policy.
 - 任一阶段失败时顶层非零退出且不输出完成提示.
 - Git 更新使用正确工作目录和 fast-forward-only 参数.
-- mise 配置全部使用显式 global scope.
-- 无 staged changes 时 `gtest` 不消费已有 stash.
+- Mise config 由 Stow 安装到显式 global path, 且不读写调用目录的 local config.
+- `plan` 和 `status` 全程无 mutation, stage selection 只执行声明范围.
+- Interrupted App/Font migration 能恢复, live lock 拒绝并发, stale lock 可以安全接管.
+- Legacy Mise config migration 覆盖 success, repeat, Stow/verify failure, retained snapshot, Rollback 和 interrupted recovery.
+- `gtest` 在 temporary worktree 中运行 staged snapshot, 不创建或消费调用者 stash.

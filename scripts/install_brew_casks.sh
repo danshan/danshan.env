@@ -7,6 +7,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 activate_homebrew
+acquire_brew_migration_lock \
+    "${HOME}/Library/Application Support/danshan.env/locks"
+trap release_brew_migration_lock EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM HUP
+recover_interrupted_brew_migrations \
+    "${HOME}/Library/Application Support/danshan.env/app-backups" \
+    "${HOME}/Library/Application Support/danshan.env/font-backups"
 load_brew_state cask
 validate_brew_cask_manifest "${PROJECT_ROOT}/defaults/brew_casks.txt"
 load_macos_state

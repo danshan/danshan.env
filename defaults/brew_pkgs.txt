@@ -1,7 +1,6 @@
 wget
 cloc
 telnet
-yarn
 graphviz
 lrzsz
 neovim
@@ -17,16 +16,12 @@ lazygit
 tree
 scrcpy
 coreutils
-1password-cli
 daipeihust/tap/im-select
 gron
 stow
-starship
 mise
-uv
 herdr
 gh
-agent-browser
 fastfetch
 fish
 zoxide
