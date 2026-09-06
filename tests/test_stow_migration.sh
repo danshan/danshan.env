@@ -1,123 +1,70 @@
 #!/usr/bin/env bash
-
 set -Eeuo pipefail
-
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${TEST_DIR}/.." && pwd)"
-# shellcheck source=tests/test_helper.sh
 source "${TEST_DIR}/test_helper.sh"
-# shellcheck source=scripts/common.sh
-source "${PROJECT_ROOT}/scripts/common.sh"
-
-TEST_TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/danshan-stow-migration.XXXXXX")"
-trap 'rm -rf -- "${TEST_TEMP_DIR}"' EXIT
-export HOME="${TEST_TEMP_DIR}/home"
-mkdir -p -- "${HOME}/.config/mise"
+load_bootstrap_libraries
 STOW_MODE=success
-
-write_legacy_config() {
-    local target_path="$1"
-    mkdir -p -- "${target_path%/*}"
-    printf '%s\n' \
-        '[tools]' \
-        'java = "zulu-17.66.19.0"' \
-        'node = "24.18.0"' \
-        > "${target_path}"
-}
-
 stow() {
-    local target_config="${HOME}/.config/mise/config.toml"
-    local target_lock="${HOME}/.config/mise/mise.lock"
-    case "$*" in
-        *'--delete'*)
-            rm -f -- "${target_config}" "${target_lock}"
-            [[ "${STOW_MODE}" != rollback-incomplete ]]
-            ;;
-        *)
-            [[ "${STOW_MODE}" != install-failure && "${STOW_MODE}" != rollback-incomplete ]] || return 1
-            mkdir -p -- "${target_config%/*}"
-            ln -s "${DOTFILES_DIR}/mise/.config/mise/config.toml" "${target_config}"
-            ln -s "${DOTFILES_DIR}/mise/.config/mise/mise.lock" "${target_lock}"
-            if [[ "${STOW_MODE}" == verify-failure ]]; then
-                rm -f -- "${target_config}"
-                ln -s "${DOTFILES_DIR}/mise/.config/mise/mise.lock" "${target_config}"
-            fi
-            ;;
-    esac
+    local dir="${HOME}/.config/mise"
+    [[ "${STOW_MODE}" != install-failure ]] || return 1
+    ln -sf "${DOTFILES_DIR}/mise/.config/mise/config.toml" "${dir}/config.toml"
+    [[ -L "${dir}/mise.lock" ]] || ln -s "${DOTFILES_DIR}/mise/.config/mise/mise.lock" "${dir}/mise.lock"
+    if [[ "${STOW_MODE}" == verify-failure ]]; then
+        ln -sf "${DOTFILES_DIR}/mise/.config/mise/mise.lock" "${dir}/config.toml"
+    elif [[ "${STOW_MODE}" == rollback-incomplete ]]; then
+        rm "${dir}/config.toml"
+        printf 'unrecognized new data\n' > "${dir}/config.toml"
+        return 1
+    fi
 }
-
-target_config="${HOME}/.config/mise/config.toml"
-success_root="${TEST_TEMP_DIR}/success"
-write_legacy_config "${target_config}"
-migrate_legacy_stow_file mise .config/mise/config.toml "${success_root}"
-[[ -L "${target_config}" ]] || fail "Successful migration must install a symlink."
-success_backup="$(find "${success_root}" -mindepth 1 -maxdepth 1 -type d -print -quit)"
-assert_equals completed "$(sed -n '1p' "${success_backup}/state")" \
-    "Successful Stow migration state"
-assert_contains 'java = "zulu-17.66.19.0"' \
-    "${success_backup}/originals/.config/mise/config.toml" \
-    "Successful Stow migration snapshot"
-if migrate_legacy_stow_file mise .config/mise/config.toml "${success_root}"; then
-    fail "Repeat migration must report not applicable."
-else
-    assert_equals 2 "$?" "Repeat Stow migration result"
-fi
-
-rm -f -- "${HOME}/.config/mise/config.toml" "${HOME}/.config/mise/mise.lock"
-failure_root="${TEST_TEMP_DIR}/install-failure"
-write_legacy_config "${target_config}"
+legacy() { mkdir -p "${HOME}/.config/mise"; printf '[tools]\nnode = "24.18.0"\n' > "${HOME}/.config/mise/config.toml"; }
+for mode in success install-failure verify-failure rollback-incomplete; do
+    STOW_MODE="${mode}"
+    rm -rf "${HOME}/.config/mise"
+    legacy
+    root="${HOME}/${mode}"
+    if [[ "${mode}" == success ]]; then
+        migrate_legacy_stow_file mise .config/mise/config.toml "${root}"
+        verify_mise_deployment
+        result=0; migrate_legacy_stow_file mise .config/mise/config.toml "${root}" || result=$?
+        assert_equals 2 "${result}" 'Repeated legacy migration'
+    else expect_failure migrate_legacy_stow_file mise .config/mise/config.toml "${root}"; fi
+    backup="$(find "${root}" -mindepth 1 -maxdepth 1 -type d -print)"
+    assert_contains 'node = "24.18.0"' "${backup}/originals/.config/mise/config.toml" 'Retained legacy config'
+    case "${mode}" in
+        success) assert_equals completed "$(cat "${backup}/state")" 'Stow commit' ;;
+        rollback-incomplete) assert_equals rollback-incomplete "$(cat "${backup}/state")" 'Stow incomplete rollback'
+            assert_contains 'unrecognized new data' "${HOME}/.config/mise/config.toml" 'Preserved conflicting file' ;;
+        *) assert_equals rolled-back "$(cat "${backup}/state")" 'Stow rollback'
+            assert_contains 'node = "24.18.0"' "${HOME}/.config/mise/config.toml" 'Restored legacy config' ;;
+    esac
+done
+# A failed snapshot move cannot be swallowed by a caller's conditional context.
+rm -rf "${HOME}/.config/mise"; legacy
+mv() { case "$1" in --) [[ "$2" != "${HOME}/.config/mise/config.toml" ]] || return 7 ;; esac; command mv "$@"; }
+expect_failure migrate_legacy_stow_file mise .config/mise/config.toml "${HOME}/move-failed"
+unset -f mv
+assert_contains 'node = "24.18.0"' "${HOME}/.config/mise/config.toml" 'Failed snapshot move preserves target'
+recover_interrupted_stow_migrations "${HOME}/move-failed"
+# An already-owned lockfile survives rollback.
+ln -s "${DOTFILES_DIR}/mise/.config/mise/mise.lock" "${HOME}/.config/mise/mise.lock"
 STOW_MODE=install-failure
-if migrate_legacy_stow_file mise .config/mise/config.toml "${failure_root}"; then
-    fail "Stow install failure must fail migration."
-fi
-[[ -f "${target_config}" && ! -L "${target_config}" ]] || \
-    fail "Install failure must restore the legacy config."
-failure_backup="$(find "${failure_root}" -mindepth 1 -maxdepth 1 -type d -print -quit)"
-assert_equals rolled-back "$(sed -n '1p' "${failure_backup}/state")" \
-    "Install failure Rollback state"
-
-rm -f -- "${target_config}"
-verify_root="${TEST_TEMP_DIR}/verify-failure"
-write_legacy_config "${target_config}"
-STOW_MODE=verify-failure
-if migrate_legacy_stow_file mise .config/mise/config.toml "${verify_root}"; then
-    fail "Stow verification failure must fail migration."
-fi
-[[ -f "${target_config}" && ! -L "${target_config}" ]] || \
-    fail "Verify failure must restore the legacy config."
-verify_backup="$(find "${verify_root}" -mindepth 1 -maxdepth 1 -type d -print -quit)"
-assert_equals rolled-back "$(sed -n '1p' "${verify_backup}/state")" \
-    "Verify failure Rollback state"
-
-rm -f -- "${target_config}"
-incomplete_root="${TEST_TEMP_DIR}/rollback-incomplete"
-write_legacy_config "${target_config}"
-STOW_MODE=rollback-incomplete
-if migrate_legacy_stow_file mise .config/mise/config.toml "${incomplete_root}"; then
-    fail "Incomplete Stow Rollback must fail migration."
-fi
-incomplete_backup="$(find "${incomplete_root}" -mindepth 1 -maxdepth 1 -type d -print -quit)"
-assert_equals rollback-incomplete "$(sed -n '1p' "${incomplete_backup}/state")" \
-    "Incomplete Stow Rollback state"
-[[ -f "${target_config}" ]] || fail "Incomplete Rollback should preserve the original config."
-
-rm -f -- "${target_config}" "${HOME}/.config/mise/mise.lock"
-recovery_root="${TEST_TEMP_DIR}/recovery"
-recovery_backup="${recovery_root}/interrupted"
-recovery_original="${recovery_backup}/originals/.config/mise/config.toml"
-write_legacy_config "${recovery_original}"
-printf '%s\n' 'mise|.config/mise/config.toml' > "${recovery_backup}/manifest.txt"
-write_migration_state "${recovery_backup}" reconciling
-STOW_MODE=success
-recover_interrupted_stow_migrations "${recovery_root}"
-assert_equals rolled-back "$(sed -n '1p' "${recovery_backup}/state")" \
-    "Interrupted Stow migration state"
-[[ -f "${target_config}" && ! -L "${target_config}" ]] || \
-    fail "Interrupted migration must restore the legacy config."
-
-unrecognized_root="${TEST_TEMP_DIR}/unrecognized"
-printf '%s\n' '[tools]' 'custom = "1.0.0"' > "${target_config}"
-if migrate_legacy_stow_file mise .config/mise/config.toml "${unrecognized_root}"; then
-    fail "Unrecognized existing config must fail closed."
-fi
-[[ ! -d "${unrecognized_root}" ]] || fail "Rejected config must not create a snapshot."
+expect_failure migrate_legacy_stow_file mise .config/mise/config.toml "${HOME}/owned-lock"
+[[ -L "${HOME}/.config/mise/mise.lock" ]] || fail 'Rollback lost an existing owned lockfile.'
+# Recovery after moving the original always restores it; success is not inferred from one link.
+backup="${HOME}/interrupted/one"
+mkdir -p "${backup}/originals/.config/mise"
+mv "${HOME}/.config/mise/config.toml" "${backup}/originals/.config/mise/config.toml"
+printf 'mise|.config/mise/config.toml\n' > "${backup}/manifest.txt"
+write_migration_state "${backup}" reconciling
+recover_interrupted_stow_migrations "${HOME}/interrupted"
+write_migration_state "${backup}" rolling-back
+recover_interrupted_stow_migrations "${HOME}/interrupted"
+assert_contains 'node = "24.18.0"' "${HOME}/.config/mise/config.toml" 'Repeated Stow recovery'
+# Unknown settings and assignments outside [tools] cannot pass subset validation.
+printf '[tools]\nunknown = "1"\n' > "${HOME}/.config/mise/config.toml"
+expect_failure migrate_legacy_stow_file mise .config/mise/config.toml "${HOME}/unknown"
+[[ ! -e "${HOME}/unknown" ]] || fail 'Rejected config created a snapshot.'
+printf '[settings]\nnode = "24.18.0"\n' > "${HOME}/wrong-section.toml"
+expect_failure source_has_simple_toml_tool "${HOME}/wrong-section.toml" node 24.18.0

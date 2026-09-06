@@ -5,9 +5,8 @@ owner: repository-maintainers
 last_updated: 2026-09-06
 related:
   - ../architecture/bootstrap.md
-  - ../design/bootstrap-hardening.md
   - ../operations/installation.md
-  - 0005-homebrew-and-mise-tool-ownership.md
+  - 0008-native-package-managers-and-explicit-migrations.md
 ---
 
 # ADR 0007: Reviewed NPM Trust Policy Exception

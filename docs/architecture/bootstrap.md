@@ -1,102 +1,73 @@
 ---
-title: Bootstrap Architecture
+title: Native Bootstrap Architecture
 status: active
 owner: repository-maintainers
 last_updated: 2026-09-06
 related:
-  - ../design/bootstrap-hardening.md
-  - ../adr/0001-bash-bootstrap-and-state-reconciliation.md
-  - ../adr/0002-transactional-homebrew-font-migration.md
-  - ../adr/0003-platform-gated-homebrew-casks.md
-  - ../adr/0004-transactional-homebrew-app-migration.md
-  - ../adr/0005-homebrew-and-mise-tool-ownership.md
-  - ../adr/0006-recoverable-bootstrap-execution.md
-  - ../adr/0007-reviewed-npm-trust-policy-exception.md
+  - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../operations/installation.md
+  - ../development/testing.md
 ---
 
-# Bootstrap Architecture
+# Native Bootstrap Architecture
 
-## Scope
+## Ownership and declarations
 
-本项目将 macOS 开发环境描述为三个可收敛层次: Homebrew system package 和 Cask, repository-managed dotfiles, 以及 Mise runtime 和固定版本的 global CLI. `install.sh` 是唯一完整入口. Bun 和 NPM 只属于具体项目的 dependency boundary.
+| Owner | 职责 | 唯一清单 |
+|---|---|---|
+| Homebrew | 主机 CLI, Shell 组件, App, 字体, 包级 trust | 根目录 `Brewfile` |
+| Mise | runtime, 构建工具, 开发 CLI, 包括 NPM/Aqua backend | `dotfiles/mise/.config/mise/config.toml` 和相邻 `mise.lock` |
+| Bun / NPM | 具体项目的 dependency | 各项目 manifest 和 lockfile |
+| Stow | 从仓库部署 dotfiles | `config/dotfiles.tsv` |
+| Git | dotfiles 使用的外部配置和插件仓库 | `config/repositories.tsv` |
+| Bootstrap | 跨阶段顺序, 精确链接, 显式 ownership migration | `config/links.tsv`, `config/migrations.txt` |
 
-## Components
+Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. Hammerspoon 配置属于本仓库的 Stow package. 开发 CLI 可以声明 `latest`, runtime 保留明确版本; 解析结果提交到 `mise.lock`. NPM backend 的原生 lock 记录版本和选项, 不提供与二进制 backend 相同的跨平台 URL/checksum 锁定强度.
 
-| Component | Responsibility |
-|---|---|
-| `install.sh` | Mode 和 stage selection, 固定顺序, 隔离子进程, 传播失败, elapsed summary |
-| `scripts/preflight.sh` | 在 mutation 前验证平台, manifest, Shell, Mise 配置来源和既有 Zed repository identity |
-| `scripts/common.sh` | 加载 shared library, 提供 Homebrew reconciliation facade |
-| `scripts/lib/*.sh` | Core logging, manifest validation, Git, runtime 和 migration state primitives |
-| `scripts/setup_homebrew.sh` | Homebrew Bootstrap 和单次 metadata refresh |
-| `scripts/setup_brew_trust.sh` | 第三方 Formula/Cask 的 exact package trust 收敛 |
-| `scripts/install_brew_pkgs.sh` | Formula inventory 和三态收敛 |
-| `scripts/install_brew_casks.sh` | Cask inventory, missing font migration batch 和三态收敛 |
-| `scripts/setup_shell.sh` | 固定 revision 的 Oh My Zsh 和 oh-my-tmux |
-| `scripts/setup_dotfiles.sh` | Stow package 和 Zed config repository |
-| `scripts/setup_devenv.sh` | Mise runtime 和固定版本的全局 CLI |
-| `defaults/brew_*.txt` | Homebrew Desired State 和 trust manifest |
-| `defaults/dotfile_pkgs.txt` | Stow package Desired State |
-| `defaults/tool_versions.env` | Remote Bootstrap 和 pinned Git dependency revisions |
-| `dotfiles/mise/.config/mise/config.toml` | Runtime 和 global CLI Desired State |
-| `dotfiles/mise/.config/mise/mise.lock` | 支持 backend 的 platform URL 与 checksum lock |
+候选 NPM release 触发 trust downgrade 时保持失败传播, 不自动修改 `trust_policy_excludes` 或 installer. 已有可信版本可通过明确 Version Selector 建立 Trust Hold, 并同步原生 lockfile, 安全约束测试和 ADR. 当前 Playwright 的固定版本与解除条件见 [ADR 0009](../adr/0009-playwright-cli-trust-hold.md).
 
-## Execution flow
+## Modules
 
-Preflight 总是先执行. 后续阶段顺序为 `base`, `homebrew`, `trust`, `formulae`, `casks`, `shell`, `dotfiles`, `devenv`. `apply` 执行 reconciliation, `plan` 展示预计动作, `status` 读取当前状态. `--stage` 选择单一阶段, `--from` 从指定阶段继续; 两者不改变 preflight 要求.
+- `install.sh`: 公开命令入口, 为 `check` 建立 macOS 只读沙箱.
+- `scripts/bootstrap.sh`: 参数, Preflight, 互斥锁, 阶段顺序和失败传播.
+- `scripts/homebrew.sh`: Homebrew 激活及原生 Bundle 调用; 首次安装委托给 `setup_homebrew.sh`.
+- `scripts/repositories.sh` 和 `scripts/lib/git.sh`: 读取仓库/链接清单, 验证 identity, clone 或 fast-forward.
+- `scripts/dotfiles.sh`: 读取 package 清单并调用 Stow.
+- `scripts/mise.sh`: 隔离配置发现, 验证 Stow 来源, 调用原生安装与查询.
+- `scripts/migrations/runner.sh`: 显式迁移许可和 pending snapshot 检查.
+- `scripts/migrations/casks.sh`: App transaction 和字体 batch transaction.
+- `scripts/migrations/legacy-mise.sh`: 旧 Mise global config 的单一兼容适配器.
+- `scripts/migrations/transaction.sh`: 原子状态, 锁, artifact 保留, 校验和恢复.
+- `scripts/lib/core.sh`: 路径, 日志和数据格式的基础函数.
 
-每个阶段由顶层通过新的 Bash 进程启动. 阶段不得依赖前一个进程导出的 PATH, 当前目录或 Shell function. `activate_homebrew` 和 Mise activation 因此在需要它们的阶段中显式执行. Homebrew activation 固定请求 Bash 格式的 `shellenv`, 不受调用者登录 Shell 为 Fish 或 Zsh 的影响.
+共享代码按职责归属模块. 不保留旧 `common.sh` facade, 不复制包管理器的普通 inventory, outdated 或升级调度逻辑.
 
-旧 Bootstrap 直接写入的 `~/.config/mise/config.toml` 是 Stow ownership transition 的唯一自动兼容入口. 只有当既有文件仅包含 `[tools]`, 且每个 key/version 都是 repository config 的子集时才允许迁移. 原文件先进入 `${HOME}/Library/Application Support/danshan.env/dotfile-backups`, 随后执行 Stow 并验证 target symlink 与内容. Failure 会删除本 package 创建的链接并恢复原文件; unrecognized content 保持普通 conflict 并 fail closed.
+## Execution
 
-Homebrew metadata 只在 `setup_homebrew.sh` 刷新一次. `setup_brew_trust.sh` 随后读取一次 JSON trust state, 并且只为 `defaults/brew_trust.txt` 中缺失的 exact Formula/Cask grant 执行 `brew trust`. Formula 和 Cask inventory 在 trust 收敛后执行, 分别读取一次 installed inventory 和一次 outdated inventory. Cask stage 额外读取一次 `sw_vers -productVersion`, 将 major 保存为本次执行稳定的 platform Observed State. 普通 manifest reconciliation 不执行逐项 `brew info`; 只有 missing 且显式声明 `migrate` 的 font cask 会读取 JSON metadata, 以得到权威 artifact target.
+`apply` 依次执行 `homebrew`, `repositories`, `dotfiles`, `mise`. Preflight 在变更前验证 macOS, Shell, 必需文件, 表格结构和已有 Git identity; 原生配置由对应管理器解析. `recover` 不依赖普通安装清单的有效性, 只处理已有 snapshot.
 
-`defaults/brew_casks.txt` 的字段依次是 package, App name, existing artifact policy 和 optional minimum macOS major. 第四列必须为空或正整数. 不满足 Platform Constraint 的 Cask 在 ownership 和 outdated classification 之前明确 skip, 因而不会 install, upgrade 或进入 migration. 默认 `preserve` 只在声明了 App 名称且 `/Applications` 中存在对应 bundle 时跳过. `adopt` 对 missing App cask 执行 `brew install --cask --adopt`, 且只接管内容相同的 artifact. `migrate` 根据 App name 分流: 非空时执行单 Cask App transaction, 为空时执行 font batch transaction.
+Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL, 例如 Thaw 仅在 macOS 26 及以上声明. 不通过吞掉安装错误推断平台兼容性.
 
-## Application migration transaction
+`scripts/homebrew.sh` 的步骤包装器直接调用命令, 继承 stdout/stderr 和 TTY, 仅在调用前后输出状态和耗时, 并保留命令退出码. Bundle 的 `--verbose` 启用子命令实时输出; metadata update 和迁移 Cask install 不使用 `--quiet`. 不捕获后集中打印安装日志, 不解析下载文本或模拟百分比. 动态下载进度由 Homebrew 按实际终端条件呈现, Bootstrap 验证成功后才报告整体完成.
 
-Missing Cask 声明 App name 与 `migrate`, 且精确 `/Applications/<name>.app` target 已存在时, Bootstrap 在 `${HOME}/Library/Application Support/danshan.env/app-backups` 创建唯一 Migration Snapshot. 原 bundle 先移动到 `originals`, 随后执行普通 `brew install --cask`, 并验证 Homebrew inventory 与 App target directory. 成功后 snapshot 标记为 `completed` 并持续保留.
+Git pinned checkout 只允许向目标 commit 的前向更新. Tracking checkout 使用 upstream 的 `pull --ff-only`; dirty tracking checkout 保留并报告跳过. 所有 existing target 必须是精确 worktree root, 并匹配 origin. Stow 只部署登录 Shell 对应的 package 和 `all` package; 不覆盖冲突文件.
 
-Install 或 verify 失败时, Rollback 卸载本 transaction 已登记的 Cask, 把新 target 隔离到 `failed-install-artifact`, 再恢复 original bundle. 完整恢复写入 `rolled-back`; 任一步无法恢复写入 `rollback-incomplete` 并停止 Bootstrap. App target 不存在时不需要 ownership transition, 直接走普通 missing install. 已由 Homebrew 管理的 current 或 outdated Cask 仍分别 skip 或 upgrade, 不重复 migration.
+Mise 命令在仓库的真实路径执行, 清除调用者 `MISE_*`, 设置仓库 global config, 空 system TOML 和目录搜索 ceiling, 禁用自动环境选择, idiomatic version files 和自动安装. 安装前验证部署的 config 和 lockfile 都指向仓库来源, 包括 Stow directory folding. Shell 日常使用 Mise 原生项目发现功能, Bootstrap 的隔离不改变项目内的配置优先级.
 
-## Font migration transaction
+## Check boundary
 
-满足 Platform Constraint 的 missing `migrate` cask 在普通 reconciliation 之前统一处理. Bootstrap 从 `brew info --cask --json=v2` 读取全部 artifact, 要求每项都是 `${HOME}/Library/Fonts` 的直接 `.ttf` 或 `.otf` target. 通过 preflight 后, 当前存在的精确 target 被移动到 `${HOME}/Library/Application Support/danshan.env/font-backups/<timestamp>-<pid>/originals`, 完整 target 和初始 presence 写入 `manifest.txt`.
+公开的 `install.sh check` 用 `config/check.sb` 禁止本进程树写入文件和访问网络, 仅允许 `/dev/null` 输出. 该边界覆盖 package manager 的隐式 cache/迁移写入, 不依赖命令名称是否包含 dry-run. 沙箱不可用时返回失败, 不退回非隔离执行. `scripts/bootstrap.sh` 和模块是内部实现, 不作为绕过公开入口的运行方式.
 
-全部 missing font cask 作为一个 batch 安装. Verify 同时要求 Homebrew inventory 登记成功和每个 target 为 regular file. 全部通过后写入 `state=completed`, 将 cask 加入当前进程的 reconciled set 并准确增加 install count. 任一 snapshot, install 或 verify 失败时, Rollback 卸载本批次已登记的 cask, 将残留新字体移动到 `failed-install-artifacts`, 恢复 original snapshot, 并写入 `rolled-back` 或 `rollback-incomplete`. 成功 snapshot 不自动删除.
+`check` 使用 Homebrew Bundle check, Stow simulate, Mise 当前状态和 `install --dry-run-code`. 缺失管理器报告 UNKNOWN, 普通资源问题汇总到剩余阶段; Preflight 或锁错误立即失败. Git tracking 只报告本地状态, 不判断远端新提交. Homebrew 使用本地 metadata, Mise 使用仓库 lockfile, 因而此命令不证明远端版本或下载可用性.
 
-## Migration serialization and recovery
+## Migration boundary
 
-Cask stage 在 inspect migration state 前获取 `${HOME}/Library/Application Support/danshan.env/locks/cask-migration.lock`. Lock 中只保存 PID. 活跃 PID 阻止并发执行; 已退出 PID 对应的精确 lock 可以移除; 结构异常的 lock fail closed. Trap 在正常或异常退出时只释放当前进程拥有的 lock.
+只有 `migrate` 才读取迁移许可并启动 transaction. 所有 Cask 先确认属于当前平台有效的 Brewfile; 第三方包需已有精确 trust. 已由 Homebrew 管理的 Cask 跳过. App/旧配置按清单顺序迁移, 所有 eligible font Cask 构成最后的一个 batch. 各 transaction 独立提交, 后续 transaction 失败不撤销先前已完成的 transaction.
 
-Migration state 通过同目录 temporary file 和 atomic rename 更新. 新 transaction 开始前扫描 App, font 和 Stow ownership snapshot. 已知 non-terminal state 沿用对应 transaction 的 Rollback 或完成验证. `completed` 和 `rolled-back` 是终态; `rollback-incomplete` 和未知 state 必须停止 Bootstrap, 由操作者检查 snapshot.
+App target 是 `/Applications/<name>.app`; font target 只接受 Homebrew metadata 中 `${HOME}/Library/Fonts` 的直接 `.ttf/.otf` 文件, 拒绝混合 artifact, 重复 target 和路径穿越. Snapshot 移动要求原件和备份父目录处于同一 filesystem, 以保持 rename 的原子性; 跨卷目标在移动前拒绝. App bundle 和字体先移入 snapshot, 安装后验证 inventory 和精确 target. 回滚先复制失败产物, 再卸载本次已登记 Cask, 最后复制恢复原件. 原件始终保留在 snapshot, 使恢复中再次中断时仍有依据.
 
-引入 state marker 之前创建的 font snapshot 使用三列 legacy manifest. 无 `state` 的目录只有在每个 target, backup path, retained original 和 Homebrew Cask ownership 全部验证通过时才能分类为历史已完成 snapshot, 且不会被改写. 无法证明完整性的 stateless snapshot 继续 fail closed.
+旧 Mise config 仅接受一个 `[tools]` section 中简单 key/version 赋值的可验证子集, 拒绝未知配置. 显式迁移保留旧配置和原 lockfile ownership, 再由 Stow 接管 config 与 lockfile. 回滚不覆盖执行期间出现的未知文件.
 
-## State ownership
+变更操作通过同一个 `lockf` 锁串行化. `check` 只读持有已存在的锁文件, 首次检查不创建锁文件. 锁文件 inode 保留, 锁由继承的文件描述符持有, 随进程树退出释放. 旧 PID lock 中可验证的活跃 owner 仍阻止操作; 无 PID 或结构异常的旧 lock fail closed.
 
-- Homebrew 是 Formula 和 Cask installation state 的事实源.
-- Manifest App name 是 App migration 精确 target 的事实源; Homebrew JSON metadata 是 font migration 精确 target 的事实源; Migration Snapshot 是迁移前内容和恢复关系的事实源.
-- `defaults/brew_trust.txt` 是第三方 Homebrew package trust 的显式 allowlist. 不从 package manifest 自动推导授权.
-- 本仓库是 Neovim 和其他 stow package 的事实源.
-- `~/.config/zed` 是独立 Git repository, 仅允许从预期 origin fast-forward.
-- Oh My Zsh 和 oh-my-tmux 使用 `defaults/tool_versions.env` 中的固定 commit.
-- Stow 安装到 `~/.config/mise/config.toml` 的 repository config 是 runtime 和 global CLI 的事实源, 不读取调用目录的 `mise.toml`.
-- Mise 是这些工具的唯一 Tool Owner. Aqua 和 NPM 仅作为 Mise Installation Backend; 不允许直接执行 Bun 或 NPM global install.
-- Mise lock 对 Aqua 等支持的 backend 固定 platform artifact 和 checksum. NPM backend 仍由精确 package version 与 registry integrity 共同约束.
-- Aube trust-policy exception 必须绑定到单一 top-level tool 和精确 transitive package version, 并由 ADR 保存 publisher, repository, provenance, commit 和 digest review evidence. 不允许 bare package exception 或全局 installer bypass.
-
-## Failure semantics
-
-所有阶段启用 strict mode. 缺失依赖, network failure, dirty pinned dependency repository, unexpected Git origin, stow conflict, unrecoverable migration 或 package manager failure 都会阻止后续阶段和最终完成提示. 失败消息包含 stage 和 exit code. Zed 是 tracking repository: dirty worktree 被保留并跳过 remote update, 不阻止其他 Managed Resource 收敛.
-
-安装过程不自动覆盖普通文件, 不使用 `stow --adopt`, 不自动处理 dirty Git worktree. 唯一自动 dotfile transition 是可证明由旧 Bootstrap 生成且被新 Desired State 完整包含的 Mise config; 其他冲突需要操作者确认所有权.
-
-## Security boundaries
-
-- 唯一的远程 Shell Bootstrap 是固定 commit 的 Homebrew 官方 installer. 脚本先下载到独立临时目录, 再执行本地文件.
-- 其他系统工具和 App 通过 Homebrew 安装. Runtime 与 global CLI 通过 Mise 固定版本安装, JavaScript CLI 由 Mise NPM backend 解析精确 package version.
-- 第三方 Homebrew source 只获得 exact Formula/Cask trust. Bootstrap 不信任整个 tap, 也不关闭 trust checks.
-- Machine-local secrets 不属于 repository state, 只能存入被忽略的 local 文件或外部 secret manager.
-- Git 历史重写不属于 Bootstrap 行为.
+Snapshot 使用 `format=2`, `manifest.txt` 和原子更新的 `state`. 已存在的格式 1 snapshot 继续接受严格路径验证. 无 state 的旧字体 snapshot 只有在清单, 精确 target, 保留原件和 Homebrew ownership 均有效时才只读认可为已完成. `rollback-incomplete` 和未知状态需要人工处理. `apply/check` 仅报告 pending, `recover` 才恢复可识别的中断.

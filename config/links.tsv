@@ -1,0 +1,11 @@
+# Purpose: declare symlinks into Git dependencies after repository reconciliation.
+# Format: source<TAB>target; exactly two non-empty fields separated by one literal TAB.
+# source: existing path relative to HOME; directories and files are both allowed.
+# target: unique symlink location relative to HOME; its parent directory must exist.
+# Paths cannot be absolute or contain empty, . or .. segments, TAB, newline or |.
+# A matching symlink is skipped. Conflicting paths or symlinks are never overwritten.
+# Link rows run in file order, after every selected repository row.
+# Blank lines and lines beginning with # are ignored. No inline comments or quoting.
+# Example (replace <TAB>): .config/example/settings<TAB>.example-settings
+
+.config/oh-my-tmux/.tmux.conf	.tmux.conf

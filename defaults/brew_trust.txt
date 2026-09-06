@@ -1,5 +1,0 @@
-# Package-level trust grants for non-official Homebrew sources.
-cask|localsend/localsend/localsend
-formula|daipeihust/tap/im-select
-cask|detachhead/tap/rebased
-cask|muxy-app/tap/muxy

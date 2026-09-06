@@ -1,0 +1,31 @@
+# Purpose: select Stow packages and the login Shells that receive them.
+# Format: package<TAB>shell, with exactly two non-empty fields and one literal TAB.
+# package: a unique directory under dotfiles/, using only letters, digits, _ or -.
+# shell: all, bash, zsh or fish; matched against the basename of the login SHELL.
+# Order: packages are deployed in file order, after Git dependencies are reconciled.
+# Blank lines and lines beginning with # are ignored. No inline comments or quoting.
+# Do not put paths, credentials, spaces around fields or embedded TABs in a row.
+# Add files under dotfiles/<package>/ using paths relative to HOME before adding a row.
+# Example (replace <TAB> with one literal TAB): example<TAB>all
+
+vim	all
+fzf	all
+git	all
+screen	all
+starship	all
+tmux	all
+nvim	all
+ghostty	all
+cmux	all
+fastfetch	all
+fd	all
+hammerspoon	all
+codex	all
+gemini	all
+claude	all
+pi	all
+herdr	all
+mise	all
+bash	bash
+zsh	zsh
+fish	fish

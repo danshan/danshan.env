@@ -1,136 +1,83 @@
 #!/usr/bin/env bash
-
 set -Eeuo pipefail
-
 TEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${TEST_DIR}/.." && pwd)"
-# shellcheck source=tests/test_helper.sh
 source "${TEST_DIR}/test_helper.sh"
-
-bash -n "${PROJECT_ROOT}/install.sh" "${PROJECT_ROOT}"/scripts/*.sh "${PROJECT_ROOT}"/scripts/lib/*.sh
-
-while IFS= read -r fish_file; do
-    if command -v fish >/dev/null 2>&1; then
-        fish -n "${fish_file}"
-    fi
-done < <(find "${PROJECT_ROOT}/dotfiles/fish" -type f -name '*.fish' -print)
-
-if rg -n 'sky_pat_|/Users/honghao\.shan|@latest' \
-    "${PROJECT_ROOT}/install.sh" \
-    "${PROJECT_ROOT}/scripts" \
-    "${PROJECT_ROOT}/defaults" \
-    "${PROJECT_ROOT}/dotfiles"; then
-    fail "Forbidden credential, absolute user path, or mutable package reference found."
+while IFS= read -r script; do /bin/bash -n "${script}"; done < <(rg --files "${PROJECT_ROOT}/scripts" "${TEST_DIR}" -g '*.sh')
+/bin/bash -n "${PROJECT_ROOT}/install.sh"
+/bin/bash -n "${PROJECT_ROOT}/dotfiles/bash/.bashrc"
+/bin/bash -n "${PROJECT_ROOT}/dotfiles/bash/.bash_profile"
+/bin/zsh -n "${PROJECT_ROOT}/dotfiles/zsh/.zshrc"
+command -v fish >/dev/null || fail 'Fish is required for Shell syntax verification.'
+while IFS= read -r script; do fish -n "${script}"; done < <(rg --files --hidden "${PROJECT_ROOT}/dotfiles/fish" -g '*.fish')
+if rg -n '(bun add|npm install).*(--global|-g)|brew (install|upgrade).*--force|curl[^|]*\|[[:space:]]*(sh|bash)' "${PROJECT_ROOT}/scripts"; then
+    fail 'Forbidden direct global package, force install or remote execution pipeline.'
 fi
-
-if rg -n 'curl[^|]*\|[[:space:]]*(sh|bash)' "${PROJECT_ROOT}/scripts"; then
-    fail "Direct remote script pipeline found."
+if rg -n 'NVM_DIR|VIRTUALENVWRAPPER_PYTHON|\.rvm/bin|\.bun/bin|\.opencode/bin|\.local/bin/env.fish' "${PROJECT_ROOT}/dotfiles/bash/.bashrc" "${PROJECT_ROOT}/dotfiles/zsh/.zshrc" "${PROJECT_ROOT}/dotfiles/fish/.config/fish/config.fish"; then
+    fail 'Obsolete runtime ownership remains in Shell initialization.'
 fi
-
-if rg -n 'HOMEBREW_NO_REQUIRE_TAP_TRUST|(^|[^[:alnum:]_])brew trust[[:space:]]+[A-Za-z0-9]' \
-    "${PROJECT_ROOT}/install.sh" \
-    "${PROJECT_ROOT}/scripts"; then
-    fail "Broad Homebrew trust bypass found."
-fi
-
-if rg -n 'brew (install|upgrade).*--force' "${PROJECT_ROOT}/scripts"; then
-    fail "Homebrew force installation bypass found."
-fi
-
-if rg -n '(bun add|npm install).*(--global|-g)' "${PROJECT_ROOT}/scripts"; then
-    fail "Direct Bun or NPM global package ownership found."
-fi
-
-for mise_owned_formula in yarn starship uv agent-browser; do
-    if grep -Fqx "${mise_owned_formula}" "${PROJECT_ROOT}/defaults/brew_pkgs.txt"; then
-        fail "Mise-owned tool remains in the Homebrew manifest: ${mise_owned_formula}"
-    fi
-done
-
-if grep -Fqx 1password-cli "${PROJECT_ROOT}/defaults/brew_pkgs.txt"; then
-    fail "Cask-only package remains in the Homebrew Formula manifest: 1password-cli"
-fi
-grep -Fqx 1password-cli "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
-    fail "Missing Homebrew Cask package: 1password-cli"
-
-for mise_tool in \
-    '"aqua:astral-sh/uv" = "0.12.10"' \
-    '"aqua:starship/starship" = "1.26.0"' \
-    '"npm:@openai/codex" = "0.153.0"' \
-    '"npm:oh-my-openagent" = { version = "4.19.1", trust_policy_excludes = ["effect@4.0.0-beta.66"] }' \
-    '"npm:agent-browser" = "0.36.0"'; do
-    grep -Fqx "${mise_tool}" "${PROJECT_ROOT}/dotfiles/mise/.config/mise/config.toml" ||
-        fail "Missing pinned Mise tool: ${mise_tool}"
-done
-
-if rg -n 'trust_policy_excludes = \["effect"\]' \
-    "${PROJECT_ROOT}/dotfiles/mise/.config/mise/config.toml"; then
-    fail "Unbounded Mise NPM trust-policy exception found."
-fi
-
-[[ -f "${PROJECT_ROOT}/dotfiles/mise/.config/mise/mise.lock" ]] ||
-    fail "Missing Mise lockfile."
-if rg -n 'eval echo -- \$token' "${PROJECT_ROOT}/dotfiles/fish"; then
-    fail "Fish command-line input is evaluated as code."
-fi
-
-while IFS='|' read -r package_type package_name || [[ -n "${package_type}${package_name}" ]]; do
-    case "${package_type}" in
-        ''|'#'*) continue ;;
-        formula|cask) ;;
-        *) fail "Invalid Homebrew trust type: ${package_type}" ;;
-    esac
-    [[ "${package_name}" == */* ]] || fail "Homebrew trust entry is not qualified: ${package_name}"
-    case "${package_type}" in
-        formula)
-            grep -Fqx "${package_name}" "${PROJECT_ROOT}/defaults/brew_pkgs.txt" ||
-                fail "Trusted formula is absent from the package manifest: ${package_name}"
-            ;;
-        cask)
-            grep -Fq "${package_name}|" "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
-                grep -Fqx "${package_name}" "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
-                fail "Trusted cask is absent from the package manifest: ${package_name}"
-            ;;
-    esac
-done < "${PROJECT_ROOT}/defaults/brew_trust.txt"
-
-while IFS= read -r package_name || [[ -n "${package_name}" ]]; do
-    case "${package_name}" in
-        ''|'#'*) continue ;;
-        */*) ;;
-        *) continue ;;
-    esac
-    grep -Fqx "formula|${package_name}" "${PROJECT_ROOT}/defaults/brew_trust.txt" ||
-        fail "Tap-qualified formula lacks explicit trust: ${package_name}"
-done < "${PROJECT_ROOT}/defaults/brew_pkgs.txt"
-
-while IFS='|' read -r package_name _application_name || [[ -n "${package_name}" ]]; do
-    case "${package_name}" in
-        ''|'#'*) continue ;;
-        */*) ;;
-        *) continue ;;
-    esac
-    grep -Fqx "cask|${package_name}" "${PROJECT_ROOT}/defaults/brew_trust.txt" ||
-        fail "Tap-qualified cask lacks explicit trust: ${package_name}"
-done < "${PROJECT_ROOT}/defaults/brew_casks.txt"
-
-grep -Fqx 'localsend/localsend/localsend|LocalSend|migrate' "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
-    fail "LocalSend must migrate an existing application transactionally."
-grep -Fqx 'thaw|Thaw|preserve|26' "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
-    fail "Thaw must require macOS 26 or newer."
-for font_cask in \
-    font-hack-nerd-font \
-    font-fira-code-nerd-font \
-    font-jetbrains-mono-nerd-font; do
-    grep -Fqx "${font_cask}||migrate" "${PROJECT_ROOT}/defaults/brew_casks.txt" ||
-        fail "Nerd Font cask must migrate existing artifacts transactionally: ${font_cask}"
-done
-if grep -Fqx 'localsend/localsend/localsend' "${PROJECT_ROOT}/defaults/brew_pkgs.txt"; then
-    fail "LocalSend must not be classified as a formula."
-fi
-
-trust_stage_line="$(grep -n 'setup_brew_trust.sh' "${PROJECT_ROOT}/install.sh" | cut -d: -f1)"
-formula_stage_line="$(grep -n 'install_brew_pkgs.sh' "${PROJECT_ROOT}/install.sh" | cut -d: -f1)"
-cask_stage_line="$(grep -n 'install_brew_casks.sh' "${PROJECT_ROOT}/install.sh" | cut -d: -f1)"
-[[ "${trust_stage_line}" -lt "${formula_stage_line}" ]] || fail "Trust stage must precede formula inventory."
-[[ "${trust_stage_line}" -lt "${cask_stage_line}" ]] || fail "Trust stage must precede cask inventory."
+python3 - "${PROJECT_ROOT}" <<'PY'
+import re
+import sys
+import tomllib
+from pathlib import Path
+root = Path(sys.argv[1])
+config = tomllib.loads((root / 'dotfiles/mise/.config/mise/config.toml').read_text())
+lock = tomllib.loads((root / 'dotfiles/mise/.config/mise/mise.lock').read_text())
+assert config['settings']['lockfile'] is True
+assert tomllib.loads((root / 'config/mise-system.toml').read_text()) == {}, 'Bootstrap system layer must stay empty'
+assert config['tools'].keys() == lock['tools'].keys(), 'Lockfile inventory drift'
+for name, value in config['tools'].items():
+    version = value['version'] if isinstance(value, dict) else value
+    entries = lock['tools'][name]
+    assert len(entries) == 1, f'Ambiguous locked versions: {name}'
+    entry = entries[0]
+    assert version in entry['specifiers'], f'Selector missing from lock: {name}'
+    assert entry['version'] != 'latest', f'Unresolved locked version: {name}'
+    for platform in (() if name.startswith('npm:') else ('macos-arm64', 'macos-x64')):
+        data = entry['platforms.' + platform]
+        assert data['url'].startswith('https://') and data['checksum'], f'Incomplete platform integrity: {name}/{platform}'
+    if isinstance(value, dict) and 'trust_policy_excludes' in value:
+        assert name == 'npm:oh-my-openagent' and version == '4.19.1'
+        assert value['trust_policy_excludes'] == ['effect@4.0.0-beta.66']
+for name in ('java', 'node', 'python', 'bun'):
+    assert config['tools'][name] != 'latest', f'Runtime must declare an explicit version: {name}'
+assert 'aqua:starship/starship' not in config['tools']
+assert config['tools']['npm:@openai/codex'] == 'latest'
+# This is an explicit supply-chain hold, not a general tool version assertion.
+assert config['tools']['npm:@playwright/cli'] == '0.1.18', 'ADR 0009 trust hold changed without review'
+assert lock['tools']['npm:@playwright/cli'][0]['version'] == config['tools']['npm:@playwright/cli'], 'Trust hold must resolve to its exact version'
+for path, fields in [('dotfiles.tsv', 2), ('repositories.tsv', 5), ('links.tsv', 2)]:
+    for line in (root / 'config' / path).read_text().splitlines():
+        if not line or line.startswith('#'):
+            continue
+        values = line.split('\t')
+        assert len(values) == fields and all(values), f'Invalid tabular row: {path}'
+# Track only repository-owned source paths, never package-specific script inventories.
+assert not (root / 'defaults').exists()
+assert not (root / 'scripts/common.sh').exists()
+for p in [root / 'install.sh', *(root / 'scripts').rglob('*.sh')]:
+    assert 'brew trust --tap' not in p.read_text()
+PY
+/usr/bin/ruby - "${PROJECT_ROOT}/Brewfile" <<'RUBY'
+require 'ostruct'
+module MacOS
+  def self.version; OpenStruct.new(major: ENV.fetch('TEST_MACOS_MAJOR')); end
+end
+$entries = []
+def brew(name, **options); $entries << [:brew, name, options]; end
+def cask(name, **options); $entries << [:cask, name, options]; end
+[25, 26].each do |major|
+  ENV['TEST_MACOS_MAJOR'] = major.to_s
+  $entries = []
+  load ARGV.fetch(0)
+  raise 'Duplicate package ownership' unless $entries.map { |type, name, _| name }.uniq.size == $entries.size
+  $entries.each do |type, name, options|
+    raise 'Missing exact third-party trust' if name.include?('/') && options[:trusted] != true
+    raise 'Broad or unknown Bundle option' unless (options.keys - [:trusted]).empty?
+  end
+  raise 'Cask classification' unless $entries.any? { |type, name, _| type == :cask && name == '1password-cli' }
+  raise 'Host CLI classification' unless $entries.any? { |type, name, _| type == :brew && name == 'starship' }
+  raise 'Platform gate' unless $entries.any? { |_, name, _| name == 'thaw' } == (major >= 26)
+end
+RUBY

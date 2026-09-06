@@ -97,3 +97,7 @@ apm_modules/
 
 # Machine-local shell secrets
 dotfiles/fish/.config/fish/conf.d/*.local.fish
+
+# Local configuration and credentials
+*.local.*
+!*.local.*.example

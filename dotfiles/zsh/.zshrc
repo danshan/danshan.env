@@ -5,21 +5,6 @@ autoload -Uz compinit
 compinit
 # OPENSPEC:END
 
-# INIT MAC
-#
-# install Command Line Tools
-# xcode-select --install
-#
-# install software manager homebrew(maybe very slowly - you can use cellular)
-#
-# /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-#
-# change mirror to tuna
-# cd "$(brew --repo)"
-# git remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
-# cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core"
-# git remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git
-
 # Path to your oh-my-zsh installation.
 export ZSH=${HOME}/.oh-my-zsh
 
@@ -65,19 +50,18 @@ HIST_STAMPS="yyyy-mm-dd"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
-ZSH_CUSTOM="${HOME}/Library/CloudStorage/ZSpace/mac/.oh-my-zshrc"
+ZSH_CUSTOM="${ZSH}/custom"
 
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 #plugins=(git ssh-agent history extract zsh-autosuggestions oc kubectl helm)
-plugins=(git history extract zsh-autosuggestions zsh-syntax-highlighting mvn httpie aliases)
+plugins=(git history extract mvn httpie aliases)
 
 # User configuration
 
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.bin:/usr/local/go/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/.bin:$PATH"
 
 [[ -r "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
@@ -138,12 +122,11 @@ fi
 # iTerm2 shell integration
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-# Plugins are now managed through oh-my-zsh plugins array above
-test -e $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh && source $ZSH_CUSTOM/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-test -e $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh && source $ZSH_CUSTOM/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-export PATH="/usr/local/opt/openssl@1.1/bin:$PATH"
-export PATH="/usr/local/opt/ruby/bin:$PATH"
+# Host Shell plugins are installed through Homebrew.
+for plugin_file in "${HOMEBREW_PREFIX:-}/share/zsh-autosuggestions/zsh-autosuggestions.zsh" "${HOMEBREW_PREFIX:-}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"; do
+  [[ ! -r "$plugin_file" ]] || source "$plugin_file"
+done
+unset plugin_file
 
 # mise 
 (( $+commands[mise] )) && eval "$(mise activate zsh)"
@@ -159,13 +142,7 @@ alias ungron="gron --ungron"
 export REPO_URL='https://mirrors.tuna.tsinghua.edu.cn/git/git-repo'
 
 # fzf
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# rust
-test -e "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
-
-# opencode
-export PATH="${HOME}/.opencode/bin:${PATH}"
+(( $+commands[fzf] )) && source <(fzf --zsh)
 
 # Kiro
 [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
@@ -178,3 +155,5 @@ test -e "${HOME}/.openclaw/completions/openclaw.zsh" && source "${HOME}/.opencla
 
 # Explicit unsafe alias
 alias claude-unsafe="claude --dangerously-skip-permissions"
+
+[[ ! -r "$HOME/.zsh.local.sh" ]] || source "$HOME/.zsh.local.sh"

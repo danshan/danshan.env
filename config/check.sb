@@ -1,0 +1,15 @@
+; Purpose: enforce read-only, offline checks across all Bootstrap child processes.
+; Format: macOS Seatbelt profile, S-expressions; semicolon starts a line comment.
+; (version 1) is required. Keep one expression per line for reviewability.
+; Default actions are allowed; file-write* and network* are explicitly denied.
+; /dev/null is the only write exception, for normal command output redirection.
+; No package, HOME, repository, cache or migration path may receive a write exception.
+; install.sh check loads this profile before executing Bootstrap, including preflight.
+; A profile or sandbox failure must fail the check; there is no unsandboxed fallback.
+; Example read-only maintenance: change a comment, then run tests/run.sh.
+
+(version 1)
+(allow default)
+(deny file-write*)
+(deny network*)
+(allow file-write* (literal "/dev/null"))

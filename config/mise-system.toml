@@ -1,0 +1,6 @@
+# Purpose: provide an empty native TOML system layer during Bootstrap Mise commands.
+# Format: valid TOML, intentionally containing only comments and no tables or values.
+# This file replaces /etc/mise configuration for Bootstrap; it is not deployed by Stow.
+# Add tools ONLY to dotfiles/mise/.config/mise/config.toml, then refresh mise.lock.
+# Do not add [tools], [env], [tasks], settings, includes or credentials here.
+# Example of an allowed edit: another # comment explaining the isolation boundary.

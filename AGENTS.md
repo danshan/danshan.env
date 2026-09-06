@@ -2,52 +2,55 @@
 
 ## Scope
 
-本文件适用于整个仓库. 子目录中的 `AGENTS.md` 可以增加更具体的约束, 但不得降低这里的安全性和验证要求.
+本文件适用于整个仓库. 子目录中的 `AGENTS.md` 可增加具体约束, 不得降低安全性和验证要求.
 
 ## Project contract
 
-- 本项目面向 macOS, Bootstrap 脚本统一使用 Bash 3.2 兼容语法.
-- 所有脚本必须支持重复执行. 已满足的状态应明确跳过, 仅对缺失或过期状态执行变更.
-- 不得把 token, password, private key 或其他凭据提交到仓库. 本地凭据只能放入已忽略的 `*.local.*` 文件或外部凭据管理器.
-- 不得直接执行未经固定版本或完整性校验的远程脚本. 唯一例外必须记录在 `docs/adr/`, 并说明信任边界和替代方案.
-- 任何步骤失败时, 顶层安装命令必须返回非零状态, 并且不得输出完成提示.
-- 涉及 Git 更新时必须显式指定工作目录, 使用 fast-forward-only 策略, 并在变更前验证目标是 Git worktree.
-- 不得隐式修改调用者当前目录中的配置. 所有持久化写入必须指定明确的目标路径或 global scope.
-- Codex Hook 只能作为 repository-local 配置加入 `.codex/hooks.json`. 不得创建或修改全局 `~/.codex/hooks.json`, 也不得引用用户绝对路径中的 executable.
-- 既有字体迁移只能由 Cask manifest 的显式 `migrate` policy 启用. 必须从 Homebrew metadata 读取精确 font target, 且只允许 `${HOME}/Library/Fonts` 的直接 `.ttf` 或 `.otf` 子项.
-- 字体迁移必须先创建 Migration Snapshot, 再按 batch 安装并验证全部 Cask. 任一 install 或 verify 失败时必须整体 Rollback, 保留失败产物和状态记录, 不得使用 `--force`, 宽泛 glob 或不可恢复删除.
-- 成功的 Migration Snapshot 必须保留在 `${HOME}/Library/Application Support/danshan.env/font-backups`, 不得由 Bootstrap 自动清理.
-- 既有 App bundle 只有在 Cask manifest 显式声明 `migrate` 时才允许转移 ownership. 必须先将精确 `/Applications/<name>.app` target 移入 Migration Snapshot, 再执行普通 Cask install 和 ownership verification; 任一失败必须隔离新 artifact 并恢复原 App.
-- `adopt` 只能用于 Homebrew 判定为 identical 的既有 artifact. 不得在 `adopt` 失败后隐式升级为 `migrate`, 也不得使用 `--force` 绕过版本或内容差异.
-- Cask 的平台限制必须在 manifest 第四列显式声明为正整数 `minimum_macos_major`. Cask stage 只读取一次 `sw_vers -productVersion`, 并在 install, upgrade 或 migration 前 skip 不兼容资源; 不得通过捕获任意 Homebrew failure 推断平台不兼容.
-- Homebrew 只管理 macOS system package 和 Cask, Mise 管理 language runtime 与固定版本的 global CLI. Bun 和 NPM 只管理 project dependency, 不得直接安装 global package.
-- App 和 font Ownership Migration 必须持有 repository-defined Migration Lock, 原子更新 state, 并在开始新 transaction 前恢复可识别的 Interrupted Migration.
-- 无 `state` 的 legacy font snapshot 只有在 manifest, exact target, retained backup 和 Homebrew ownership 全部验证通过时才能视为 completed. 不得改写该 snapshot; 其他 stateless snapshot 必须 fail closed.
-- 旧 Bootstrap 生成的 Mise global config 只有在其 `[tools]` 内容是 repository config 的严格可验证子集时才允许迁移到 Stow ownership. 必须先保留 snapshot, 并覆盖 success, repeat, install failure, verify failure, Rollback, rollback-incomplete 和 interrupted recovery.
-- `plan` 和 `status` 模式必须是只读的. 新增 mutation 时必须同时提供对应的预览或状态行为.
+- 本项目面向 macOS, Bootstrap 使用 Bash 3.2 兼容语法.
+- 日常资源按原生管理器规则收敛, 可重复执行. 已满足状态应跳过, 任何失败必须传播为非零, 且不得输出完成提示.
+- Homebrew 通过 `Brewfile` 管理主机 CLI, Shell 组件, App 和字体. Mise 通过原生 config/lockfile 管理 runtime 与开发 CLI. Bun/NPM 只直接管理项目 dependency, 不执行 global install.
+- 开发 CLI 可以声明 `latest`, 日常安装使用已提交的原生 lockfile. runtime 保留明确版本. 不手写上游 backend 不支持的 checksum 或 dependency lock.
+- ADR 0007 的精确信任例外只适用于其绑定版本和依赖, 不得因 latest 策略扩大例外.
+- NPM trust downgrade 不得自动添加例外或切换 installer. 可依据发布证据将工具固定在可信版本, 同步原生 lockfile 与 ADR; ADR 0009 的 Playwright Trust Hold 需重新审查后才可解除.
+- 不得复制 Homebrew 普通 inventory/outdated/upgrade 状态机, 不为新增普通 package 添加专用安装分支.
+- Homebrew 安装必须实时透传 stdout/stderr 并保留 TTY, 下载进度由原生工具呈现. 步骤状态和耗时不得掩盖失败或提前报告整体完成.
+- 包级 trust 与平台条件写在 Brewfile. 不信任整个 tap, 不关闭 trust 检查, 不使用 `--force`, 不自动清理未声明软件.
+- Bundle adoption 采用 Homebrew 原生规则, 不宣称仓库保证逐字节一致. adoption 失败不得自动升级为 ownership migration.
+- 公开入口为 `install.sh apply/check/migrate/recover`. `check` 必须使用仓库 Seatbelt profile 禁止文件写入与网络访问, 包括隐式 cache 和迁移写入; 沙箱不可用则失败, 不回退为非隔离执行.
+- 所有 mutation 使用 repository-defined `lockf` 锁. 不删除活跃锁文件 inode, 不用 PID 文件替代内核互斥.
+- `apply/check` 仅检查 pending snapshot, 不自动迁移或恢复. 新 transaction 前必须没有未解决 snapshot; 恢复只由显式 `recover` 执行.
+- 接管必须由 `config/migrations.txt` 显式许可. App 只允许精确 `/Applications/<name>.app`; 字体从 Homebrew metadata 读取精确 target, 只允许 `${HOME}/Library/Fonts` 直接 `.ttf/.otf` 子项.
+- 字体迁移按 batch 安装并验证. App/字体必须先保存原件, 任一 install 或 verify 失败时先保留失败产物, 再卸载本次安装并恢复原件. 拒绝宽泛 glob, symlinked parent, 路径穿越和覆盖未知文件.
+- Snapshot 移动必须验证原件和备份位于同一 filesystem, 禁止将跨卷 copy/delete 当作原子 rename.
+- Snapshot 和原件持续保留在 `${HOME}/Library/Application Support/danshan.env` 对应 backups 目录, Bootstrap 不自动清理. state 原子更新, `rollback-incomplete` 必须 fail closed.
+- 保留可识别的旧 snapshot 恢复兼容. 无 state 的 legacy font snapshot 只有在 manifest, exact target, retained backup 和 Homebrew ownership 全部验证后才可只读认可 completed.
+- 旧 Mise global config 仅当 `[tools]` 简单赋值是 repository config 的可验证子集时才可迁移为 Stow ownership. 必须保留 snapshot 和原 lockfile ownership, 未知内容拒绝自动接管.
+- Git mutation 必须使用显式 `git -C`, 验证精确 worktree root 与 origin, 只允许 fast-forward. Pinned dirty worktree 失败, tracking dirty worktree 保留并明确报告 skip.
+- 不隐式修改调用者 cwd 配置. Mise Bootstrap 配置发现必须隔离 cwd, 祖先, system, 外部 global 和调用者环境设置.
+- 清单由配置文件管理. `config/` 文件头部必须完整说明用途, 格式, 字段, 允许值, 分隔符, 注释规则和维护示例; 示例和代码注释使用 English.
+- 不提交 token, password 或 private key. 本地凭据仅使用已忽略的 `*.local.*` 或外部凭据管理器.
+- 不直接执行未经固定版本或完整性校验的远程脚本; 例外必须记录 ADR, 信任边界和替代方案.
+- Codex Hook 仅可放入 repository-local `.codex/hooks.json`, 使用仓库内 executable. 不创建或修改全局 Hook.
 
 ## Documentation
 
-- 所有正式文档遵循 `docs/standards/documentation.md`.
-- 代码, 配置, 安装行为或运维步骤发生变化时, 必须在同一变更中更新对应文档.
-- 新增文档后必须更新 `docs/README.md` 导航.
-- 架构决策和不可逆兼容性选择必须在 `docs/adr/` 新增 ADR, 不得只记录在 commit message 中.
-- 项目术语以根目录 `CONTEXT.md` 为准. 新增或改变领域术语时必须同步更新 glossary.
+- 正式文档遵循 `docs/standards/documentation.md`.
+- 代码, 配置, 安装或运维行为改变时, 同一变更中同步对应文档与 `CONTEXT.md` 术语.
+- 新文档登记到 `docs/README.md`. 长期架构决策与兼容性变化必须有 ADR.
+- 被替代文档标记 superseded 并链接替代文档, 或按维护者授权删除并清理引用. ADR 编号不得复用, 有效安全依据应保留. 历史 Review 不作为当前运行指引.
 
 ## Implementation style
 
-- Shell 代码, 注释, 标识符和输出消息使用 English.
-- 对路径和变量展开使用双引号, 对未设置变量保持 `set -u` 安全.
-- 共享行为放入 `scripts/common.sh`, 不复制状态判断或错误处理逻辑.
-- 优先使用状态收敛模型: inspect, classify, reconcile, verify.
+- Shell 代码, 注释, 标识符和输出使用 English, 路径与变量展开加双引号, 保持 `set -u` 安全.
+- 功能模块放在 `scripts/`, 基础函数在 `scripts/lib/`, 迁移逻辑在 `scripts/migrations/`. 不重新建立跨职责的大型 common 模块.
+- 关键写入显式检查退出状态, 覆盖函数在条件上下文中被调用时 `errexit` 不生效的情况.
 
 ## Verification
 
-- 修改 Shell 脚本时, 至少执行语法检查和 `tests/run.sh`.
-- 测试必须使用临时 `HOME` 和 stub executable, 禁止真实安装软件或修改用户环境.
-- 新增分支逻辑时, 至少覆盖 missing, current, outdated 和 command failure.
-- 新增 migration transaction 时, 必须覆盖 success, repeat execution, install failure, verify failure, artifact preservation, Rollback 和 rollback-incomplete contract.
-- 修改字体迁移时, 还必须覆盖 exact target validation, batch success, repeat execution, partial install failure, Rollback 和 backup state marker.
-- 修改 Cask 平台 gating 时, 必须覆盖 below-minimum, at-minimum, installed, outdated, invalid manifest value 和 `sw_vers` command failure.
-- 修改顶层阶段或执行模式时, 必须覆盖完整隔离执行, plan/status 无 mutation, `--stage`, `--from` 和 stage failure propagation.
-- 提交前确认工作树中不存在凭据, 临时文件或未登记文档.
+- 修改 Shell 至少逐文件执行语法检查和 `tests/run.sh`.
+- 测试使用临时 HOME/XDG 和 stub, 禁止真实安装或修改用户环境. 可在隔离环境调用真实只读管理器, 本地 Git, Stow 和系统锁验证行为.
+- 覆盖 missing, current, outdated 与 command failure; 不把具体工具版本字符串当作通用状态机测试.
+- 新增迁移覆盖 success, repeat, install/verify failure, artifact preservation, rollback, rollback-incomplete 和 interrupted recovery.
+- 字体额外覆盖 exact target, batch/partial failure, 原先 absent target 和 retained state; 恢复必须覆盖异常 manifest 和原件缺失.
+- 顶层模式覆盖完整隔离执行, check 无 mutation, `--stage`, `--from`, 锁冲突和失败传播.
+- 配置格式变化同步校验合法与非法输入. 提交前检查凭据, 临时文件和文档导航.

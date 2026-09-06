@@ -1,0 +1,18 @@
+# Purpose: declare Git repositories needed by dotfiles, in dependency order.
+# Format: id<TAB>url<TAB>target<TAB>revision<TAB>shell; exactly five non-empty fields.
+# id: a unique label using only letters, digits, _ or -.
+# url: an HTTPS URL or git@host:path SSH URL, without embedded credentials.
+# target: a unique path relative to HOME; no absolute path, empty segment, . or .. segment.
+# revision: a full lowercase 40-character commit SHA, or the literal tracking.
+# Pinned revisions require a clean checkout and forward ancestry when changing HEAD.
+# tracking: clone the default branch, then use its upstream with pull --ff-only.
+# shell: all, bash, zsh or fish; matched against the basename of the login SHELL.
+# Existing targets must be exact Git worktree roots with the exact declared origin URL.
+# Dirty tracking checkouts are preserved and reported; pinned dirty checkouts fail.
+# Blank lines and lines beginning with # are ignored. No inline comments or quoting.
+# Use literal TAB separators; spaces in paths are literal and must not pad fields.
+# Example (replace <TAB>): editor<TAB>https://github.com/example/editor.git<TAB>.config/editor<TAB>tracking<TAB>all
+
+oh-my-zsh	https://github.com/ohmyzsh/ohmyzsh.git	.oh-my-zsh	0f45f82c0afdcaf71b193e349d01c069a3fb9de7	zsh
+oh-my-tmux	https://github.com/gpakosz/.tmux.git	.config/oh-my-tmux	a746ed81323936dd9fb0144f2b60345679509283	all
+zed	git@github.com:danshan/zed-config.git	.config/zed	tracking	all

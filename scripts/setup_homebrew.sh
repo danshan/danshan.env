@@ -3,9 +3,11 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=scripts/common.sh
-source "${SCRIPT_DIR}/common.sh"
-load_tool_versions
+# shellcheck source=scripts/lib/core.sh
+source "${SCRIPT_DIR}/lib/core.sh"
+source "${SCRIPT_DIR}/homebrew.sh"
+load_homebrew_install_config
+[[ "${HOMEBREW_INSTALL_REF:-}" =~ ^[0-9a-f]{40}$ ]] || { die "Homebrew installer revision must be a commit."; exit 1; }
 
 HOMEBREW_INSTALL_DIRECTORY=""
 
@@ -55,26 +57,9 @@ if [[ "$(uname -s)" != Darwin ]]; then
     die "This bootstrap currently supports macOS only."
 fi
 
-if command -v brew >/dev/null 2>&1 || [[ -x /opt/homebrew/bin/brew ]] || [[ -x /usr/local/bin/brew ]]; then
-    log_success "Skipping Homebrew installation: Homebrew is already available."
+if find_homebrew >/dev/null; then
+    log_success "Homebrew is already available."
 else
-    if is_read_only_mode; then
-        log_planned_action "install Homebrew."
-        log_notice "Remaining Homebrew state is unavailable until Homebrew is installed."
-        exit 0
-    fi
     install_homebrew
 fi
-
 activate_homebrew
-
-if is_read_only_mode; then
-    log_notice "Skipping Homebrew metadata update in ${DANSHAN_MODE} mode."
-elif [[ "${DANSHAN_SKIP_BREW_UPDATE:-0}" == 1 ]]; then
-    log_notice "Skipping Homebrew metadata update by request."
-else
-    log_info "Refreshing Homebrew metadata once."
-    brew update --quiet
-fi
-
-log_success "Homebrew setup complete."

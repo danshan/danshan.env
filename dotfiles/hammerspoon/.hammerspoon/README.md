@@ -4,19 +4,15 @@
 
 Hammerspoon-config is an easily configurable and extendible Hammerspoon package that implements all of the Spectacle keybindings.
 
-## Get started
+## Installation and updates
 
-1. Install [Hammerspoon](http://www.hammerspoon.org/) first.
-
-2. `git clone https://github.com/danshan/hammerspoon-config.git ~/.hammerspoon`
-
-3. Reload the configutation.
-
-## Keep update
+此目录由本仓库的 Stow package 管理, Hammerspoon 应用由根目录 `Brewfile` 管理. 在仓库根目录执行:
 
 ```bash
-cd ~/.hammerspoon && git pull
+bash install.sh apply
 ```
+
+完成后, 在 Hammerspoon 菜单中选择 Reload Config. 修改快捷键后再次 Reload Config 即可. 配置随本仓库更新, 不再把 `~/.hammerspoon` 作为独立 Git 仓库更新. 旧独立 checkout 会被 Stow 识别为冲突, 需先比较并保留其本地改动.
 
 ## Default Keybindings
 

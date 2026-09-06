@@ -5,7 +5,10 @@ lockfile_version = 1
 [[tools."aqua:astral-sh/uv"]]
 version = "0.12.10"
 backend = "aqua:astral-sh/uv"
-specifiers = ["0.12.10"]
+specifiers = [
+    "0.12.10",
+    "latest",
+]
 
 [tools."aqua:astral-sh/uv"."platforms.macos-arm64"]
 checksum = "sha256:51c6170e8e3a01cef9f33b94f582b7b81ac65046f55d40afb35f9cff5a68c179"
@@ -24,26 +27,6 @@ checksum = "sha256:5296d5aa2b9143360405eea866f8ef4d5dc8986b164eb0dc35e8f876a9304
 url = "https://github.com/astral-sh/uv/releases/download/0.12.10/uv-x86_64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/545034436"
 provenance = "github-attestations"
-
-[[tools."aqua:starship/starship"]]
-version = "1.26.0"
-backend = "aqua:starship/starship"
-specifiers = ["1.26.0"]
-
-[tools."aqua:starship/starship"."platforms.macos-arm64"]
-checksum = "sha256:c40b27b11f580411e068f2fa6c1be7830a387c0bc47a94d1d37f32b054c5361d"
-url = "https://github.com/starship/starship/releases/download/v1.26.0/starship-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/starship/starship/releases/assets/460374577"
-
-[tools."aqua:starship/starship"."platforms.macos-x64"]
-checksum = "sha256:5548f406a4b6f5695903bdea83f77ce47ec12c8c0e62dabd33122d8f133e4207"
-url = "https://github.com/starship/starship/releases/download/v1.26.0/starship-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/starship/starship/releases/assets/460374608"
-
-[tools."aqua:starship/starship"."platforms.macos-x64-baseline"]
-checksum = "sha256:5548f406a4b6f5695903bdea83f77ce47ec12c8c0e62dabd33122d8f133e4207"
-url = "https://github.com/starship/starship/releases/download/v1.26.0/starship-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/starship/starship/releases/assets/460374608"
 
 [[tools.bun]]
 version = "1.3.14"
@@ -80,21 +63,21 @@ checksum = "sha256:6a7b8b23f2419ea1dde7eeace0d5a4cc5dbe7bbc83a8dda35dc64aa12269d
 url = "https://cdn.azul.com/zulu/bin/zulu17.66.19-ca-jdk17.0.19-macosx_x64.tar.gz"
 
 [[tools.maven]]
-version = "3.9.9"
+version = "3.9.16"
 backend = "aqua:apache/maven"
-specifiers = ["3.9.9"]
+specifiers = ["latest"]
 
 [tools.maven."platforms.macos-arm64"]
-checksum = "sha512:a555254d6b53d267965a3404ecb14e53c3827c09c3b94b5678835887ab404556bfaf78dcfe03ba76fa2508649dca8531c74bca4d5846513522404d48e8c4ac8b"
-url = "https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz"
+checksum = "sha512:831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6"
+url = "https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz"
 
 [tools.maven."platforms.macos-x64"]
-checksum = "sha512:a555254d6b53d267965a3404ecb14e53c3827c09c3b94b5678835887ab404556bfaf78dcfe03ba76fa2508649dca8531c74bca4d5846513522404d48e8c4ac8b"
-url = "https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz"
+checksum = "sha512:831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6"
+url = "https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz"
 
 [tools.maven."platforms.macos-x64-baseline"]
-checksum = "sha512:a555254d6b53d267965a3404ecb14e53c3827c09c3b94b5678835887ab404556bfaf78dcfe03ba76fa2508649dca8531c74bca4d5846513522404d48e8c4ac8b"
-url = "https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz"
+checksum = "sha512:831a8591fe20c8243b1dbe7d71e3244f31d1665b0804b2e825e38cbbe5ce0cafb8338851f90780735568773e0a6cd07bbec107cda0b896b008b861075358b6f6"
+url = "https://archive.apache.org/dist/maven/maven-3/3.9.16/binaries/apache-maven-3.9.16-bin.tar.gz"
 
 [[tools.node]]
 version = "24.18.0"
@@ -114,39 +97,42 @@ checksum = "sha256:dfd0dbd3e721503434df7b7205e719f61b3a3a31b2bcf9729b8b91fea240f
 url = "https://nodejs.org/dist/v24.18.0/node-v24.18.0-darwin-x64.tar.gz"
 
 [[tools."npm:@anthropic-ai/claude-code"]]
-version = "2.1.220"
+version = "2.1.261"
 backend = "npm:@anthropic-ai/claude-code"
-specifiers = ["2.1.220"]
+specifiers = ["latest"]
 
 [[tools."npm:@earendil-works/pi-coding-agent"]]
-version = "0.82.1"
+version = "0.85.0"
 backend = "npm:@earendil-works/pi-coding-agent"
-specifiers = ["0.82.1"]
+specifiers = ["latest"]
 
 [[tools."npm:@google/gemini-cli"]]
-version = "0.52.0"
+version = "0.58.0"
 backend = "npm:@google/gemini-cli"
-specifiers = ["0.52.0"]
+specifiers = ["latest"]
 
 [[tools."npm:@openai/codex"]]
-version = "0.153.0"
+version = "0.153.4"
 backend = "npm:@openai/codex"
-specifiers = ["0.153.0"]
+specifiers = ["latest"]
 
 [[tools."npm:@playwright/cli"]]
-version = "0.1.17"
+version = "0.1.18"
 backend = "npm:@playwright/cli"
-specifiers = ["0.1.17"]
+specifiers = ["0.1.18"]
 
 [[tools."npm:agent-browser"]]
 version = "0.36.0"
 backend = "npm:agent-browser"
-specifiers = ["0.36.0"]
+specifiers = [
+    "0.36.0",
+    "latest",
+]
 
 [[tools."npm:ctx7"]]
-version = "0.5.9"
+version = "0.5.10"
 backend = "npm:ctx7"
-specifiers = ["0.5.9"]
+specifiers = ["latest"]
 
 [[tools."npm:oh-my-openagent"]]
 version = "4.19.1"
@@ -157,9 +143,9 @@ specifiers = ["4.19.1"]
 trust_policy_excludes = '["effect@4.0.0-beta.66"]'
 
 [[tools."npm:opencode-ai"]]
-version = "1.18.5"
+version = "1.18.29"
 backend = "npm:opencode-ai"
-specifiers = ["1.18.5"]
+specifiers = ["latest"]
 
 [[tools.python]]
 version = "3.12.12"

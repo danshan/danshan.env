@@ -1,26 +1,16 @@
 #!/usr/bin/env bash
-
-set -Eeuo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=scripts/common.sh
-source "${SCRIPT_DIR}/common.sh"
-
-log_title "Validating Bootstrap preconditions."
-
-[[ "$(uname -s)" == Darwin ]] || die "This bootstrap currently supports macOS only."
-validate_brew_formula_manifest "${PROJECT_ROOT}/defaults/brew_pkgs.txt"
-validate_brew_cask_manifest "${PROJECT_ROOT}/defaults/brew_casks.txt"
-validate_brew_trust_manifest "${PROJECT_ROOT}/defaults/brew_trust.txt"
-validate_dotfile_manifest "${PROJECT_ROOT}/defaults/dotfile_pkgs.txt"
-validate_login_shell
-load_tool_versions
-validate_tracking_git_repository_identity_if_present \
-    "Zed configuration" \
-    "git@github.com:danshan/zed-config.git" \
-    "${HOME}/.config/zed"
-
-[[ -f "${DOTFILES_DIR}/mise/.config/mise/config.toml" ]] ||
-    die "Mise global configuration is missing from the dotfile package."
-
-log_success "Bootstrap preflight complete."
+bootstrap_preflight() {
+    local file
+    [[ "$(uname -s)" == Darwin ]] || { die "This Bootstrap requires macOS."; return 1; }
+    [[ "${DANSHAN_MODE:-apply}" != recover ]] || return 0
+    case "${SHELL:-}" in */bash|*/zsh|*/fish) ;; *) die "Unsupported login Shell: ${SHELL:-unset}"; return 1 ;; esac
+    for file in Brewfile config/mise-system.toml config/bootstrap.env config/dotfiles.tsv config/repositories.tsv config/links.tsv config/migrations.txt \
+        dotfiles/mise/.config/mise/config.toml dotfiles/mise/.config/mise/mise.lock; do
+        [[ -f "${PROJECT_ROOT}/${file}" ]] || { die "Required configuration is missing: ${file}"; return 1; }
+    done
+    validate_dotfile_config || return 1
+    validate_repository_config || return 1
+    validate_migration_config || return 1
+    load_homebrew_install_config || return 1
+    [[ "${HOMEBREW_INSTALL_REF:-}" =~ ^[0-9a-f]{40}$ ]] || { die "Homebrew installer revision must be a commit."; return 1; }
+}

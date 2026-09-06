@@ -12,8 +12,6 @@ if ! command -v fish >/dev/null 2>&1; then
     exit 0
 fi
 
-TEST_TEMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/danshan-gtest.XXXXXX")"
-trap 'rm -rf -- "${TEST_TEMP_DIR}"' EXIT
 repository_path="${TEST_TEMP_DIR}/repository"
 mkdir -p "${repository_path}"
 git -C "${repository_path}" init --quiet

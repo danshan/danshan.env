@@ -2,7 +2,7 @@
 title: Documentation Standard
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-03
+last_updated: 2026-09-06
 related:
   - ../README.md
 ---
@@ -102,6 +102,8 @@ related:
 3. 实现完成时, 将当前事实写入 architecture, development 和 operations 文档.
 4. 被替代文档改为 `superseded`, 双向链接替代文档.
 5. 仅当文档不再参与当前导航且只具有历史价值时移动到 `archive/`.
+
+维护者明确批准清理过期文档时, 可以删除已被替代的设计或 ADR, 并同步移除全部入站链接. 被删除 ADR 的编号不得复用, 历史由 Git 保留. 仍有效的信任例外和安全事件证据应继续保留或归档.
 
 文档移动必须同时更新入站链接. 不得仅复制后删除, 以免形成两个并行事实源.
 

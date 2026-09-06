@@ -1,11 +1,6 @@
 set fish_greeting
 
-if status is-interactive
-    #eval (zellij setup --generate-auto-start fish | string collect)
-end
-
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-export PATH="$HOME/.bun/bin:$HOME/.local/bin:$HOME/.bin:/usr/local/go/bin:$PATH"
+set -gx PATH "$HOME/.local/bin" "$HOME/.bin" $PATH
 
 # Homebrew
 export HOMEBREW_INSTALL_FROM_API=1
@@ -74,7 +69,7 @@ export OPENSPEC_TELEMETRY=0
 
 
 # Added by Antigravity IDE
-fish_add_path "$HOME/.antigravity-ide/antigravity-ide/bin"
+fish_add_path --global "$HOME/.antigravity-ide/antigravity-ide/bin"
 
 # Codex app proxy
 function codex-app
@@ -112,5 +107,5 @@ end
 # <<< otty shell integration <<<
 
 # >>> grok installer >>>
-fish_add_path $HOME/.grok/bin
+fish_add_path --global "$HOME/.grok/bin"
 # <<< grok installer <<<

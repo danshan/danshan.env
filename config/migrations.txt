@@ -1,0 +1,24 @@
+# Purpose: explicitly allow ownership changes when native installation finds conflicts.
+# Format: kind|resource|target; exactly three non-empty fields separated by literal |.
+# kind=app: resource is a Brewfile Cask token; target is the App name WITHOUT .app.
+# App targets resolve only to /Applications/<target>.app; no slash or path traversal.
+# kind=font: resource is a Brewfile font Cask token; target must be the literal -.
+# Font targets come only from Homebrew metadata and must be direct HOME/Library/Fonts
+# .ttf or .otf files. All eligible font rows form one rollback-capable batch.
+# kind=dotfile: the only recognized legacy adapter is mise|.config/mise/config.toml.
+# Cask tokens use letters, digits, @, +, ., _, -, /; no leading -, traversal or empty segment.
+# Every resource and App target is unique. Casks must be active in Brewfile for the current platform.
+# Third-party Casks require package-level trust already granted from Brewfile by apply.
+# Execution: only install.sh migrate uses this allowlist; apply/check never migrate.
+# Homebrew-owned Casks are skipped. App/dotfile rows run in order, then the font batch.
+# Existing snapshots are retained; pending recovery must finish before new migration.
+# Blank lines and lines beginning with # are ignored. No inline comments or quoting.
+# Examples: app|example-app|Example App
+#           font|font-example|-
+#           dotfile|mise|.config/mise/config.toml
+
+app|localsend/localsend/localsend|LocalSend
+font|font-hack-nerd-font|-
+font|font-fira-code-nerd-font|-
+font|font-jetbrains-mono-nerd-font|-
+dotfile|mise|.config/mise/config.toml

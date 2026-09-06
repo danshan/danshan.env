@@ -1,5 +1,5 @@
 # Archive
 
-本目录只保存不再参与当前操作或设计导航的历史文档. 移入前必须将文档状态改为 `archived`, 并更新所有入站链接.
+归档材料用于保留历史与安全证据, 不作为当前安装指引. 当前行为见 [Installation Runbook](../operations/installation.md).
 
-当前没有 archived 文档.
+- [2026-09-03 Bootstrap Remediation](2026-09-03-bootstrap-remediation.md): 当时的审查, 凭据历史清理和仍需服务端处理的安全事项.
