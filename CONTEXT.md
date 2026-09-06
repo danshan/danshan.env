@@ -50,7 +50,7 @@
 
 **Rollback**: 失败时先保留替换产物, 撤销本 transaction 的新安装, 再从 snapshot 恢复原状态. 不撤销之前已经 completed 的其他 transaction.
 
-**Migration Lock**: 保护 Bootstrap 变更的内核互斥锁. 锁文件 inode 持续保留, 活跃持有者退出后锁释放.
+**Migration Lock**: 保护 Bootstrap 变更的内核 `flock(2)` 互斥锁. 仓库 helper 对已打开的文件描述符非阻塞加锁; 锁文件 inode 持续保留, 活跃持有者退出后锁释放.
 
 **Interrupted Migration**: 在 snapshot 建立后但最终状态写入前退出的 transaction. 只有显式 Recover 才处理可识别的中断.
 

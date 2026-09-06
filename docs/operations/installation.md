@@ -2,10 +2,11 @@
 title: Installation Runbook
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-06
+last_updated: 2026-09-07
 related:
   - ../architecture/bootstrap.md
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
+  - ../adr/0011-perl-flock-helper.md
   - ../adr/0007-reviewed-npm-trust-policy-exception.md
   - ../development/testing.md
 ---
@@ -169,7 +170,7 @@ bash install.sh check
 
 格式 1 的旧 snapshot 仍可按既有布局恢复. 更早无 state 的 font snapshot 只有在 target, 保留原件和 Homebrew ownership 全部验证后才被只读认可为 completed, 不补写历史 state.
 
-变更命令由 `locks/bootstrap.lock` 的内核锁串行化, 不删除该文件 inode. 已存在锁文件时 `check` 只读加锁; 首次 `check` 不创建锁文件. 进程树结束后锁自动释放. 旧 `cask-migration.lock` 的活跃 PID 会阻止新命令, 无 PID 或异常结构需要人工确认旧进程已结束, 不直接删除 active lock.
+变更命令由 `locks/bootstrap.lock` 的内核 `flock(2)` 锁串行化, 不删除该文件 inode. 仓库 helper 使用 macOS 的 `/usr/bin/perl` 对 Bash 继承的文件描述符加锁, 兼容性依据见 [ADR 0011](../adr/0011-perl-flock-helper.md). 已存在锁文件时 `check` 只读加锁; 首次 `check` 不创建锁文件. 进程树结束后锁自动释放. 如果 Perl 或 helper 缺失, 或内核加锁返回非竞争错误, Bootstrap 会报告锁实现故障, 不会误报为另一进程持锁. 旧 `cask-migration.lock` 的活跃 PID 会阻止新命令, 无 PID 或异常结构需要人工确认旧进程已结束, 不直接删除 active lock.
 
 ## Shell and local secrets
 

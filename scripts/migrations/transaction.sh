@@ -198,9 +198,16 @@ validate_completed_legacy_font_migration() {
     done
 }
 
+acquire_file_lock() {
+    LC_ALL=C /usr/bin/perl "$1" "$2"
+}
+
 lock_bootstrap() {
     local lock_root="${STATE_ROOT}/locks" lock_path="${STATE_ROOT}/locks/bootstrap.lock"
-    local legacy="${STATE_ROOT}/locks/cask-migration.lock" owner=""
+    local lock_helper="${PROJECT_ROOT}/scripts/lib/lock.pl"
+    local legacy="${STATE_ROOT}/locks/cask-migration.lock" owner="" lock_status
+    [[ -x /usr/bin/perl ]] || { die "Required system command not found: /usr/bin/perl"; return 1; }
+    [[ -f "${lock_helper}" && ! -L "${lock_helper}" ]] || { die "Bootstrap lock helper is missing or unsafe: ${lock_helper}"; return 1; }
     validate_private_path "${lock_root}" || return 1
     [[ ! -L "${legacy}" ]] || { die "Symlinked legacy lock."; return 1; }
     if [[ -d "${legacy}" ]]; then
@@ -222,7 +229,17 @@ lock_bootstrap() {
         exec 9>"${lock_path}" || return 1
     fi
     # The inherited descriptor keeps the kernel lock alive for this process tree.
-    /usr/bin/lockf -t 0 9 || { die "Another Bootstrap operation holds ${lock_path}"; return 1; }
+    if acquire_file_lock "${lock_helper}" 9; then
+        return 0
+    else
+        lock_status=$?
+    fi
+    if [[ "${lock_status}" -eq 1 ]]; then
+        die "Another Bootstrap operation holds ${lock_path}"
+    else
+        die "Failed to acquire Bootstrap lock ${lock_path} (helper exit ${lock_status})"
+    fi
+    return 1
 }
 
 recover_interrupted_app_migration() {

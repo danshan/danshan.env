@@ -11,7 +11,7 @@
 | `standards/` | 文档结构, 命名和生命周期规范 | [Documentation Standard](standards/documentation.md) |
 | `architecture/` | 当前系统边界, 组件和执行流 | [Bootstrap Architecture](architecture/bootstrap.md) |
 | `design/` | 已批准或正在评审的功能设计 | [Design Index](design/README.md) |
-| `adr/` | 当前有效的架构与信任决策, 已删除编号不复用 | [ADR 0007](adr/0007-reviewed-npm-trust-policy-exception.md), [ADR 0008](adr/0008-native-package-managers-and-explicit-migrations.md), [ADR 0009](adr/0009-playwright-cli-trust-hold.md), [ADR 0010](adr/0010-local-compatibility-casks.md) |
+| `adr/` | 当前有效的架构与信任决策, 已删除编号不复用 | [ADR 0007](adr/0007-reviewed-npm-trust-policy-exception.md), [ADR 0008](adr/0008-native-package-managers-and-explicit-migrations.md), [ADR 0009](adr/0009-playwright-cli-trust-hold.md), [ADR 0010](adr/0010-local-compatibility-casks.md), [ADR 0011](adr/0011-perl-flock-helper.md) |
 | `development/` | 本地开发, 测试和贡献流程 | [Testing Guide](development/testing.md) |
 | `operations/` | 安装, 升级, 故障恢复和安全操作 | [Installation Runbook](operations/installation.md) |
 | `reviews/` | 带日期的 code review 和验证记录 | [Native Bootstrap Review](reviews/2026-09-06-native-bootstrap.md) |

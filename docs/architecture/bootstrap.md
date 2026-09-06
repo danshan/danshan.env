@@ -2,9 +2,10 @@
 title: Native Bootstrap Architecture
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-06
+last_updated: 2026-09-07
 related:
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
+  - ../adr/0011-perl-flock-helper.md
   - ../operations/installation.md
   - ../development/testing.md
 ---
@@ -70,6 +71,6 @@ App target 是 `/Applications/<name>.app`; font target 只接受 Homebrew metada
 
 旧 Mise config 仅接受一个 `[tools]` section 中简单 key/version 赋值的可验证子集, 拒绝未知配置. 显式迁移保留旧配置和原 lockfile ownership, 再由 Stow 接管 config 与 lockfile. 回滚不覆盖执行期间出现的未知文件.
 
-变更操作通过同一个 `lockf` 锁串行化. `check` 只读持有已存在的锁文件, 首次检查不创建锁文件. 锁文件 inode 保留, 锁由继承的文件描述符持有, 随进程树退出释放. 旧 PID lock 中可验证的活跃 owner 仍阻止操作; 无 PID 或结构异常的旧 lock fail closed.
+变更操作通过同一个内核 `flock(2)` 锁串行化. 仓库 Perl helper 对 Bash 已打开并继承的文件描述符非阻塞加锁, 锁竞争与 helper 故障使用不同退出状态. `check` 只读持有已存在的锁文件, 首次检查不创建锁文件. 锁文件 inode 保留, 锁由继承的文件描述符持有, 随进程树退出释放. 旧 PID lock 中可验证的活跃 owner 仍阻止操作; 无 PID 或结构异常的旧 lock fail closed. 兼容性决策见 [ADR 0011](../adr/0011-perl-flock-helper.md).
 
 Snapshot 使用 `format=2`, `manifest.txt` 和原子更新的 `state`. 已存在的格式 1 snapshot 继续接受严格路径验证. 无 state 的旧字体 snapshot 只有在清单, 精确 target, 保留原件和 Homebrew ownership 均有效时才只读认可为已完成. `rollback-incomplete` 和未知状态需要人工处理. `apply/check` 仅报告 pending, `recover` 才恢复可识别的中断.

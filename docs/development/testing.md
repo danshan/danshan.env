@@ -2,9 +2,10 @@
 title: Bootstrap Testing Guide
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-06
+last_updated: 2026-09-07
 related:
   - ../architecture/bootstrap.md
+  - ../adr/0011-perl-flock-helper.md
   - ../reviews/2026-09-06-native-bootstrap.md
 ---
 
@@ -12,13 +13,13 @@ related:
 
 ## Environment and command
 
-测试运行于 macOS, 使用系统 Bash 3.2, Git, Ruby, plutil, lockf, sandbox-exec, 以及已安装的 Fish, Mise 和 Python 3.11 及以上. Python 标准库用于配置/锁文件校验和 PTY 输出测试, 不是 Bootstrap 运行依赖. 测试不得执行真实安装或修改用户配置.
+测试运行于 macOS, 使用系统 Bash 3.2, Git, Perl, Ruby, plutil, sandbox-exec, 以及已安装的 Fish, Mise 和 Python 3.11 及以上. Perl 是 Bootstrap 内核文件锁 helper 的运行依赖. Python 标准库用于配置/锁文件校验和 PTY 输出测试, 不是 Bootstrap 运行依赖. 测试不得执行真实安装或修改用户配置.
 
 ```bash
 bash tests/run.sh
 ```
 
-测试创建临时 HOME 和 XDG 目录; 包管理器安装, 卸载, trust 和 Stow 失败路径使用 stub. Git 行为使用临时本地 repository. Mise 的配置发现测试调用真实查询命令, 在只读, 离线沙箱内验证结果和文件摘要; lockf 测试使用系统内核锁.
+测试创建临时 HOME 和 XDG 目录; 包管理器安装, 卸载, trust 和 Stow 失败路径使用 stub. Git 行为使用临时本地 repository. Mise 的配置发现测试调用真实查询命令, 在只读, 离线沙箱内验证结果和文件摘要; 锁测试通过仓库 Perl helper 调用系统 `flock(2)`.
 
 `check` 的系统沙箱不能在某些外层限制环境中建立. 如果测试报告 `sandbox_apply: Operation not permitted`, 应在允许建立 Seatbelt profile 的执行环境运行整套测试, 同时保留临时 HOME 和 stub. 不应跳过只读验证来把失败改成成功.
 
@@ -33,7 +34,7 @@ bash tests/run.sh
 | `test_install_execution.sh` | 完整隔离入口, 重复执行, check 无文件变化, stage/from, 失败传播, 无隐式恢复 |
 | `test_git_repositories.sh` | missing/current/outdated pinned checkout, 前向更新, dirty, origin, worktree root 和查询失败 |
 | `test_mise_isolation.sh` | cwd/祖先/全局/system/env 配置隔离, 真实路径 ceiling, 只读查询, Stow directory folding |
-| `test_lock.sh` | 锁互斥, 持有者退出, 首次 check 不建状态目录, 旧 PID lock |
+| `test_lock.sh` | 锁互斥, helper 故障, 持有者退出, 首次 check 不建状态目录, 旧 PID lock |
 | `test_migrations.sh` | App/font commit, 失败, 原件与失败产物保留, batch rollback, 中断重复恢复, 精确目标和 legacy snapshot |
 | `test_stow_migration.sh` | 已知旧配置子集, snapshot move 失败, install/verify failure, 已有 lock ownership, 未知冲突保留, 重复恢复 |
 | `test_gtest_worktree.sh` | Fish Git helper 不误恢复旧 stash 或覆盖 worktree |

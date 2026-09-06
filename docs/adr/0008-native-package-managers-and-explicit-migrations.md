@@ -2,12 +2,13 @@
 title: Native Package Managers and Explicit Migrations
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-06
+last_updated: 2026-09-07
 related:
   - ../architecture/bootstrap.md
   - ../operations/installation.md
   - ../development/testing.md
   - 0007-reviewed-npm-trust-policy-exception.md
+  - 0011-perl-flock-helper.md
 ---
 
 # ADR 0008: Native Package Managers and Explicit Migrations
@@ -26,7 +27,7 @@ Review 同时发现 Mise global config override 不能独立排除 cwd 配置, P
 
 Brewfile 中的 Cask 表示 Homebrew ownership, 接受 Bundle 默认的原生 adoption. Homebrew 的判断可能依据 App bundle 版本或内容比较, 不应描述成仓库承诺的逐字节一致性. 不再提供默认 preserve 的第二套普通安装模型; 需要保持外部管理的 App 应移出 Brewfile. 不满足原生 adoption 条件时, 只有显式迁移许可加 `migrate` 命令才能替换 artifact.
 
-公开操作调整为 `apply/check/migrate/recover`, 删除 `plan/status` 和旧 stage 名称. `check` 使用 macOS Seatbelt 阻止写入和网络访问, 因为原生查询也可能触发内部迁移. 使用系统 `lockf` 保证互斥, 保留原子状态和历史 snapshot 恢复. Package inventory 和 migration allowlist 分开, 前者定义持续管理, 后者定义一次性接管许可.
+公开操作调整为 `apply/check/migrate/recover`, 删除 `plan/status` 和旧 stage 名称. `check` 使用 macOS Seatbelt 阻止写入和网络访问, 因为原生查询也可能触发内部迁移. 使用系统内核 advisory lock 保证互斥, 保留原子状态和历史 snapshot 恢复; macOS CLI 兼容性修正见 [ADR 0011](0011-perl-flock-helper.md). Package inventory 和 migration allowlist 分开, 前者定义持续管理, 后者定义一次性接管许可.
 
 ## Alternatives
 
@@ -50,4 +51,4 @@ Seatbelt 是 macOS 专用系统接口; 外层受限执行环境可能禁止建�
 - [Mise Configuration](https://mise.jdx.dev/configuration.html).
 - [Mise lock](https://mise.jdx.dev/cli/lock.html).
 - [Mise startup migration implementation](https://github.com/jdx/mise/blob/main/src/migrate.rs).
-- macOS 本机 `man lockf` 和 `man sandbox-exec`.
+- macOS 本机 `man 2 flock`, `perldoc -f flock` 和 `man sandbox-exec`.
