@@ -70,8 +70,11 @@ cask "antigravity"
 cask "ghostty"
 cask "detachhead/tap/rebased", trusted: true
 cask "muxy-app/tap/muxy", trusted: true
-# Menu bar manager: Thaw, available on macOS 26 or later.
-cask "thaw" if MacOS.version.major.to_i >= 26
+# The local tap reads committed Cask definitions from this repository.
+if MacOS.version.major.to_i >= 26
+  cask "thaw"
+elsif MacOS.version.major.to_i >= 14
+  tap "danshan/env", File.expand_path(__dir__)
+  cask "danshan/env/thaw@1", trusted: true
+end
 cask "localsend/localsend/localsend", trusted: true
-cask "hammerspoon"
-cask "cmux"

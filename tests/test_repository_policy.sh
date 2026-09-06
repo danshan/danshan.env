@@ -67,17 +67,26 @@ end
 $entries = []
 def brew(name, **options); $entries << [:brew, name, options]; end
 def cask(name, **options); $entries << [:cask, name, options]; end
-[25, 26].each do |major|
+def tap(name, source, **options); $entries << [:tap, name, options.merge(source: source)]; end
+[13, 14, 15, 25, 26, 27].each do |major|
   ENV['TEST_MACOS_MAJOR'] = major.to_s
   $entries = []
   load ARGV.fetch(0)
   raise 'Duplicate package ownership' unless $entries.map { |type, name, _| name }.uniq.size == $entries.size
   $entries.each do |type, name, options|
+    if type == :tap
+      raise 'Unexpected tap source' unless name == 'danshan/env' && options == {source: File.dirname(ARGV.fetch(0))}
+      next
+    end
     raise 'Missing exact third-party trust' if name.include?('/') && options[:trusted] != true
     raise 'Broad or unknown Bundle option' unless (options.keys - [:trusted]).empty?
   end
   raise 'Cask classification' unless $entries.any? { |type, name, _| type == :cask && name == '1password-cli' }
   raise 'Host CLI classification' unless $entries.any? { |type, name, _| type == :brew && name == 'starship' }
-  raise 'Platform gate' unless $entries.any? { |_, name, _| name == 'thaw' } == (major >= 26)
+  legacy = major >= 14 && major < 26
+  raise 'Current platform gate' unless $entries.any? { |_, name, _| name == 'thaw' } == (major >= 26)
+  raise 'Legacy platform gate' unless $entries.any? { |_, name, _| name == 'danshan/env/thaw@1' } == legacy
+  raise 'Legacy tap gate' unless $entries.any? { |type, _, _| type == :tap } == legacy
 end
 RUBY
+/usr/bin/ruby -c "${PROJECT_ROOT}/Casks/thaw@1.rb"

@@ -95,6 +95,28 @@ bash install.sh apply --stage mise
 
 `oh-my-openagent@4.19.1` 的 `effect@4.0.0-beta.66` 例外仍以 ADR 0007 为准. 改变依赖链前重新审查, 依赖不再需要时删除例外; 不扩大为无版本的 `effect` 例外.
 
+## Compatibility casks
+
+Thaw 的平台选择由 Brewfile 决定:
+
+| macOS major | 声明 |
+|---|---|
+| 小于 14 | 不安装 Thaw |
+| 14 至 25 | 本仓库 `danshan/env/thaw@1`, 固定 1.2.0 |
+| 26 及以上 | 官方 `thaw`, 由 Homebrew 提供当前版本 |
+
+在旧平台, 原生 Bundle 将当前 Bootstrap Git 仓库克隆为 `danshan/env` tap. 源位置从 Brewfile 所在目录解析, 不依赖调用者 cwd. Cask 定义必须先提交到源仓库, 未提交修改不会进入 tap. 普通仓库更新后执行:
+
+```bash
+bash install.sh apply --stage homebrew
+```
+
+该命令会收敛整个 Homebrew 清单, 并非只安装 Thaw. 预期 `thaw@1` 安装成功, 再次执行时由原生 Bundle 跳过已满足项. 安装失败保留非零结果, 不移除平台条件或使用 `--force`.
+
+维护 `Casks/` 时先核对官方 release, 下载摘要及最低系统要求, 同步 ADR 与平台测试, 然后提交定义并执行上述命令. 不直接编辑 Homebrew tap clone. 源仓库移动后, 核对 `brew --repository danshan/env` 中的 origin, 再显式调整本地 tap 的 source; 不覆盖未知 tap.
+
+`thaw@1` 与官方 `thaw` 都安装 `Thaw.app`, 因此声明原生 conflict. 系统升级到 macOS 26 后, 需要先明确卸载旧 Cask, 保留偏好数据, 再执行 Homebrew 阶段安装官方版本; Bootstrap 不自动删除旧版本. Cask 固定版本不控制 App 内置更新器, 旧系统不要手动升级到超出系统要求的版本. 发布证据与选择理由见 [ADR 0010](../adr/0010-local-compatibility-casks.md).
+
 ## NPM trust downgrade
 
 `trustPolicy=no-downgrade` 表示候选 release 的发布信任证据弱于历史版本, 不属于普通下载或版本解析失败. 先从 npm 官方 registry 核对 publisher, provenance, source commit 和 tarball 摘要; 若代理返回的 metadata 不同, 还需定位代理问题. 不自动加入 `trust_policy_excludes`, 不使用 `npm.shell_out=true` 绕过检查.
@@ -125,7 +147,7 @@ bash install.sh apply
 
 App 按清单中的不含 `.app` 后缀的名字定位 `/Applications/<name>.app`. 字体 target 仅取 Homebrew metadata, 只允许 `${HOME}/Library/Fonts` 直接文件, 拒绝非字体 artifact, 目录穿越, 重复目标和 symlinked parent.
 
-旧 `~/.config/mise/config.toml` 的迁移只接受已知 `[tools]` 简单赋值子集. 额外 section, comment, 不同版本, 未知 key 或外部 lockfile 都会拒绝. 先保留 snapshot, 再部署 config/lockfile. 普通 Stow 冲突和旧 Hammerspoon 独立 Git checkout 不在自动适配范围, 需先比较并保留本地改动, 再移至明确备份路径.
+旧 `~/.config/mise/config.toml` 的迁移只接受已知 `[tools]` 简单赋值子集. 额外 section, comment, 不同版本, 未知 key 或外部 lockfile 都会拒绝. 先保留 snapshot, 再部署 config/lockfile. 普通 Stow 冲突和既有独立 Git checkout 不在自动适配范围, 需先比较并保留本地改动, 再移至明确备份路径.
 
 ## Recovery and snapshots
 

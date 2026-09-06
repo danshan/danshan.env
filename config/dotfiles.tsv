@@ -16,10 +16,8 @@ starship	all
 tmux	all
 nvim	all
 ghostty	all
-cmux	all
 fastfetch	all
 fd	all
-hammerspoon	all
 codex	all
 gemini	all
 claude	all

@@ -22,6 +22,7 @@ Homebrew 安装默认实时显示原生输出, 并报告各步骤的开始, 完�
 | 维护内容 | 配置位置 |
 |---|---|
 | 主机 CLI, App, 字体, 第三方包信任和平台条件 | [Brewfile](Brewfile) |
+| 旧平台的固定版本 Compatibility Cask | [Casks/](Casks/) |
 | runtime 和开发 CLI | [Mise config](dotfiles/mise/.config/mise/config.toml) |
 | 开发工具解析后的版本 | [mise.lock](dotfiles/mise/.config/mise/mise.lock) |
 | Stow package, Git dependency, 附加链接, 迁移许可 | [config/](config/) |
@@ -35,6 +36,8 @@ bash install.sh apply --stage mise
 ```
 
 `oh-my-openagent` 当前保留与信任审查绑定的精确版本, 见 [ADR 0007](docs/adr/0007-reviewed-npm-trust-policy-exception.md).
+
+Thaw 在 macOS 14 至 25 使用固定的 1.2.0 Compatibility Cask, macOS 26 及以上使用官方当前版本. 本地 tap 读取本仓库已提交的 `Casks/` 内容; 修改 Cask 后需先提交再执行 Homebrew 阶段, 见 [兼容版本维护](docs/operations/installation.md#compatibility-casks).
 
 `@playwright/cli` 因新版本缺少此前的发布信任证据, 固定为 `0.1.18`, 保留 Aube 信任检查, 见 [ADR 0009](docs/adr/0009-playwright-cli-trust-hold.md). Mise 阶段失败后, 修复配置并执行 `bash install.sh apply --stage mise` 可继续该阶段.
 

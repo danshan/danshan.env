@@ -26,6 +26,10 @@
 
 **Platform Constraint**: 原生清单对当前主机启用资源的条件. 不满足条件时不声明该资源, 不能通过忽略任意安装错误替代判断.
 
+**Compatibility Cask**: 为旧平台保留的固定版本 Homebrew Cask. 定义在仓库 `Casks/` 中, 原生 Local Tap 消费已提交版本, Brewfile 决定平台选择与包级 trust.
+
+**Local Tap**: Homebrew 从当前 Bootstrap Git 仓库创建的独立 tap clone. 它只读取已提交的 Cask 定义, 不与源工作树共享 checkout, 不授予整个 tap 信任.
+
 **Version Selector**: 配置中的版本意图, 可以是固定版本或开发 CLI 的 `latest`.
 
 **Trust Hold**: 因候选 release 的发布信任证据下降, 将工具明确固定到经过核验的版本. 不豁免原生信任检查, 解除前必须重新核对发布证据并同步 ADR 和 Lockfile.

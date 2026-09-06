@@ -26,7 +26,7 @@ bash tests/run.sh
 
 | Test | Contract |
 |---|---|
-| `test_repository_policy.sh` | 逐文件 Shell 语法, 原生清单 owner, latest/lock 一致性, 平台条件, 精确信任例外和 ADR 0009 Trust Hold |
+| `test_repository_policy.sh` | 逐文件 Shell/Cask 语法, 原生清单 owner, latest/lock 一致性, Compatibility Cask 平台边界和 tap source, 精确信任例外和 ADR 0009 Trust Hold |
 | `test_configuration.sh` | 文件格式, 错误字段, 重复 owner/target, 安装器数据不执行为代码, 迁移许可整体校验 |
 | `test_adapters.sh` | Bundle 实时 install/check, update/install/verify 失败状态及停止后续步骤, update skip, 环境 override 清除, 激活失败, Stow simulate, 表格校验 |
 | `test_homebrew_output.sh` | PTY 和重定向输出, 命令结束前透传无换行 stdout/stderr, 保留 TTY 与退出码, 耗时及失败无完成提示 |
@@ -48,6 +48,8 @@ Cask stub 的 uninstall 必须真的删除测试 artifact, 这样才能发现保
 新增普通应用或 CLI 通常只改变原生配置, 用结构与 lock 一致性检查验证, 不为每个 token 写一次重复安装测试. 新字段或条件应覆盖合法值, 非法值和错误传播; 新 ownership migration 则必须覆盖精确路径, success, repeat, install failure, verify failure, original/failed artifact preservation, rollback 和 rollback-incomplete.
 
 Shell 语法检查必须逐文件调用 `/bin/bash -n`, 一次传入多个文件只会检查第一个. 修改文档链接或配置格式时同步更新对应检查. 完成测试后审查 `git diff --check` 和工作树, 排除临时文件, 未登记文档和凭据.
+
+Compatibility Cask 的平台测试覆盖最低系统之前, 最低系统, 当前旧系统, 新版本边界前后和未来系统. 当前 Thaw 覆盖 13, 14, 15, 25, 26, 27, 验证新旧 Cask 互斥, Local Tap 仅在旧平台声明, source 从 Brewfile 目录解析, trust 只授予具体 package. 修改 Cask 时额外核对 Homebrew 原生 metadata 与真实 artifact, 该检查不应通过测试脚本执行真实安装.
 
 Trust Hold 的固定版本属于显式安全约束, 需要检查 declaration 与 lockfile 都指向审查版本, 且未增加 trust exception. 这类检查不代替真实发布证据审查, 也不把具体版本当作普通 reconciliation 状态机. 解除 Hold 时同步更新 ADR, 配置和对应约束.
 

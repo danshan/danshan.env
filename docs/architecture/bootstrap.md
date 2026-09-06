@@ -22,7 +22,7 @@ related:
 | Git | dotfiles 使用的外部配置和插件仓库 | `config/repositories.tsv` |
 | Bootstrap | 跨阶段顺序, 精确链接, 显式 ownership migration | `config/links.tsv`, `config/migrations.txt` |
 
-Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. Hammerspoon 配置属于本仓库的 Stow package. 开发 CLI 可以声明 `latest`, runtime 保留明确版本; 解析结果提交到 `mise.lock`. NPM backend 的原生 lock 记录版本和选项, 不提供与二进制 backend 相同的跨平台 URL/checksum 锁定强度.
+Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. 开发 CLI 可以声明 `latest`, runtime 保留明确版本; 解析结果提交到 `mise.lock`. NPM backend 的原生 lock 记录版本和选项, 不提供与二进制 backend 相同的跨平台 URL/checksum 锁定强度.
 
 候选 NPM release 触发 trust downgrade 时保持失败传播, 不自动修改 `trust_policy_excludes` 或 installer. 已有可信版本可通过明确 Version Selector 建立 Trust Hold, 并同步原生 lockfile, 安全约束测试和 ADR. 当前 Playwright 的固定版本与解除条件见 [ADR 0009](../adr/0009-playwright-cli-trust-hold.md).
 
@@ -46,7 +46,9 @@ Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 
 
 `apply` 依次执行 `homebrew`, `repositories`, `dotfiles`, `mise`. Preflight 在变更前验证 macOS, Shell, 必需文件, 表格结构和已有 Git identity; 原生配置由对应管理器解析. `recover` 不依赖普通安装清单的有效性, 只处理已有 snapshot.
 
-Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL, 例如 Thaw 仅在 macOS 26 及以上声明. 不通过吞掉安装错误推断平台兼容性.
+Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL. Thaw 在 macOS 14 至 25 使用 `danshan/env/thaw@1`, macOS 26 及以上使用官方 `thaw`; 更旧系统不声明. 不通过吞掉安装错误推断平台兼容性.
+
+Compatibility Cask 定义位于 `Casks/`, 固定 upstream version, URL 和 SHA-256. 旧平台的 Brewfile 通过原生 `tap` 从当前仓库创建 `danshan/env` 独立 clone, 再对具体 Cask 声明 trust. Homebrew 只消费源 Git 仓库中的已提交内容, 更新仍由原生 `brew update` 完成. Bootstrap 不复制 Cask 文件, 不链接源工作树为 tap, 不增加 package 安装分支. 维护与版本切换约束见 [ADR 0010](../adr/0010-local-compatibility-casks.md).
 
 `scripts/homebrew.sh` 的步骤包装器直接调用命令, 继承 stdout/stderr 和 TTY, 仅在调用前后输出状态和耗时, 并保留命令退出码. Bundle 的 `--verbose` 启用子命令实时输出; metadata update 和迁移 Cask install 不使用 `--quiet`. 不捕获后集中打印安装日志, 不解析下载文本或模拟百分比. 动态下载进度由 Homebrew 按实际终端条件呈现, Bootstrap 验证成功后才报告整体完成.
 

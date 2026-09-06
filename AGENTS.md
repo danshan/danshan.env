@@ -15,6 +15,7 @@
 - 不得复制 Homebrew 普通 inventory/outdated/upgrade 状态机, 不为新增普通 package 添加专用安装分支.
 - Homebrew 安装必须实时透传 stdout/stderr 并保留 TTY, 下载进度由原生工具呈现. 步骤状态和耗时不得掩盖失败或提前报告整体完成.
 - 包级 trust 与平台条件写在 Brewfile. 不信任整个 tap, 不关闭 trust 检查, 不使用 `--force`, 不自动清理未声明软件.
+- Compatibility Cask 放在 `Casks/`, 固定 version, URL 和 SHA-256. Local Tap 通过 Homebrew 原生 clone 读取本仓库已提交定义, 不链接源工作树为 tap, 不在安装脚本中复制 Cask 或新增 package-specific 分支.
 - Bundle adoption 采用 Homebrew 原生规则, 不宣称仓库保证逐字节一致. adoption 失败不得自动升级为 ownership migration.
 - 公开入口为 `install.sh apply/check/migrate/recover`. `check` 必须使用仓库 Seatbelt profile 禁止文件写入与网络访问, 包括隐式 cache 和迁移写入; 沙箱不可用则失败, 不回退为非隔离执行.
 - 所有 mutation 使用 repository-defined `lockf` 锁. 不删除活跃锁文件 inode, 不用 PID 文件替代内核互斥.
