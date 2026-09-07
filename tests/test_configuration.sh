@@ -37,10 +37,16 @@ expect_failure validate_migration_config
 printf 'font|font-a|Some.ttf\n' > "${fixture}/config/migrations.txt"
 expect_failure validate_migration_config
 # The runner checks the entire allowlist before any transaction and skips owned Casks.
-printf 'app|one|Example\nfont|font-a|-\n' > "${fixture}/config/migrations.txt"
+printf 'app|vendor/tap/one|Example\nfont|vendor/tap/font-a|-\n' > "${fixture}/config/migrations.txt"
 MIGRATION_CALLS=0
 bundle() { printf 'one\nfont-a\n'; }
-brew() { [[ "$*" == 'list --cask -1' ]] || return 90; printf 'one\nfont-a\n'; }
+brew() {
+    case "$*" in
+        'list --cask -1') printf 'one\nfont-a\n' ;;
+        'trust --cask --json=v1') printf '["vendor/tap/one","vendor/tap/font-a"]\n' ;;
+        *) return 90 ;;
+    esac
+}
 migrate_brew_font_casks() { MIGRATION_CALLS=$((MIGRATION_CALLS + 1)); }
 migrate_existing_brew_app_cask() { MIGRATION_CALLS=$((MIGRATION_CALLS + 1)); }
 run_migrations

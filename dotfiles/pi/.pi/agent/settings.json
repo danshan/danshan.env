@@ -1,8 +1,10 @@
 {
-  "lastChangelogVersion": "0.78.0",
-  "theme": "dark",
-  "defaultProvider": "custom-endpoint",
-  "defaultModel": "glm-4.5-air",
+  "defaultModel": "gpt-5.6-sol",
+  "defaultProvider": "openai-codex",
+  "extensions": [
+    "/Users/honghao.shan/.pi/agent/extensions/muxy-notify.ts"
+  ],
+  "lastChangelogVersion": "0.81.1",
   "packages": [
     "npm:context-mode",
     "npm:pi-web-access",
@@ -13,5 +15,7 @@
     "npm:@narumitw/pi-statusline",
     "npm:pi-agent-browser-native",
     "npm:pi-chrome"
-  ]
+  ],
+  "theme": "dark",
+  "defaultThinkingLevel": "high"
 }

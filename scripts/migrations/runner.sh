@@ -71,7 +71,8 @@ run_migrations() {
     installed="$(brew list --cask -1)" || return 1
     while IFS='|' read -r kind resource target extra || [[ -n "${kind}" ]]; do
         case "${kind}" in ''|'#'*|dotfile) continue ;; esac
-        printf '%s\n' "${configured}" | grep -Fx -- "${resource}" >/dev/null || {
+        item="$(normalize_brew_name "${resource}")"
+        printf '%s\n' "${configured}" | grep -Fx -- "${item}" >/dev/null || {
             die "Migration Cask is absent or platform-excluded from Brewfile: ${resource}"; return 1
         }
         case "${resource}" in

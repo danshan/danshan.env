@@ -17,6 +17,7 @@
 #           font|font-example|-
 #           dotfile|mise|.config/mise/config.toml
 
+app|muxy-app/tap/muxy|Muxy
 app|localsend/localsend/localsend|LocalSend
 font|font-hack-nerd-font|-
 font|font-fira-code-nerd-font|-
