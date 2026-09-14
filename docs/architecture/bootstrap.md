@@ -2,7 +2,7 @@
 title: Native Bootstrap Architecture
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-07
+last_updated: 2026-09-14
 related:
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
@@ -23,7 +23,9 @@ related:
 | Git | dotfiles 使用的外部配置和插件仓库 | `config/repositories.tsv` |
 | Bootstrap | 跨阶段顺序, 精确链接, 显式 ownership migration | `config/links.tsv`, `config/migrations.txt` |
 
-Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. 开发 CLI 可以声明 `latest`, runtime 保留明确版本; 解析结果提交到 `mise.lock`. NPM backend 的原生 lock 记录版本和选项, 不提供与二进制 backend 相同的跨平台 URL/checksum 锁定强度.
+Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. [Leaf](https://github.com/rivolink/leaf) 是通用终端 Markdown 预览器, 同属 Homebrew 主机 CLI; 在 `Brewfile` 中声明 `leaf-markdown-viewer`, 安装后使用 `leaf` 命令.
+
+开发 CLI 可以声明 `latest`, runtime 保留明确版本; 解析结果提交到 `mise.lock`. NPM backend 的原生 lock 记录版本和选项, 不提供与二进制 backend 相同的跨平台 URL/checksum 锁定强度.
 
 候选 NPM release 触发 trust downgrade 时保持失败传播, 不自动修改 `trust_policy_excludes` 或 installer. 已有可信版本可通过明确 Version Selector 建立 Trust Hold, 并同步原生 lockfile, 安全约束测试和 ADR. 当前 Playwright 的固定版本与解除条件见 [ADR 0009](../adr/0009-playwright-cli-trust-hold.md).
 

@@ -12,7 +12,7 @@
 
 **Managed Resource**: 清单明确声明由本仓库及其 Tool Owner 持续管理的资源.
 
-**Tool Owner**: 对工具安装, 版本选择和更新承担唯一职责的管理器. Homebrew 管理主机工具与 Cask, Mise 管理 runtime 与开发 CLI.
+**Tool Owner**: 对工具安装, 版本选择和更新承担唯一职责的管理器. Homebrew 管理主机工具与 Cask, 包括通用终端 Markdown 查看器; Mise 管理 runtime 与开发 CLI.
 
 **Installation Backend**: Mise 获取工具的上游 transport, 例如 NPM 或 Aqua. Backend 不构成第二个 Tool Owner.
 
