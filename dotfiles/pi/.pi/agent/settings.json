@@ -4,7 +4,7 @@
   "extensions": [
     "/Users/honghao.shan/.pi/agent/extensions/muxy-notify.ts"
   ],
-  "lastChangelogVersion": "0.81.1",
+  "lastChangelogVersion": "0.85.0",
   "packages": [
     "npm:context-mode",
     "npm:pi-web-access",
