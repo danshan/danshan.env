@@ -17,6 +17,7 @@ local applications = {
     { key = "2", name = "Safari" },
     { key = "3", name = "Feishu" },
     { key = "4", name = "WeChat" },
+    { key = "5", bundle_id = "com.electron.lark.iron" },
     { key = "6", name = "Discord" },
     { key = "d", name = "Zed" },
     { key = "e", name = "Sublime Text" },

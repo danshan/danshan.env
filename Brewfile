@@ -69,6 +69,7 @@ cask "1password"
 cask "1password-cli"
 cask "antigravity"
 cask "ghostty"
+cask "hammerspoon"
 cask "detachhead/tap/rebased", trusted: true
 cask "muxy-app/tap/muxy", trusted: true
 # The local tap reads committed Cask definitions from this repository.
