@@ -28,6 +28,7 @@ local applications = {
     { key = "r", name = "Reminders" },
     { key = "s", name = "IntelliJ IDEA" },
     { key = "v", name = "Visual Studio Code" },
+    { key = "w", name = "1Password" },
     { key = "z", bundle_id = "com.zentraedi.zspaceMacApp" },
 }
 
