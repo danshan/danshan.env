@@ -8,12 +8,12 @@ local modifiers = {
 }
 
 local applications = {
-    { key = "`", name = "iTerm" },
+    { key = "`", name = "Ghostty" },
     { key = ",", name = "Notion" },
     { key = ".", name = "Bruno" },
     { key = "/", name = "Finder" },
     { key = ";", name = "Preview" },
-    { key = "1", name = "Microsoft Edge" },
+    { key = "1", name = "Google Chrome" },
     { key = "2", name = "Safari" },
     { key = "3", name = "Feishu" },
     { key = "4", name = "WeChat" },
@@ -22,6 +22,7 @@ local applications = {
     { key = "a", name = "iStatistica Pro" },
     { key = "d", name = "WebStorm" },
     { key = "e", name = "Sublime Text" },
+    { key = "k", name = "ChatGPT" },
     { key = "m", name = "QQMusic" },
     { key = "n", name = "Telegram" },
     { key = "p", name = "PyCharm CE" },
