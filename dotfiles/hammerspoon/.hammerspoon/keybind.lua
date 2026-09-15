@@ -9,7 +9,7 @@ local modifiers = {
 
 local applications = {
     { key = "`", name = "Ghostty" },
-    { key = ",", name = "Notion" },
+    { key = ",", name = "Obsidian" },
     { key = ".", name = "Bruno" },
     { key = "/", name = "Finder" },
     { key = ";", name = "Preview" },
@@ -17,20 +17,16 @@ local applications = {
     { key = "2", name = "Safari" },
     { key = "3", name = "Feishu" },
     { key = "4", name = "WeChat" },
-    { key = "5", bundle_id = "com.tencent.WeWorkMac" },
     { key = "6", name = "Discord" },
-    { key = "a", name = "iStatistica Pro" },
-    { key = "d", name = "WebStorm" },
+    { key = "d", name = "Zed" },
     { key = "e", name = "Sublime Text" },
     { key = "k", name = "ChatGPT" },
-    { key = "m", name = "QQMusic" },
+    { key = "m", name = "Muxy" },
     { key = "n", name = "Telegram" },
     { key = "p", name = "PyCharm" },
     { key = "r", name = "Reminders" },
     { key = "s", name = "IntelliJ IDEA" },
-    { key = "t", name = "Tweetbot" },
-    { key = "v", name = "Cursor" },
-    { key = "w", name = "Bitwarden" },
+    { key = "v", name = "Visual Studio Code" },
     { key = "z", bundle_id = "com.zentraedi.zspaceMacApp" },
 }
 
