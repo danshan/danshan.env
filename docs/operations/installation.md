@@ -2,7 +2,7 @@
 title: Installation Runbook
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-07
+last_updated: 2026-09-17
 related:
   - ../architecture/bootstrap.md
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
@@ -80,6 +80,8 @@ Finished: Verify Brewfile packages (1s)
 | `config/migrations.txt` | 只登记需要明确接管许可的 App, font 或受支持的 legacy config. |
 
 `config/` 各文件头部是数据格式的就地说明, 包括分隔符, 顺序, 允许值和示例. TSV 必须用真实 TAB, 不支持用空格替代, 不允许空字段, 行尾注释或额外列. 不在这些清单中放凭据.
+
+`raycast` Stow package 将 `.rayignore` 链接到 HOME 根目录, 通过递归 glob pattern 从 Raycast File Search 结果中排除常见源码文件. 修改后需重启 Raycast 以触发重新索引.
 
 菜单栏管理统一使用 Thaw 替代 Bartender, 由 Brewfile 的 `thaw` Cask 管理. [Homebrew Cask](https://formulae.brew.sh/cask/thaw) 要求 macOS 26 及以上, 因而较旧系统跳过该项, 不自动安装 Bartender 作为替代. 已安装的 Bartender 不会被 Bootstrap 自动卸载; 切换时应先退出 Bartender 并关闭其登录启动, 再启用 Thaw, 避免同时管理菜单栏. 平台要求核对日期为 2026-09-06.
 

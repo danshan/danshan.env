@@ -53,6 +53,10 @@ for path, fields in [('dotfiles.tsv', 2), ('repositories.tsv', 5), ('links.tsv',
             continue
         values = line.split('\t')
         assert len(values) == fields and all(values), f'Invalid tabular row: {path}'
+rayignore = (root / 'dotfiles/raycast/.rayignore').read_text().splitlines()
+assert rayignore and all(line.startswith('**/') for line in rayignore), 'Raycast ignores must be recursive globs'
+for pattern in ('**/*.go', '**/*.java', '**/*.py', '**/*.rs', '**/*.ts'):
+    assert pattern in rayignore, f'Missing representative source ignore: {pattern}'
 # Track only repository-owned source paths, never package-specific script inventories.
 assert not (root / 'defaults').exists()
 assert not (root / 'scripts/common.sh').exists()
