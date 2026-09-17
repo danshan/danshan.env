@@ -37,6 +37,7 @@ brew "zsh-syntax-highlighting"
 brew "starship"
 
 cask "sublime-text"
+cask "visual-studio-code"
 cask "surge"
 cask "wechat"
 cask "feishu"
