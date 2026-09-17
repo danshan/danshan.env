@@ -36,3 +36,5 @@ command = "yazi"
 [advanced]
 scrollback_limit_bytes = 10485760
 
+[terminal]
+default_shell = "/opt/homebrew/bin/fish"
