@@ -43,6 +43,8 @@ bundle() (
     for setting in ${!HOMEBREW_BUNDLE_@}; do unset "${setting}"; done
     unset HOMEBREW_CASK_OPTS HOMEBREW_NO_REQUIRE_TAP_TRUST
     export HOMEBREW_NO_AUTO_UPDATE=1
+    # Serialize downloads so every artifact keeps its native progress visible.
+    export HOMEBREW_DOWNLOAD_CONCURRENCY=1
     brew bundle "$@" --file="${PROJECT_ROOT}/Brewfile"
 )
 

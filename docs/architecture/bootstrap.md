@@ -2,10 +2,11 @@
 title: Native Bootstrap Architecture
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-14
+last_updated: 2026-09-17
 related:
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
+  - ../adr/0012-fish-default-login-shell.md
   - ../operations/installation.md
   - ../development/testing.md
 ---
@@ -34,6 +35,7 @@ Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 
 - `install.sh`: 公开命令入口, 为 `check` 建立 macOS 只读沙箱.
 - `scripts/bootstrap.sh`: 参数, Preflight, 互斥锁, 阶段顺序和失败传播.
 - `scripts/homebrew.sh`: Homebrew 激活及原生 Bundle 调用; 首次安装委托给 `setup_homebrew.sh`.
+- `scripts/shell.sh`: 验证 fish 路径, `/etc/shells` 注册和账户默认登录 Shell.
 - `scripts/repositories.sh` 和 `scripts/lib/git.sh`: 读取仓库/链接清单, 验证 identity, clone 或 fast-forward.
 - `scripts/dotfiles.sh`: 读取 package 清单并调用 Stow.
 - `scripts/mise.sh`: 隔离配置发现, 验证 Stow 来源, 调用原生安装与查询.
@@ -47,13 +49,15 @@ Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 
 
 ## Execution
 
-`apply` 依次执行 `homebrew`, `repositories`, `dotfiles`, `mise`. Preflight 在变更前验证 macOS, Shell, 必需文件, 表格结构和已有 Git identity; 原生配置由对应管理器解析. `recover` 不依赖普通安装清单的有效性, 只处理已有 snapshot.
+`apply` 依次执行 `homebrew`, `shell`, `repositories`, `dotfiles`, `mise`. Preflight 在变更前验证 macOS, Shell, 必需文件, 表格结构和已有 Git identity; 原生配置由对应管理器解析. `recover` 不依赖普通安装清单的有效性, 只处理已有 snapshot.
 
-Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL. Thaw 在 macOS 14 至 25 使用 `danshan/env/thaw@1`, macOS 26 及以上使用官方 `thaw`; 更旧系统不声明. 不通过吞掉安装错误推断平台兼容性.
+`shell` stage 在 Homebrew 提供 fish 后解析其绝对可执行路径. `apply` 先以精确行将该路径登记到 `/etc/shells`, 再通过 `chsh` 修改当前账户的目录服务记录并重新读取验证; 随后更新当前 Bootstrap 进程的 `SHELL`, 保证 Git dependency 和 Stow selector 在同一轮执行中选择 fish. `check` 只读取 `/etc/shells` 和账户记录, 但以期望的 fish 路径检查后续资源. 单独跳过 `shell` stage 不会补跑该依赖.
+
+Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass, 并将 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL. Thaw 在 macOS 14 至 25 使用 `danshan/env/thaw@1`, macOS 26 及以上使用官方 `thaw`; 更旧系统不声明. 不通过吞掉安装错误推断平台兼容性.
 
 Compatibility Cask 定义位于 `Casks/`, 固定 upstream version, URL 和 SHA-256. 旧平台的 Brewfile 通过原生 `tap` 从当前仓库创建 `danshan/env` 独立 clone, 再对具体 Cask 声明 trust. Homebrew 只消费源 Git 仓库中的已提交内容, 更新仍由原生 `brew update` 完成. Bootstrap 不复制 Cask 文件, 不链接源工作树为 tap, 不增加 package 安装分支. 维护与版本切换约束见 [ADR 0010](../adr/0010-local-compatibility-casks.md).
 
-`scripts/homebrew.sh` 的步骤包装器直接调用命令, 继承 stdout/stderr 和 TTY, 仅在调用前后输出状态和耗时, 并保留命令退出码. Bundle 的 `--verbose` 启用子命令实时输出; metadata update 和迁移 Cask install 不使用 `--quiet`. 不捕获后集中打印安装日志, 不解析下载文本或模拟百分比. 动态下载进度由 Homebrew 按实际终端条件呈现, Bootstrap 验证成功后才报告整体完成.
+`scripts/homebrew.sh` 的步骤包装器直接调用命令, 继承 stdout/stderr 和 TTY, 仅在调用前后输出状态和耗时, 并保留命令退出码. Bundle 的 `--verbose` 启用子命令实时输出; metadata update 和迁移 Cask install 不使用 `--quiet`. Bundle 下载使用单并发, 避免 Homebrew 合并 Formula/Cask 队列时由终端高度隐藏排在后面的 artifact; 代价是放弃并发下载吞吐量. 不捕获后集中打印安装日志, 不解析下载文本或模拟百分比. 动态下载进度仍由 Homebrew 按实际终端条件呈现, Bootstrap 验证成功后才报告整体完成.
 
 Git pinned checkout 只允许向目标 commit 的前向更新. Tracking checkout 使用 upstream 的 `pull --ff-only`; dirty tracking checkout 保留并报告跳过. 所有 existing target 必须是精确 worktree root, 并匹配 origin. Stow 只部署登录 Shell 对应的 package 和 `all` package; 不覆盖冲突文件.
 

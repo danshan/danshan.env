@@ -13,7 +13,7 @@ brew() {
         update) [[ "${BREW_FAILURE}" != update ]] || return 23 ;;
         bundle)
             [[ -z "${HOMEBREW_BUNDLE_FILE:-}${HOMEBREW_BUNDLE_BREW_SKIP:-}${HOMEBREW_BUNDLE_NO_UPGRADE:-}${HOMEBREW_CASK_OPTS:-}${HOMEBREW_NO_REQUIRE_TAP_TRUST:-}" ]] || return 7
-            [[ "${HOMEBREW_NO_AUTO_UPDATE}" == 1 && "${!#}" == "--file=${PROJECT_ROOT}/Brewfile" ]] || return 8
+            [[ "${HOMEBREW_NO_AUTO_UPDATE}" == 1 && "${HOMEBREW_DOWNLOAD_CONCURRENCY}" == 1 && "${!#}" == "--file=${PROJECT_ROOT}/Brewfile" ]] || return 8
             [[ "${BREW_FAILURE}" != "$2" ]] ;;
     esac
 }
@@ -27,7 +27,7 @@ printf 'export BOOTSTRAP_TEST_ACTIVATED=1\n'
 STUB
 chmod +x "${HOME}/bin/brew"
 find_homebrew() { printf '%s/bin/brew\n' "${HOME}"; }
-export HOMEBREW_BUNDLE_FILE=/unrelated HOMEBREW_BUNDLE_BREW_SKIP=stow HOMEBREW_BUNDLE_NO_UPGRADE=1 HOMEBREW_CASK_OPTS=--force HOMEBREW_NO_REQUIRE_TAP_TRUST=1
+export HOMEBREW_BUNDLE_FILE=/unrelated HOMEBREW_BUNDLE_BREW_SKIP=stow HOMEBREW_BUNDLE_NO_UPGRADE=1 HOMEBREW_CASK_OPTS=--force HOMEBREW_NO_REQUIRE_TAP_TRUST=1 HOMEBREW_DOWNLOAD_CONCURRENCY=8
 DANSHAN_SKIP_BREW_UPDATE=0
 apply_homebrew > "${HOME}/output" 2>&1
 assert_contains 'Starting: Update Homebrew metadata' "${HOME}/output" 'Update status'

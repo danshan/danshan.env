@@ -6,6 +6,7 @@ for argument in "$@"; do
 done
 source "${SCRIPT_DIR}/lib/core.sh"
 source "${SCRIPT_DIR}/homebrew.sh"
+source "${SCRIPT_DIR}/shell.sh"
 source "${SCRIPT_DIR}/mise.sh"
 source "${SCRIPT_DIR}/dotfiles.sh"
 source "${SCRIPT_DIR}/repositories.sh"
@@ -18,10 +19,10 @@ DANSHAN_MODE=apply
 SELECTED_STAGE=""
 START_STAGE=""
 CURRENT_STAGE=preflight
-STAGES=(homebrew repositories dotfiles mise)
+STAGES=(homebrew shell repositories dotfiles mise)
 usage() {
     printf '%s\n' 'Usage: bash install.sh [apply|check|migrate|recover] [--stage NAME|--from NAME] [--no-color]' \
-        'Stages for apply/check: homebrew repositories dotfiles mise'
+        'Stages for apply/check: homebrew shell repositories dotfiles mise'
 }
 case "${1:-}" in apply|check|migrate|recover) DANSHAN_MODE="$1"; shift ;; esac
 while [[ "$#" -gt 0 ]]; do

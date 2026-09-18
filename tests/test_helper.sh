@@ -47,7 +47,7 @@ mkdir -p -- "${HOME}"
 load_bootstrap_libraries() {
     local module
     source "${PROJECT_ROOT}/scripts/lib/core.sh"
-    for module in homebrew mise dotfiles repositories migrations/transaction migrations/casks migrations/legacy-mise migrations/runner preflight; do
+    for module in homebrew shell mise dotfiles repositories migrations/transaction migrations/casks migrations/legacy-mise migrations/runner preflight; do
         source "${PROJECT_ROOT}/scripts/${module}.sh"
     done
 }

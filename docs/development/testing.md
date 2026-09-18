@@ -2,7 +2,7 @@
 title: Bootstrap Testing Guide
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-07
+last_updated: 2026-09-17
 related:
   - ../architecture/bootstrap.md
   - ../adr/0011-perl-flock-helper.md
@@ -21,7 +21,7 @@ bash tests/run.sh
 
 测试创建临时 HOME 和 XDG 目录; 包管理器安装, 卸载, trust 和 Stow 失败路径使用 stub. Git 行为使用临时本地 repository. Mise 的配置发现测试调用真实查询命令, 在只读, 离线沙箱内验证结果和文件摘要; 锁测试通过仓库 Perl helper 调用系统 `flock(2)`.
 
-`check` 的系统沙箱不能在某些外层限制环境中建立. 如果测试报告 `sandbox_apply: Operation not permitted`, 应在允许建立 Seatbelt profile 的执行环境运行整套测试, 同时保留临时 HOME 和 stub. 不应跳过只读验证来把失败改成成功.
+`check` 的系统沙箱不能在某些外层限制环境中建立. 如果测试报告 `sandbox_apply: Operation not permitted`, 应在允许建立 Seatbelt profile 的执行环境运行整套测试, 同时保留临时 HOME 和 stub. 此时 `test_install_execution.sh` 随后的 `missing 'check: mise'` 只是入口在 stage loop 之前退出产生的次级断言, 不表示 Mise stage 失败. 不应跳过只读验证来把失败改成成功.
 
 ## Coverage
 
@@ -29,9 +29,10 @@ bash tests/run.sh
 |---|---|
 | `test_repository_policy.sh` | 逐文件 Shell/Cask 语法, 原生清单 owner, latest/lock 一致性, Compatibility Cask 平台边界和 tap source, 精确信任例外和 ADR 0009 Trust Hold |
 | `test_configuration.sh` | 文件格式, 错误字段, 重复 owner/target, 安装器数据不执行为代码, 迁移许可整体校验 |
-| `test_adapters.sh` | Bundle 实时 install/check, update/install/verify 失败状态及停止后续步骤, update skip, 环境 override 清除, 激活失败, Stow simulate, 表格校验 |
+| `test_adapters.sh` | Bundle 实时 install/check, 单并发下载策略, update/install/verify 失败状态及停止后续步骤, update skip, 环境 override 清除, 激活失败, Stow simulate, 表格校验 |
 | `test_homebrew_output.sh` | PTY 和重定向输出, 命令结束前透传无换行 stdout/stderr, 保留 TTY 与退出码, 耗时及失败无完成提示 |
 | `test_install_execution.sh` | 完整隔离入口, 重复执行, check 无文件变化, stage/from, 失败传播, 无隐式恢复 |
+| `test_shell.sh` | fish 路径注册, 默认登录 Shell 切换, 同轮 selector 更新, 幂等与失败传播 |
 | `test_git_repositories.sh` | missing/current/outdated pinned checkout, 前向更新, dirty, origin, worktree root 和查询失败 |
 | `test_mise_isolation.sh` | cwd/祖先/全局/system/env 配置隔离, 真实路径 ceiling, 只读查询, Stow directory folding |
 | `test_lock.sh` | 锁互斥, helper 故障, 持有者退出, 首次 check 不建状态目录, 旧 PID lock |

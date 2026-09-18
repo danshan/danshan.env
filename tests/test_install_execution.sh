@@ -7,6 +7,18 @@ fixture="${TEST_TEMP_DIR}/repository"
 mkdir -p "${fixture}" "${HOME}/bin"
 cp -R "${PROJECT_ROOT}/scripts" "${PROJECT_ROOT}/config" "${fixture}/"
 cp "${PROJECT_ROOT}/install.sh" "${PROJECT_ROOT}/Brewfile" "${fixture}/"
+cat > "${fixture}/scripts/shell.sh" <<'STUB'
+#!/usr/bin/env bash
+apply_shell() {
+    [[ "${FAIL_STAGE:-}" != shell ]] || return 3
+    touch "${HOME}/shell-registered" "${HOME}/login-shell"
+    export SHELL="${HOME}/bin/fish"
+}
+check_shell() {
+    export SHELL="${HOME}/bin/fish"
+    [[ -f "${HOME}/shell-registered" && -f "${HOME}/login-shell" ]]
+}
+STUB
 mkdir -p "${fixture}/dotfiles/mise/.config/mise"
 cp "${PROJECT_ROOT}/dotfiles/mise/.config/mise/config.toml" "${PROJECT_ROOT}/dotfiles/mise/.config/mise/mise.lock" "${fixture}/dotfiles/mise/.config/mise/"
 printf 'mise\tall\n' > "${fixture}/config/dotfiles.tsv"
@@ -33,6 +45,7 @@ if [[ "$*" == *--simulate* ]]; then
     [[ -L "${HOME}/.config/mise" ]] || printf 'LINK: .config/mise => repository\n' >&2
     exit 0
 fi
+[[ -f "${HOME}/login-shell" ]] || exit 6
 mkdir -p "${HOME}/.config"
 [[ -L "${HOME}/.config/mise" ]] || ln -s "$2/mise/.config/mise" "${HOME}/.config/mise"
 STUB
@@ -47,6 +60,10 @@ case "$*" in
     *) exit 94 ;;
 esac
 STUB
+cat > "${HOME}/bin/fish" <<'STUB'
+#!/usr/bin/env bash
+exit 0
+STUB
 chmod +x "${HOME}/bin/"*
 export PATH="${HOME}/bin:/usr/bin:/bin:/usr/sbin:/sbin" SHELL=/bin/bash
 export GIT_CONFIG_NOSYSTEM=1
@@ -56,6 +73,8 @@ expect_failure /bin/bash "${fixture}/install.sh" check > "${output}" 2>&1
 assert_contains 'check: mise' "${output}" 'Check must continue through unmet stages'
 /bin/bash "${fixture}/install.sh" apply > "${output}" 2>&1
 assert_contains 'Bootstrap apply complete.' "${output}" 'Complete apply'
+assert_contains 'apply: shell' "${output}" 'Shell stage runs before Shell configuration'
+[[ -f "${HOME}/login-shell" && -f "${HOME}/shell-registered" ]] || fail 'Apply did not configure the default login Shell.'
 /bin/bash "${fixture}/install.sh" apply > "${output}" 2>&1
 before="$(find "${HOME}" -type f -exec shasum {} \; | sort)"
 /bin/bash "${fixture}/install.sh" check > "${output}" 2>&1
@@ -65,7 +84,7 @@ assert_not_contains 'apply: homebrew' "${output}" 'Selected stage'
 /bin/bash "${fixture}/install.sh" apply --from dotfiles > "${output}" 2>&1
 assert_not_contains 'apply: repositories' "${output}" 'From skips earlier stages'
 assert_contains 'apply: mise' "${output}" 'From includes remaining stages'
-for stage in homebrew dotfiles mise; do
+for stage in homebrew shell dotfiles mise; do
     export FAIL_STAGE="${stage}"
     expect_failure /bin/bash "${fixture}/install.sh" apply > "${output}" 2>&1
     assert_not_contains 'Bootstrap apply complete.' "${output}" 'Failure cannot report completion'

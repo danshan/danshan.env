@@ -13,9 +13,9 @@ bash install.sh check
 bash install.sh apply
 ```
 
-`check` 在首次安装时返回非零是正常结果, 表示资源缺失, 冲突或工具状态无法查询. 它禁止文件写入和网络访问. `apply` 按 `homebrew → repositories → dotfiles → mise` 执行, 任一步失败都会停止并返回非零.
+`check` 在首次安装时返回非零是正常结果, 表示资源缺失, 冲突或工具状态无法查询. 它禁止文件写入和网络访问. `apply` 按 `homebrew → shell → repositories → dotfiles → mise` 执行, 安装 fish 后将其登记并设为默认登录 Shell, 再部署 fish 配置. 任一步失败都会停止并返回非零.
 
-Homebrew 安装默认实时显示原生输出, 并报告各步骤的开始, 完成或失败及耗时. 终端内的下载进度由 Homebrew 原生呈现, 重定向输出时保留实时日志, 见 [安装输出说明](docs/operations/installation.md#installation-output).
+Homebrew 安装按单并发下载以保持当前 artifact 的原生进度可见, 并报告各步骤的开始, 完成或失败及耗时. 重定向输出时保留实时日志, 见 [安装输出说明](docs/operations/installation.md#installation-output).
 
 ## Configuration
 

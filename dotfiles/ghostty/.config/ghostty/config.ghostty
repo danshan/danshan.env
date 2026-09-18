@@ -1,5 +1,5 @@
-theme = Catppuccin Frappe
-#theme = Dracula
+#theme = Catppuccin Frappe
+theme = Dracula
 
 font-family = JetBrainsMono Nerd Font
 font-size = 14
@@ -28,3 +28,4 @@ keybind=ctrl+backquote=toggle_quick_terminal
 # https://github.com/KroneCorylus/ghostty-shader-playground/
 custom-shader = "~/.config/ghostty/shaders/cursor_smear.glsl"
 
+mouse-hide-while-typing = false

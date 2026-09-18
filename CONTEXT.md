@@ -20,6 +20,8 @@
 
 **Reconciliation**: 原生管理器或部署模块把 Observed State 收敛到 Desired State 的过程.
 
+**Download Serialization**: Homebrew reconciliation 将下载并发固定为 1, 使当前 artifact 的原生进度持续可见. 该策略优先可观测性, 接受低于并发下载的整体吞吐量.
+
 **Satisfied Resource**: 已满足声明状态, 可以跳过变更的资源.
 
 **Missing Resource**: 声明要求但当前不存在的资源.
@@ -39,6 +41,8 @@
 **Lockfile**: 原生管理器保存的具体解析结果. URL, checksum 和 dependency graph 的锁定能力取决于 backend, 不能统一推断.
 
 **Bootstrap Stage**: 有独立职责和失败边界的阶段, 例如 Homebrew, Git dependency, Stow 或 Mise 部署.
+
+**Login Shell**: macOS 账户目录服务记录的默认交互 Shell. Bootstrap 的期望状态是 Homebrew fish 的绝对路径已登记到 `/etc/shells`, 已写入当前账户记录, 且当前执行过程使用同一路径选择 Shell-specific resource.
 
 **Preflight**: 变更前的平台, 声明格式和已有 Git identity 检查. 原生配置由对应管理器继续验证.
 

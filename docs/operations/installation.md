@@ -7,6 +7,7 @@ related:
   - ../architecture/bootstrap.md
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
+  - ../adr/0012-fish-default-login-shell.md
   - ../adr/0007-reviewed-npm-trust-policy-exception.md
   - ../development/testing.md
 ---
@@ -15,9 +16,9 @@ related:
 
 ## Preconditions
 
-使用受 Homebrew 支持的 macOS, 安装 Command Line Tools, 准备 Git, 网络访问和必要的 SSH repository 权限. 支持的登录 Shell 为 Bash, Zsh, Fish. Homebrew 首次安装使用 `config/bootstrap.env` 中完整 commit 对应的安装器; 配置文件头部说明修改格式和审查要求.
+使用受 Homebrew 支持的 macOS, 安装 Command Line Tools, 准备 Git, 网络访问和必要的 SSH repository 权限. Bootstrap 可从 Bash, Zsh 或 Fish 启动, 期望状态是将 Homebrew fish 设为当前账户的默认登录 Shell. Homebrew 首次安装使用 `config/bootstrap.env` 中完整 commit 对应的安装器; 配置文件头部说明修改格式和审查要求.
 
-Bootstrap 不切换登录 Shell, 不强制覆盖冲突配置, 不删除未声明软件. Stow 部署 `all` 和当前登录 Shell 的 package. 已有 Zed 等 Git target 必须匹配清单声明的 origin; identity 不匹配时先核实来源, 不应直接绕过检查.
+Bootstrap 会在部署 Shell-specific repository 和 dotfile 之前切换默认登录 Shell, 不强制覆盖冲突配置, 不删除未声明软件. Stow 部署 `all` 和 fish package. 已有 Zed 等 Git target 必须匹配清单声明的 origin; identity 不匹配时先核实来源, 不应直接绕过检查.
 
 ## Commands
 
@@ -37,7 +38,9 @@ bash install.sh apply --from dotfiles
 | `migrate` | 按迁移许可接管既有 artifact | 单 transaction 失败即停止 |
 | `recover` | 恢复已有可识别的中断 transaction | 未完成恢复为非零 |
 
-阶段顺序为 `homebrew`, `repositories`, `dotfiles`, `mise`. `--stage` 只执行一个阶段; `--from` 执行指定阶段及之后全部阶段, 两者互斥. 这些选项仅用于 `apply/check`, 不补跑依赖阶段. 例如 `--stage mise` 要求 Homebrew/Mise 已存在且 Mise package 已由 Stow 部署.
+阶段顺序为 `homebrew`, `shell`, `repositories`, `dotfiles`, `mise`. `--stage` 只执行一个阶段; `--from` 执行指定阶段及之后全部阶段, 两者互斥. 这些选项仅用于 `apply/check`, 不补跑依赖阶段. 例如 `--stage shell` 要求 Homebrew fish 已安装; `--from repositories` 要求 fish 已登记到 `/etc/shells` 并成为默认登录 Shell; `--stage mise` 要求 Homebrew/Mise 已存在且 Mise package 已由 Stow 部署.
+
+`shell` stage 首次运行可能分别由 `sudo` 和 `chsh` 请求终端认证. 前者只在 `/etc/shells` 缺少精确 fish 路径时追加该行, 后者只在账户目录服务记录不是该路径时修改. 任一命令失败都会停止 `apply`, 不会提前部署 fish 配置. 如果切换成功后更晚的阶段失败, fish 已经是默认登录 Shell; 修复失败原因并重新执行 `apply` 即可幂等继续.
 
 旧 `plan/status` 已移除, 改用 `check`; 旧 `devenv` stage 改为 `mise`. 模块脚本是内部实现, 日常操作统一使用 `install.sh`.
 
@@ -50,6 +53,8 @@ Homebrew stage 默认先刷新 metadata; 调试隔离测试时可设置 `DANSHAN
 ## Installation output
 
 Homebrew stage 默认显示 metadata update, Brewfile install/upgrade 和最终 verification 的开始, 完成或失败及耗时. 首次安装 Homebrew 也有独立步骤提示. Bundle 启用 `--verbose`, 安装过程中的原生下载, 解包和安装输出随命令执行直接显示.
+
+Bootstrap 将 Bundle 的 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`, 覆盖调用者设置. Homebrew 会按队列顺序逐个下载 Formula, dependency 和 Cask, 使当前 artifact 的原生进度始终处于可见行; 大型 Cask 之前可能先显示其他 package 的下载. 该策略以较低的整体下载吞吐量换取稳定可观测性, 不改变 Homebrew 的解析, 安装或失败语义.
 
 在交互终端中, Homebrew 可以显示原生动态下载进度. 经 `tee`, 文件重定向或执行器捕获后, Homebrew 可能关闭动态进度条, 但安装状态日志仍会实时输出. 不保证每个下载源都提供百分比, 也不计算整个 Brewfile 的统一百分比.
 
@@ -176,7 +181,7 @@ bash install.sh check
 
 ## Shell and local secrets
 
-Bash, Zsh, Fish 使用 Homebrew Shell 环境和 Mise activation. NVM/RVM/standalone Bun, uv, OpenCode 的旧初始化已从声明配置中移除; Bootstrap 不删除机器上这些旧安装目录. 重新打开 Shell 后检查实际命令来源; 已在运行的 Fish session 可能保留先前 universal PATH, 不应以旧 session 判断新的初始化结果.
+Fish 使用 Homebrew Shell 环境和 Mise activation. Bash/Zsh 配置继续保留在仓库中, 但正常 Bootstrap 在切换默认登录 Shell 后只部署 fish selector. NVM/RVM/standalone Bun, uv, OpenCode 的旧初始化已从声明配置中移除; Bootstrap 不删除机器上这些旧安装目录. `apply` 完成后新开终端进入 fish 并检查实际命令来源; 已在运行的 Fish session 可能保留先前 universal PATH, 不应以旧 session 判断新的初始化结果.
 
 Bash/Zsh 的本机扩展分别为 `~/.bash.local.sh` 和 `~/.zsh.local.sh`. Fish 可从被忽略的 `conf.d/*.local.fish` 加载. 不提交真实凭据, 不对 local-secret 文件使用 `git add -f`.
 
