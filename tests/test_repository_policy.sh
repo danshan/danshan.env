@@ -87,6 +87,7 @@ def tap(name, source, **options); $entries << [:tap, name, options.merge(source:
   end
   raise 'Cask classification' unless $entries.any? { |type, name, _| type == :cask && name == '1password-cli' }
   raise 'Host CLI classification' unless $entries.any? { |type, name, _| type == :brew && name == 'starship' }
+  raise 'GitLab CLI ownership' unless $entries.any? { |type, name, _| type == :brew && name == 'glab' }
   legacy = major >= 14 && major < 26
   raise 'Current platform gate' unless $entries.any? { |_, name, _| name == 'thaw' } == (major >= 26)
   raise 'Legacy platform gate' unless $entries.any? { |_, name, _| name == 'danshan/env/thaw@1' } == legacy
