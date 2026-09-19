@@ -2,7 +2,7 @@
 title: Bootstrap Testing Guide
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-17
+last_updated: 2026-09-19
 related:
   - ../architecture/bootstrap.md
   - ../adr/0011-perl-flock-helper.md
@@ -51,7 +51,7 @@ Cask stub 的 uninstall 必须真的删除测试 artifact, 这样才能发现保
 
 Shell 语法检查必须逐文件调用 `/bin/bash -n`, 一次传入多个文件只会检查第一个. 修改文档链接或配置格式时同步更新对应检查. 完成测试后审查 `git diff --check` 和工作树, 排除临时文件, 未登记文档和凭据.
 
-Compatibility Cask 的平台测试覆盖最低系统之前, 最低系统, 当前旧系统, 新版本边界前后和未来系统. 当前 Thaw 覆盖 13, 14, 15, 25, 26, 27, 验证新旧 Cask 互斥, Local Tap 仅在旧平台声明, source 从 Brewfile 目录解析, trust 只授予具体 package. 修改 Cask 时额外核对 Homebrew 原生 metadata 与真实 artifact, 该检查不应通过测试脚本执行真实安装.
+Compatibility Cask 的平台测试覆盖最低系统之前, 最低系统, 当前旧系统, 新版本边界前后和未来系统. 当前 Thaw 覆盖 13, 14, 15, 25, 26, 27, 28, 验证新旧 Cask 互斥, 27 及以上跳过全部 Thaw Cask 和 Local Tap, Local Tap 仅在旧平台声明, source 从 Brewfile 目录解析, trust 只授予具体 package. 修改 Cask 时额外核对 Homebrew 原生 metadata 与真实 artifact, 该检查不应通过测试脚本执行真实安装.
 
 Trust Hold 的固定版本属于显式安全约束, 需要检查 declaration 与 lockfile 都指向审查版本, 且未增加 trust exception. 这类检查不代替真实发布证据审查, 也不把具体版本当作普通 reconciliation 状态机. 解除 Hold 时同步更新 ADR, 配置和对应约束.
 

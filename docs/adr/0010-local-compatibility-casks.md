@@ -2,15 +2,18 @@
 title: Local Compatibility Casks
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-06
+last_updated: 2026-09-19
 related:
   - ../architecture/bootstrap.md
   - ../operations/installation.md
   - ../development/testing.md
   - 0008-native-package-managers-and-explicit-migrations.md
+  - 0014-thaw-platform-upper-bound.md
 ---
 
 # ADR 0010: Local Compatibility Casks
+
+Thaw 的平台范围已由 [ADR 0014](0014-thaw-platform-upper-bound.md) 局部替代. 下述发布证据与 Local Tap, 固定版本, 包级 trust 决策继续有效.
 
 ## Context
 

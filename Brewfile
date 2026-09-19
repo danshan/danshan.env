@@ -74,10 +74,12 @@ cask "ghostty"
 cask "hammerspoon"
 cask "detachhead/tap/rebased", trusted: true
 cask "muxy-app/tap/muxy", trusted: true
-# The local tap reads committed Cask definitions from this repository.
-if MacOS.version.major.to_i >= 26
+# Skip Thaw on macOS 27 and later.
+case MacOS.version.major.to_i
+when 26
   cask "thaw"
-elsif MacOS.version.major.to_i >= 14
+when 14..25
+  # The local tap reads committed Cask definitions from this repository.
   tap "danshan/env", File.expand_path(__dir__)
   cask "danshan/env/thaw@1", trusted: true
 end

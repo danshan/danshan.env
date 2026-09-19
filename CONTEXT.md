@@ -28,7 +28,7 @@
 
 **Outdated Resource**: 已存在但需要按 owner 的版本规则更新的资源.
 
-**Platform Constraint**: 原生清单对当前主机启用资源的条件. 不满足条件时不声明该资源, 不能通过忽略任意安装错误替代判断.
+**Platform Constraint**: 原生清单对当前主机启用资源的条件, 可以包含系统版本下限与上限. 不满足条件时不声明该资源, 不表示卸载已有资源, 不能通过忽略任意安装错误替代判断.
 
 **Compatibility Cask**: 为旧平台保留的固定版本 Homebrew Cask. 定义在仓库 `Casks/` 中, 原生 Local Tap 消费已提交版本, Brewfile 决定平台选择与包级 trust.
 

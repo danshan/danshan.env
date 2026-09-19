@@ -72,7 +72,7 @@ $entries = []
 def brew(name, **options); $entries << [:brew, name, options]; end
 def cask(name, **options); $entries << [:cask, name, options]; end
 def tap(name, source, **options); $entries << [:tap, name, options.merge(source: source)]; end
-[13, 14, 15, 25, 26, 27].each do |major|
+[13, 14, 15, 25, 26, 27, 28].each do |major|
   ENV['TEST_MACOS_MAJOR'] = major.to_s
   $entries = []
   load ARGV.fetch(0)
@@ -90,7 +90,7 @@ def tap(name, source, **options); $entries << [:tap, name, options.merge(source:
   raise 'GitHub CLI ownership' unless $entries.any? { |type, name, _| type == :brew && name == 'gh' }
   raise 'GitLab CLI ownership' unless $entries.any? { |type, name, _| type == :brew && name == 'glab' }
   legacy = major >= 14 && major < 26
-  raise 'Current platform gate' unless $entries.any? { |_, name, _| name == 'thaw' } == (major >= 26)
+  raise 'Current platform gate' unless $entries.any? { |_, name, _| name == 'thaw' } == (major == 26)
   raise 'Legacy platform gate' unless $entries.any? { |_, name, _| name == 'danshan/env/thaw@1' } == legacy
   raise 'Legacy tap gate' unless $entries.any? { |type, _, _| type == :tap } == legacy
 end

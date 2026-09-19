@@ -2,7 +2,7 @@
 title: Native Bootstrap Architecture
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-17
+last_updated: 2026-09-19
 related:
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
@@ -53,7 +53,7 @@ Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 
 
 `shell` stage 在 Homebrew 提供 fish 后解析其绝对可执行路径. `apply` 先以精确行将该路径登记到 `/etc/shells`, 再通过 `chsh` 修改当前账户的目录服务记录并重新读取验证; 随后更新当前 Bootstrap 进程的 `SHELL`, 保证 Git dependency 和 Stow selector 在同一轮执行中选择 fish. `check` 只读取 `/etc/shells` 和账户记录, 但以期望的 fish 路径检查后续资源. 单独跳过 `shell` stage 不会补跑该依赖.
 
-Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass, 并将 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL. Thaw 在 macOS 14 至 25 使用 `danshan/env/thaw@1`, macOS 26 及以上使用官方 `thaw`; 更旧系统不声明. 不通过吞掉安装错误推断平台兼容性.
+Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass, 并将 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL. Thaw 的平台范围见 [Installation Runbook](../operations/installation.md#compatibility-casks). 不通过吞掉安装错误推断平台兼容性.
 
 Compatibility Cask 定义位于 `Casks/`, 固定 upstream version, URL 和 SHA-256. 旧平台的 Brewfile 通过原生 `tap` 从当前仓库创建 `danshan/env` 独立 clone, 再对具体 Cask 声明 trust. Homebrew 只消费源 Git 仓库中的已提交内容, 更新仍由原生 `brew update` 完成. Bootstrap 不复制 Cask 文件, 不链接源工作树为 tap, 不增加 package 安装分支. 维护与版本切换约束见 [ADR 0010](../adr/0010-local-compatibility-casks.md).
 

@@ -2,12 +2,13 @@
 title: Installation Runbook
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-17
+last_updated: 2026-09-19
 related:
   - ../architecture/bootstrap.md
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
   - ../adr/0012-fish-default-login-shell.md
+  - ../adr/0014-thaw-platform-upper-bound.md
   - ../adr/0007-reviewed-npm-trust-policy-exception.md
   - ../development/testing.md
 ---
@@ -88,7 +89,7 @@ Finished: Verify Brewfile packages (1s)
 
 `raycast` Stow package 将 `.rayignore` 链接到 HOME 根目录, 通过递归 glob pattern 从 Raycast File Search 结果中排除常见源码文件. 修改后需重启 Raycast 以触发重新索引.
 
-菜单栏管理统一使用 Thaw 替代 Bartender, 由 Brewfile 的 `thaw` Cask 管理. [Homebrew Cask](https://formulae.brew.sh/cask/thaw) 要求 macOS 26 及以上, 因而较旧系统跳过该项, 不自动安装 Bartender 作为替代. 已安装的 Bartender 不会被 Bootstrap 自动卸载; 切换时应先退出 Bartender 并关闭其登录启动, 再启用 Thaw, 避免同时管理菜单栏. 平台要求核对日期为 2026-09-06.
+菜单栏管理使用 Thaw 替代 Bartender, 由 Brewfile 按[平台规则](#compatibility-casks)选择官方或兼容 Cask, 不自动安装 Bartender 作为替代. 已安装的 Bartender 不会被 Bootstrap 自动卸载; 切换时应先退出 Bartender 并关闭其登录启动, 再启用 Thaw, 避免同时管理菜单栏.
 
 刷新开发 CLI latest 和修改后的 runtime pin:
 
@@ -111,7 +112,10 @@ Thaw 的平台选择由 Brewfile 决定:
 |---|---|
 | 小于 14 | 不安装 Thaw |
 | 14 至 25 | 本仓库 `danshan/env/thaw@1`, 固定 1.2.0 |
-| 26 及以上 | 官方 `thaw`, 由 Homebrew 提供当前版本 |
+| 26 | 官方 `thaw`, 由 Homebrew 提供当前版本 |
+| 27 及以上 | 不安装 Thaw, 不声明兼容 Cask 或 Local Tap |
+
+macOS 27 及以上跳过 Thaw 是仓库明确的平台策略, 见 [ADR 0014](../adr/0014-thaw-platform-upper-bound.md). 已安装的 Thaw 不会被 Bootstrap 自动卸载.
 
 在旧平台, 原生 Bundle 将当前 Bootstrap Git 仓库克隆为 `danshan/env` tap. 源位置从 Brewfile 所在目录解析, 不依赖调用者 cwd. Cask 定义必须先提交到源仓库, 未提交修改不会进入 tap. 普通仓库更新后执行:
 
