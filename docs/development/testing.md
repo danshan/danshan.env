@@ -13,7 +13,7 @@ related:
 
 ## Environment and command
 
-测试运行于 macOS, 使用系统 Bash 3.2, Git, Perl, Ruby, plutil, sandbox-exec, 以及已安装的 Fish, Mise 和 Python 3.11 及以上. Perl 是 Bootstrap 内核文件锁 helper 的运行依赖. Python 标准库用于配置/锁文件校验和 PTY 输出测试, 不是 Bootstrap 运行依赖. 测试不得执行真实安装或修改用户配置.
+测试运行于 macOS, 使用系统 Bash 3.2, Git, Perl, Ruby, plutil, sandbox-exec, 以及已安装的 Fish, Mise 和 Python 3.11 及以上. Perl 是内核文件锁 helper 和 Mise JSON inventory 校验的运行依赖, JSON::PP 属于系统 Perl 标准模块. Python 标准库用于配置/锁文件校验和 PTY 输出测试, 不是 Bootstrap 运行依赖. 测试不得执行真实安装或修改用户配置.
 
 ```bash
 bash tests/run.sh
@@ -35,6 +35,7 @@ bash tests/run.sh
 | `test_shell.sh` | fish 路径注册, 默认登录 Shell 切换, 同轮 selector 更新, 幂等与失败传播 |
 | `test_git_repositories.sh` | missing/current/outdated pinned checkout, 前向更新, dirty, origin, worktree root 和查询失败 |
 | `test_mise_isolation.sh` | cwd/祖先/全局/system/env 配置隔离, 真实路径 ceiling, 只读查询, Stow directory folding |
+| `test_mise_policy.sh` | 逐工具更新, missing/current/outdated, install-only 与固定版本保留, 空更新组, check 无刷新, 未知工具和刷新/安装/验证失败传播 |
 | `test_lock.sh` | 锁互斥, helper 故障, 持有者退出, 首次 check 不建状态目录, 旧 PID lock |
 | `test_migrations.sh` | App/font commit, 失败, 原件与失败产物保留, batch rollback, 中断重复恢复, 精确目标和 legacy snapshot |
 | `test_stow_migration.sh` | 已知旧配置子集, snapshot move 失败, install/verify failure, 已有 lock ownership, 未知冲突保留, 重复恢复 |

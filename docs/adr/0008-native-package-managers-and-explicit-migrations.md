@@ -2,16 +2,21 @@
 title: Native Package Managers and Explicit Migrations
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-07
+last_updated: 2026-09-19
 related:
   - ../architecture/bootstrap.md
   - ../operations/installation.md
   - ../development/testing.md
   - 0007-reviewed-npm-trust-policy-exception.md
   - 0011-perl-flock-helper.md
+  - 0013-per-package-update-policies.md
 ---
 
 # ADR 0008: Native Package Managers and Explicit Migrations
+
+## Partial supersession
+
+日常安装不自动刷新 lockfile 的版本更新限制已于 2026-09-19 被 [ADR 0013](0013-per-package-update-policies.md) 替代. 其余决策继续有效, 下文保留原始决策背景.
 
 ## Context
 

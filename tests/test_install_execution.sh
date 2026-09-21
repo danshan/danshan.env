@@ -54,6 +54,9 @@ cat > "${HOME}/bin/mise" <<'STUB'
 set -eu
 [[ "${FAIL_STAGE:-}" != mise ]] || exit 5
 case "$*" in
+    *'ls --current --json')
+        printf '{"java":[],"maven":[],"node":[],"python":[],"bun":[],"aqua:astral-sh/uv":[],"npm:@openai/codex":[],"npm:@google/gemini-cli":[],"npm:@anthropic-ai/claude-code":[],"npm:opencode-ai":[],"npm:oh-my-openagent":[],"npm:@earendil-works/pi-coding-agent":[],"npm:ctx7":[],"npm:@playwright/cli":[],"npm:agent-browser":[]}\n' ;;
+    *'lock --global --bump --platform '*) touch "${HOME}/mise-refreshed" ;;
     *'install --yes') touch "${HOME}/mise-installed" ;;
     *'install --dry-run-code') [[ -f "${HOME}/mise-installed" ]] ;;
     *'ls --current') ;;

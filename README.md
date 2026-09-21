@@ -24,10 +24,13 @@ Homebrew 安装按单并发下载以保持当前 artifact 的原生进度可见,
 | 主机 CLI, App, 字体, 第三方包信任和平台条件 | [Brewfile](Brewfile) |
 | 旧平台的固定版本 Compatibility Cask | [Casks/](Casks/) |
 | runtime 和开发 CLI | [Mise config](dotfiles/mise/.config/mise/config.toml) |
+| Mise 每个工具的自动更新策略 | [Mise policies](config/mise-policy.tsv) |
 | 开发工具解析后的版本 | [mise.lock](dotfiles/mise/.config/mise/mise.lock) |
 | Stow package, Git dependency, 附加链接, 迁移许可 | [config/](config/) |
 
-`config/` 每个文件的头部包含完整格式和维护示例. 开发 CLI 默认允许 `latest`, runtime 保留明确版本. 日常安装使用锁文件, 刷新开发工具版本时执行:
+软件可以独立选择 `latest` 或 `installed`: 前者在每次 `apply` 时更新, 后者只补装缺失资源. Homebrew 在 Brewfile 的每条声明后配置 `update_policy`, Mise 在策略表中逐行配置. 当前 Formula 和未固定版本的 Mise 开发 CLI 使用 `latest`, 多数 Cask 与固定版本工具使用 `installed`; ChatGPT 和 Muxy Cask 使用 `latest`. Mise 的 `installed` 仍要求锁文件选定版本, 其他已安装版本不能替代它. 示例和边界见 [逐软件更新策略](docs/operations/installation.md#per-package-update-policies).
+
+`config/` 每个文件头部包含完整格式和维护示例. Mise `apply` 自动刷新选中工具的锁文件, 保留 runtime pin 和 Trust Hold, 更新后应审查并提交原生 lockfile 及生成的配套文件. 需要在安装前单独审查更新时执行:
 
 ```bash
 bash scripts/update_mise_lock.sh

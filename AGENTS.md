@@ -9,7 +9,8 @@
 - 本项目面向 macOS, Bootstrap 使用 Bash 3.2 兼容语法.
 - 日常资源按原生管理器规则收敛, 可重复执行. 已满足状态应跳过, 任何失败必须传播为非零, 且不得输出完成提示.
 - Homebrew 通过 `Brewfile` 管理主机 CLI, Shell 组件, App 和字体. Mise 通过原生 config/lockfile 管理 runtime 与开发 CLI. Bun/NPM 只直接管理项目 dependency, 不执行 global install.
-- 开发 CLI 可以声明 `latest`, 日常安装使用已提交的原生 lockfile. runtime 保留明确版本. 不手写上游 backend 不支持的 checksum 或 dependency lock.
+- 软件更新策略逐项配置. Homebrew Formula/Cask 在 Brewfile 选择 `latest/installed`, 分组调用原生 Bundle, `installed` 使用 `--no-upgrade`. 不复制 inventory/outdated 状态机.
+- Mise 通过 `config/mise-policy.tsv` 选择 `latest/installed`. `apply` 仅对 `latest` 条目刷新原生 lockfile 后安装; `installed` 按已有 lockfile 补装, 不接受其他版本代替声明. runtime 保留明确版本. 不手写上游 backend 不支持的 checksum 或 dependency lock.
 - ADR 0007 的精确信任例外只适用于其绑定版本和依赖, 不得因 latest 策略扩大例外.
 - NPM trust downgrade 不得自动添加例外或切换 installer. 可依据发布证据将工具固定在可信版本, 同步原生 lockfile 与 ADR; ADR 0009 的 Playwright Trust Hold 需重新审查后才可解除.
 - 不得复制 Homebrew 普通 inventory/outdated/upgrade 状态机, 不为新增普通 package 添加专用安装分支.

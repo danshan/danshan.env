@@ -2,12 +2,13 @@
 title: Installation Runbook
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-19
+last_updated: 2026-09-21
 related:
   - ../architecture/bootstrap.md
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
   - ../adr/0012-fish-default-login-shell.md
+  - ../adr/0013-per-package-update-policies.md
   - ../adr/0014-thaw-platform-upper-bound.md
   - ../adr/0007-reviewed-npm-trust-policy-exception.md
   - ../development/testing.md
@@ -80,6 +81,7 @@ Finished: Verify Brewfile packages (1s)
 |---|---|
 | `Brewfile` | 使用原生 `brew` 或 `cask` declaration. 第三方 package 使用完整 token 和 `trusted: true`, 不给整个 tap 授权. 平台差异用原生条件表达. |
 | `dotfiles/mise/.config/mise/config.toml` | 修改 runtime 或开发 CLI declaration; 新开发 CLI 通常使用 `latest`. |
+| `config/mise-policy.tsv` | 每个 Mise 工具独立选择 `latest` 或 `installed`, 字段之间使用真实 TAB. |
 | `config/dotfiles.tsv` | 新增 Stow package 及 `all/bash/zsh/fish` selector. |
 | `config/repositories.tsv` | 新增 Git URL, HOME-relative target, commit 或 tracking 和 Shell selector. |
 | `config/links.tsv` | 新增依赖仓库内的精确 source/target link. |
@@ -89,9 +91,13 @@ Finished: Verify Brewfile packages (1s)
 
 `raycast` Stow package 将 `.rayignore` 链接到 HOME 根目录, 通过递归 glob pattern 从 Raycast File Search 结果中排除常见源码文件. 修改后需重启 Raycast 以触发重新索引.
 
+`pi` Stow package 包含 Herdr 管理的 `herdr-agent-state.ts` 扩展. 仅在 Herdr 提供 `HERDR_ENV=1`, socket path 和 pane id 时启用, 并为 Pi 的 TUI session 报告 session 引用及 working, blocked, idle 状态. Herdr 更新集成时会覆盖该文件, 自定义扩展应放在同目录的其他文件中.
+
+JetBrains IDE 通过 `intellij-idea`, `pycharm` 和 `webstorm` Cask 管理, 当前均使用 `installed` 策略.
+
 菜单栏管理使用 Thaw 替代 Bartender, 由 Brewfile 按[平台规则](#compatibility-casks)选择官方或兼容 Cask, 不自动安装 Bartender 作为替代. 已安装的 Bartender 不会被 Bootstrap 自动卸载; 切换时应先退出 Bartender 并关闭其登录启动, 再启用 Thaw, 避免同时管理菜单栏.
 
-刷新开发 CLI latest 和修改后的 runtime pin:
+需要在安装前单独审查开发 CLI latest 或修改后的 runtime pin 时:
 
 ```bash
 bash scripts/update_mise_lock.sh
@@ -100,9 +106,53 @@ bash tests/run.sh
 bash install.sh apply --stage mise
 ```
 
-刷新命令仅调用原生 `mise lock --global --bump --platform macos-arm64,macos-x64`, 不安装工具. 可以追加 tool selector 缩小刷新范围, 例如 `bash scripts/update_mise_lock.sh npm:@openai/codex`. 它会访问远端 metadata, 部分 backend 会下载 artifact 验证 provenance. Mise 原生 NPM lock 记录 top-level version, 不锁定完整传递 dependency graph. 不手写 backend 不提供的 checksum 字段.
+刷新命令仅调用原生 `mise lock --global --bump --platform macos-arm64,macos-x64`, 不安装工具. 可以追加 tool selector 缩小刷新范围, 例如 `bash scripts/update_mise_lock.sh npm:@openai/codex`. 这是显式维护命令, 不受自动更新策略表限制; 不传工具时刷新全部声明. 它会访问远端 metadata, 部分 backend 会下载 artifact 验证 provenance. checksum 和 dependency graph 支持由具体 backend 决定, 不手写上游不支持的字段. 审查并提交原生 lockfile 以及管理器生成的配套文件.
 
 `oh-my-openagent@4.19.1` 的 `effect@4.0.0-beta.66` 例外仍以 ADR 0007 为准. 改变依赖链前重新审查, 依赖不再需要时删除例外; 不扩大为无版本的 `effect` 例外.
+
+## Per-package update policies
+
+每个软件独立配置, 不按管理器强制统一策略. `apply` 的策略语义如下:
+
+| Owner | `latest` | `installed` |
+|---|---|---|
+| Homebrew Formula | 缺失时安装, 过期时由 Bundle 升级 | 缺失时安装, 已由 Homebrew 管理的版本保留 |
+| Homebrew Cask | 缺失时安装, 由 Bundle 升级; `greedy: true` 包括自更新和无固定版本的 Cask | 缺失时安装, 已由 Homebrew 管理的版本保留 |
+| Mise | 刷新该工具的原生 lock 条目, 再安装声明约束允许的版本 | 不刷新 lock, 仅补装锁文件选定的版本 |
+
+Brewfile 每条声明末尾选择策略, trust 和平台条件保留在同一清单. 例如, 两个 Formula 和两个 Cask 可以分别采用不同策略:
+
+```ruby
+brew "wget" if update_policy(:latest)
+brew "neovim" if update_policy(:installed)
+cask "raycast", greedy: true if update_policy(:latest)
+cask "visual-studio-code" if update_policy(:installed)
+```
+
+当前 Formula 配置为 `latest`, 多数 Cask 配置为 `installed`; ChatGPT 和 Muxy Cask 使用 `latest`. 修改任意一行即可改变该软件的策略. Compatibility Cask 即使选择 `latest`, 也只跟随已提交的固定 Cask 定义, 不会绕过平台边界寻找不兼容版本. 策略约束 Bootstrap 的直接更新请求, 不冻结 Homebrew 的依赖更新, 系统更新或 App 自更新. 原生 `brew bundle` 的单次调用不能表达这里的混合策略, 日常操作使用 `install.sh`.
+
+Mise 在 `config/mise-policy.tsv` 中设置, 以下两列以真实 TAB 分隔:
+
+```text
+npm:@openai/codex	latest
+npm:@google/gemini-cli	installed
+node	installed
+```
+
+工具名必须匹配 Mise config 的 `[tools]` key. 未列出的工具默认 `installed`; 重复条目, 非法值和未知工具会报错. `installed` 不表示接受任意历史版本, 因为 Mise 的 Shell 选择仍服从 config/lockfile. 要保留某个具体版本, 应将其写入原生 config 并通过显式维护命令同步 lock.
+
+Version Selector 始终生效: `latest` 策略不会把精确 runtime pin 改为最新版, 也不会解除 ADR 0007/0009 的信任约束. 刷新或安装遇到 trust downgrade 会返回非零. 已成功写入的原生 lock 可能保留, 修复发布信任问题后重试, 不自动增加信任例外.
+
+在管理器和 Stow 部署已就绪时执行对应阶段:
+
+```bash
+bash install.sh apply --stage homebrew
+bash install.sh apply --stage mise
+git diff -- dotfiles/mise/.config/mise
+bash install.sh check
+```
+
+Mise 自动更新会修改仓库 lockfile, 请审查并提交更新. `check` 始终只读离线, 使用本地 Homebrew metadata 和当前 Mise lockfile, 不刷新远端版本, 因而成功不代表远端没有新版本.
 
 ## Compatibility casks
 

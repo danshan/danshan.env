@@ -6,15 +6,17 @@ source "${TEST_DIR}/test_helper.sh"
 load_bootstrap_libraries
 CALLS="${HOME}/calls"
 BREW_FAILURE=""
+BREW_FAILURE_POLICY=""
 brew() {
     printf '%s\n' "$*" >> "${CALLS}"
     case "$1" in
         shellenv) [[ "${BREW_FAILURE}" != shellenv ]] || return 6; printf 'export BOOTSTRAP_TEST_ACTIVATED=1\n' ;;
         update) [[ "${BREW_FAILURE}" != update ]] || return 23 ;;
         bundle)
+            printf 'policy=%s %s\n' "${DANSHAN_BREW_POLICY}" "$*" >> "${CALLS}"
             [[ -z "${HOMEBREW_BUNDLE_FILE:-}${HOMEBREW_BUNDLE_BREW_SKIP:-}${HOMEBREW_BUNDLE_NO_UPGRADE:-}${HOMEBREW_CASK_OPTS:-}${HOMEBREW_NO_REQUIRE_TAP_TRUST:-}" ]] || return 7
             [[ "${HOMEBREW_NO_AUTO_UPDATE}" == 1 && "${HOMEBREW_DOWNLOAD_CONCURRENCY}" == 1 && "${!#}" == "--file=${PROJECT_ROOT}/Brewfile" ]] || return 8
-            [[ "${BREW_FAILURE}" != "$2" ]] ;;
+            [[ "${BREW_FAILURE}" != "$2" || ( -n "${BREW_FAILURE_POLICY}" && "${BREW_FAILURE_POLICY}" != "${DANSHAN_BREW_POLICY}" ) ]] ;;
     esac
 }
 export -f brew
@@ -34,6 +36,14 @@ assert_contains 'Starting: Update Homebrew metadata' "${HOME}/output" 'Update st
 assert_contains 'Finished: Verify Brewfile packages (' "${HOME}/output" 'Verified completion'
 assert_contains 'bundle install --verbose --file=' "${CALLS}" 'Native Bundle live install output'
 assert_contains 'bundle check --verbose --file=' "${CALLS}" 'Native Bundle verification'
+assert_contains 'policy=latest bundle install --verbose --file=' "${CALLS}" 'Latest group upgrades'
+assert_contains 'policy=installed bundle install --verbose --no-upgrade --file=' "${CALLS}" 'Installed group only installs missing packages'
+assert_contains 'policy=installed bundle check --verbose --no-upgrade --file=' "${CALLS}" 'Installed group accepts older installed packages'
+export DANSHAN_BREW_POLICY=invalid
+: > "${CALLS}"
+bundle list --cask
+assert_contains 'policy=all bundle list --cask' "${CALLS}" 'Migration inventory includes both policies despite caller override'
+unset DANSHAN_BREW_POLICY
 for state in update install check; do
     BREW_FAILURE="${state}"
     : > "${CALLS}"
@@ -50,6 +60,21 @@ for state in update install check; do
     esac
     assert_not_contains 'Finished: Verify Brewfile packages' "${HOME}/output" 'No false verified completion'
 done
+# The second policy group has the same failure boundary as the first.
+BREW_FAILURE=install
+BREW_FAILURE_POLICY=installed
+: > "${CALLS}"
+expect_failure apply_homebrew > "${HOME}/output" 2>&1
+assert_contains 'policy=latest bundle install' "${CALLS}" 'Latest group reached before second-group failure'
+assert_contains 'policy=installed bundle install' "${CALLS}" 'Installed group failure reached'
+assert_not_contains 'bundle check' "${CALLS}" 'No verification after second-group failure'
+assert_not_contains 'Finished: Install or upgrade' "${HOME}/output" 'Second-group failure cannot report success'
+BREW_FAILURE=check
+BREW_FAILURE_POLICY=latest
+: > "${CALLS}"
+expect_failure check_homebrew
+assert_contains 'policy=installed bundle check' "${CALLS}" 'Check inspects both groups despite unmet latest group'
+BREW_FAILURE_POLICY=""
 BREW_FAILURE=""
 DANSHAN_SKIP_BREW_UPDATE=1
 : > "${CALLS}"

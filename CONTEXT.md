@@ -36,6 +36,10 @@
 
 **Version Selector**: 配置中的版本意图, 可以是固定版本或开发 CLI 的 `latest`.
 
+**Update Policy**: 每个 Managed Resource 独立声明的更新意图. `latest` 在 Apply 时寻找 Version Selector 允许的最新版本; `installed` 仅确保满足声明的安装存在, 不主动寻找新版.
+
+**Install-only Resource**: Update Policy 为 `installed` 的资源. Homebrew 接受其管理的已有版本; Mise 仍要求原生 Lockfile 选定的版本, 不把其他已安装版本视为满足版本声明.
+
 **Trust Hold**: 因候选 release 的发布信任证据下降, 将工具明确固定到经过核验的版本. 不豁免原生信任检查, 解除前必须重新核对发布证据并同步 ADR 和 Lockfile.
 
 **Lockfile**: 原生管理器保存的具体解析结果. URL, checksum 和 dependency graph 的锁定能力取决于 backend, 不能统一推断.

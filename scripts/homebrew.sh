@@ -38,15 +38,33 @@ activate_homebrew() {
 }
 
 bundle() (
+    local policy=all
+    if [[ "${1:-}" == --policy ]]; then
+        policy="${2:-}"
+        [[ "$#" -ge 2 ]] || return 2
+        shift 2
+    fi
+    case "${policy}" in all|latest|installed) ;; *) die "Invalid Homebrew update policy: ${policy}"; return 2 ;; esac
     # Inherited skip/cleanup flags must not change repository ownership.
     local setting
     for setting in ${!HOMEBREW_BUNDLE_@}; do unset "${setting}"; done
     unset HOMEBREW_CASK_OPTS HOMEBREW_NO_REQUIRE_TAP_TRUST
     export HOMEBREW_NO_AUTO_UPDATE=1
+    export DANSHAN_BREW_POLICY="${policy}"
     # Serialize downloads so every artifact keeps its native progress visible.
     export HOMEBREW_DOWNLOAD_CONCURRENCY=1
     brew bundle "$@" --file="${PROJECT_ROOT}/Brewfile"
 )
+
+reconcile_homebrew_packages() {
+    local action="$1" failed=0
+    bundle --policy latest "${action}" --verbose || {
+        [[ "${action}" == check ]] || return 1
+        failed=1
+    }
+    bundle --policy installed "${action}" --verbose --no-upgrade || return 1
+    return "${failed}"
+}
 
 apply_homebrew() {
     if ! find_homebrew >/dev/null; then
@@ -58,11 +76,11 @@ apply_homebrew() {
     else
         log_notice "Skipping Homebrew metadata update (DANSHAN_SKIP_BREW_UPDATE=1)."
     fi
-    if ! run_homebrew_step "Install or upgrade Brewfile packages" bundle install --verbose; then
+    if ! run_homebrew_step "Install or upgrade Brewfile packages" reconcile_homebrew_packages install; then
         die "Homebrew reconciliation failed. For artifact conflicts, review config/migrations.txt and run migrate."
         return 1
     fi
-    run_homebrew_step "Verify Brewfile packages" bundle check --verbose
+    run_homebrew_step "Verify Brewfile packages" reconcile_homebrew_packages check
 }
 
 check_homebrew() {
@@ -71,7 +89,7 @@ check_homebrew() {
         return 1
     fi
     activate_homebrew || return 1
-    bundle check --verbose
+    reconcile_homebrew_packages check
 }
 
 load_homebrew_install_config() {

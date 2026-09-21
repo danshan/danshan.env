@@ -44,6 +44,12 @@ for name in ('java', 'node', 'python', 'bun'):
     assert config['tools'][name] != 'latest', f'Runtime must declare an explicit version: {name}'
 assert 'aqua:starship/starship' not in config['tools']
 assert config['tools']['npm:@openai/codex'] == 'latest'
+policies = dict(line.split('\t') for line in (root / 'config/mise-policy.tsv').read_text().splitlines()
+                if line and not line.startswith('#'))
+assert policies.keys() == config['tools'].keys(), 'Every repository tool should document its policy'
+assert policies['npm:@openai/codex'] == 'latest'
+for name in ('java', 'node', 'python', 'bun', 'npm:oh-my-openagent', 'npm:@playwright/cli'):
+    assert policies[name] == 'installed', f'Pinned tool must not opt into automatic refresh: {name}'
 # This is an explicit supply-chain hold, not a general tool version assertion.
 assert config['tools']['npm:@playwright/cli'] == '0.1.18', 'ADR 0009 trust hold changed without review'
 assert lock['tools']['npm:@playwright/cli'][0]['version'] == config['tools']['npm:@playwright/cli'], 'Trust hold must resolve to its exact version'
@@ -83,7 +89,7 @@ def tap(name, source, **options); $entries << [:tap, name, options.merge(source:
       next
     end
     raise 'Missing exact third-party trust' if name.include?('/') && options[:trusted] != true
-    raise 'Broad or unknown Bundle option' unless (options.keys - [:trusted]).empty?
+    raise 'Broad or unknown Bundle option' unless (options.keys - [:trusted, :greedy]).empty?
   end
   raise 'Cask classification' unless $entries.any? { |type, name, _| type == :cask && name == '1password-cli' }
   raise 'Host CLI classification' unless $entries.any? { |type, name, _| type == :brew && name == 'starship' }
@@ -93,6 +99,45 @@ def tap(name, source, **options); $entries << [:tap, name, options.merge(source:
   raise 'Current platform gate' unless $entries.any? { |_, name, _| name == 'thaw' } == (major == 26)
   raise 'Legacy platform gate' unless $entries.any? { |_, name, _| name == 'danshan/env/thaw@1' } == legacy
   raise 'Legacy tap gate' unless $entries.any? { |type, _, _| type == :tap } == legacy
+  all = $entries.reject { |type, _, _| type == :tap }
+  groups = %w[latest installed].map do |policy|
+    ENV['DANSHAN_BREW_POLICY'] = policy
+    $entries = []
+    load ARGV.fetch(0)
+    $entries.reject { |type, _, _| type == :tap }
+  end
+  raise 'Policy groups overlap' unless (groups[0] & groups[1]).empty?
+  raise 'Policy groups lose inventory' unless (groups.flatten(1) - all).empty? && (all - groups.flatten(1)).empty?
+  ENV.delete('DANSHAN_BREW_POLICY')
 end
+begin
+  update_policy(:invalid)
+  raise 'Invalid policy was accepted'
+rescue ArgumentError
+end
+# Switching one Formula and one Cask must not affect their neighbors.
+input = File.read(ARGV.fetch(0))
+input = input.sub('brew "wget" if update_policy(:latest)', 'brew "wget" if update_policy(:installed)')
+input = input.sub('cask "raycast" if update_policy(:installed)', 'cask "raycast", greedy: true if update_policy(:latest)')
+%w[latest installed].each do |policy|
+  ENV['DANSHAN_BREW_POLICY'] = policy
+  $entries = []
+  eval(input, binding, ARGV.fetch(0))
+  names = $entries.map { |_, name, _| name }
+  raise 'Formula policy is not independent' unless names.include?('wget') == (policy == 'installed')
+  raise 'Neighbor Formula policy changed' unless names.include?('cloc') == (policy == 'latest')
+  raise 'Cask policy is not independent' unless names.include?('raycast') == (policy == 'latest')
+  raise 'Neighbor Cask policy changed' unless names.include?('visual-studio-code') == (policy == 'installed')
+  if policy == 'latest'
+    raise 'Cask greedy option lost' unless $entries.find { |_, name, _| name == 'raycast' }[2][:greedy]
+  end
+end
+ENV['DANSHAN_BREW_POLICY'] = 'invalid'
+begin
+  load ARGV.fetch(0)
+  raise 'Invalid policy selection was accepted'
+rescue ArgumentError
+end
+ENV.delete('DANSHAN_BREW_POLICY')
 RUBY
 /usr/bin/ruby -c "${PROJECT_ROOT}/Casks/thaw@1.rb"

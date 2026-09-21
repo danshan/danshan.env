@@ -1,0 +1,24 @@
+# Purpose: choose automatic update behavior independently for each Mise tool.
+# Format: TOOL<TAB>POLICY, exactly two nonempty fields separated by one literal TAB.
+# TOOL: exact key from [tools] in dotfiles/mise/.config/mise/config.toml; no version suffix.
+# POLICY: latest refreshes the native lock before apply; installed only ensures the locked version exists.
+# Version constraints still apply: exact runtime pins and Trust Holds are never widened.
+# Tools omitted from this file default to installed. Duplicate or unknown tools are errors.
+# Blank lines and whole-line # comments are allowed; inline comments, spaces as separators and CRLF are not.
+# Maintenance: change one policy; keep versions and backend options in the native Mise config.
+# Example: npm:@openai/codex<TAB>latest (replace <TAB> with one literal TAB).
+java	installed
+maven	installed
+node	installed
+python	installed
+bun	installed
+aqua:astral-sh/uv	latest
+npm:@openai/codex	latest
+npm:@google/gemini-cli	latest
+npm:@anthropic-ai/claude-code	latest
+npm:opencode-ai	latest
+npm:oh-my-openagent	installed
+npm:@earendil-works/pi-coding-agent	latest
+npm:ctx7	latest
+npm:@playwright/cli	installed
+npm:agent-browser	latest

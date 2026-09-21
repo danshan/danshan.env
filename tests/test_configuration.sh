@@ -15,6 +15,13 @@ export SHELL=/bin/bash
 validate_dotfile_config
 validate_repository_config
 validate_migration_config
+validate_mise_policy
+for row in 'node latest' 'node\tunknown' 'node\t' 'node\tlatest\textra' 'node\tlatest\nnode\tinstalled' 'bad name\tlatest' 'node\tlatest\r'; do
+    printf '%b\n' "${row}" > "${fixture}/config/mise-policy.tsv"
+    expect_failure validate_mise_policy
+done
+printf '# Policies may omit tools; omitted tools are install-only.\n\nnode\tinstalled\n' > "${fixture}/config/mise-policy.tsv"
+validate_mise_policy
 load_homebrew_install_config
 printf 'HOMEBREW_INSTALL_REF=latest\n' > "${fixture}/config/bootstrap.env"
 expect_failure load_homebrew_install_config

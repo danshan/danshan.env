@@ -29,6 +29,17 @@ output="$(/usr/bin/sandbox-exec -f "${PROJECT_ROOT}/config/check.sb" /bin/bash -
 [[ "${output}" != *unrelated-test-tool* ]] || fail 'Mise loaded caller or local tools.'
 [[ "${output}" == *dotfiles/mise/.config/mise/config.toml* ]] || fail 'Repository config missing.'
 [[ "${before}" == "$(find "${HOME}" -type f -exec shasum {} \; | sort)" ]] || fail 'Mise check wrote files.'
+# Validate scoped and dotted backend keys with native Mise, without installing tools.
+printf '[tools]\n"npm:@fixture/tool.with-dot" = "1.0.0"\n' > "${DOTFILES_DIR}/mise/.config/mise/config.toml"
+printf 'npm:@fixture/tool.with-dot\tinstalled\n' > "${PROJECT_ROOT}/config/mise-policy.tsv"
+before="$(find "${HOME}" -type f -exec shasum {} \; | sort)"
+/usr/bin/sandbox-exec -f "${PROJECT_ROOT}/config/check.sb" /bin/bash -c '
+    source "$1/scripts/lib/core.sh"
+    source "$1/scripts/mise.sh"
+    DANSHAN_MODE=check
+    verify_mise_policy_tools
+' bash "${PROJECT_ROOT}"
+[[ "${before}" == "$(find "${HOME}" -type f -exec shasum {} \; | sort)" ]] || fail 'Mise policy check wrote files.'
 # Stow directory folding must still count as the exact repository deployment.
 printf '# Lock\n' > "${DOTFILES_DIR}/mise/.config/mise/mise.lock"
 rm -rf "${HOME}/.config/mise"

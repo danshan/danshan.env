@@ -7,6 +7,7 @@ related:
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
   - ../adr/0012-fish-default-login-shell.md
+  - ../adr/0013-per-package-update-policies.md
   - ../operations/installation.md
   - ../development/testing.md
 ---
@@ -18,7 +19,7 @@ related:
 | Owner | 职责 | 唯一清单 |
 |---|---|---|
 | Homebrew | 主机 CLI, Shell 组件, App, 字体, 包级 trust | 根目录 `Brewfile` |
-| Mise | runtime, 构建工具, 开发 CLI, 包括 NPM/Aqua backend | `dotfiles/mise/.config/mise/config.toml` 和相邻 `mise.lock` |
+| Mise | runtime, 构建工具, 开发 CLI, 包括 NPM/Aqua backend | `dotfiles/mise/.config/mise/config.toml` 和相邻 `mise.lock`; 更新策略在 `config/mise-policy.tsv` |
 | Bun / NPM | 具体项目的 dependency | 各项目 manifest 和 lockfile |
 | Stow | 从仓库部署 dotfiles | `config/dotfiles.tsv` |
 | Git | dotfiles 使用的外部配置和插件仓库 | `config/repositories.tsv` |
@@ -26,7 +27,7 @@ related:
 
 Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. [Leaf](https://github.com/rivolink/leaf) 是通用终端 Markdown 预览器, 同属 Homebrew 主机 CLI; 在 `Brewfile` 中声明 `leaf-markdown-viewer`, 安装后使用 `leaf` 命令.
 
-开发 CLI 可以声明 `latest`, runtime 保留明确版本; 解析结果提交到 `mise.lock`. NPM backend 的原生 lock 记录版本和选项, 不提供与二进制 backend 相同的跨平台 URL/checksum 锁定强度.
+Version Selector 与 Update Policy 分别表达版本约束和自动刷新意图. 开发 CLI 可以声明 `latest`, runtime 保留明确版本. Mise `apply` 仅刷新策略为 `latest` 的工具, 再安装原生 lockfile 的解析结果; `installed` 和未配置策略的工具不自动刷新. 原生 lockfile 及生成的配套文件应审查并提交, URL, checksum 和 dependency graph 的能力由 backend 决定.
 
 候选 NPM release 触发 trust downgrade 时保持失败传播, 不自动修改 `trust_policy_excludes` 或 installer. 已有可信版本可通过明确 Version Selector 建立 Trust Hold, 并同步原生 lockfile, 安全约束测试和 ADR. 当前 Playwright 的固定版本与解除条件见 [ADR 0009](../adr/0009-playwright-cli-trust-hold.md).
 
@@ -53,7 +54,7 @@ Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 
 
 `shell` stage 在 Homebrew 提供 fish 后解析其绝对可执行路径. `apply` 先以精确行将该路径登记到 `/etc/shells`, 再通过 `chsh` 修改当前账户的目录服务记录并重新读取验证; 随后更新当前 Bootstrap 进程的 `SHELL`, 保证 Git dependency 和 Stow selector 在同一轮执行中选择 fish. `check` 只读取 `/etc/shells` 和账户记录, 但以期望的 fish 路径检查后续资源. 单独跳过 `shell` stage 不会补跑该依赖.
 
-Homebrew stage 显式刷新 metadata, 然后执行 `brew bundle install --verbose` 和 `brew bundle check --verbose`. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass, 并将 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`. 第三方信任声明在 Brewfile 的具体 `brew/cask` 行中, 不信任整个 tap. 平台条件使用 Brewfile 原生 Ruby DSL. Thaw 的平台范围见 [Installation Runbook](../operations/installation.md#compatibility-casks). 不通过吞掉安装错误推断平台兼容性.
+Homebrew stage 显式刷新 metadata, 然后按 Brewfile 中每个软件的 Update Policy 分组执行原生 Bundle install/check. `latest` 组允许升级, `installed` 组添加 `--no-upgrade`. Brewfile 用 Ruby 条件筛选声明, 不读取 inventory; 普通状态判断完全交给 Homebrew. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass, 并将 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`. 内部策略选择由调用参数明确设置, 普通 list 总是列出全部策略, 避免迁移许可被外部环境变量隐藏. 第三方信任声明仍在具体 `brew/cask` 行中, 不信任整个 tap. 平台条件保持原生 Ruby DSL, 不通过吞掉安装错误推断兼容性.
 
 Compatibility Cask 定义位于 `Casks/`, 固定 upstream version, URL 和 SHA-256. 旧平台的 Brewfile 通过原生 `tap` 从当前仓库创建 `danshan/env` 独立 clone, 再对具体 Cask 声明 trust. Homebrew 只消费源 Git 仓库中的已提交内容, 更新仍由原生 `brew update` 完成. Bootstrap 不复制 Cask 文件, 不链接源工作树为 tap, 不增加 package 安装分支. 维护与版本切换约束见 [ADR 0010](../adr/0010-local-compatibility-casks.md).
 
@@ -62,6 +63,8 @@ Compatibility Cask 定义位于 `Casks/`, 固定 upstream version, URL 和 SHA-2
 Git pinned checkout 只允许向目标 commit 的前向更新. Tracking checkout 使用 upstream 的 `pull --ff-only`; dirty tracking checkout 保留并报告跳过. 所有 existing target 必须是精确 worktree root, 并匹配 origin. Stow 只部署登录 Shell 对应的 package 和 `all` package; 不覆盖冲突文件.
 
 Mise 命令在仓库的真实路径执行, 清除调用者 `MISE_*`, 设置仓库 global config, 空 system TOML 和目录搜索 ceiling, 禁用自动环境选择, idiomatic version files 和自动安装. 安装前验证部署的 config 和 lockfile 都指向仓库来源, 包括 Stow directory folding. Shell 日常使用 Mise 原生项目发现功能, Bootstrap 的隔离不改变项目内的配置优先级.
+
+Mise 策略表先校验格式, 再通过原生 `ls --current --json` 验证工具属于当前声明; JSON 由系统 Perl 的 JSON::PP 读取. `latest` 组非空时才调用原生 `lock --global --bump --platform macos-arm64,macos-x64` 并传入精确工具列表. 空组必须跳过, 不能省略列表而刷新全部工具. 刷新失败立即停止, 不切换 installer 或修改信任策略. 该版本刷新行为替代 ADR 0008 的手工刷新限制, 见 [ADR 0013](../adr/0013-per-package-update-policies.md).
 
 ## Check boundary
 
