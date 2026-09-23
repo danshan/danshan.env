@@ -13,10 +13,10 @@ brew() {
         shellenv) [[ "${BREW_FAILURE}" != shellenv ]] || return 6; printf 'export BOOTSTRAP_TEST_ACTIVATED=1\n' ;;
         update) [[ "${BREW_FAILURE}" != update ]] || return 23 ;;
         bundle)
-            printf 'policy=%s %s\n' "${DANSHAN_BREW_POLICY}" "$*" >> "${CALLS}"
+            printf 'policy=%s %s\n' "${HOMEBREW_DANSHAN_BREW_POLICY}" "$*" >> "${CALLS}"
             [[ -z "${HOMEBREW_BUNDLE_FILE:-}${HOMEBREW_BUNDLE_BREW_SKIP:-}${HOMEBREW_BUNDLE_NO_UPGRADE:-}${HOMEBREW_CASK_OPTS:-}${HOMEBREW_NO_REQUIRE_TAP_TRUST:-}" ]] || return 7
             [[ "${HOMEBREW_NO_AUTO_UPDATE}" == 1 && "${HOMEBREW_DOWNLOAD_CONCURRENCY}" == 1 && "${!#}" == "--file=${PROJECT_ROOT}/Brewfile" ]] || return 8
-            [[ "${BREW_FAILURE}" != "$2" || ( -n "${BREW_FAILURE_POLICY}" && "${BREW_FAILURE_POLICY}" != "${DANSHAN_BREW_POLICY}" ) ]] ;;
+            [[ "${BREW_FAILURE}" != "$2" || ( -n "${BREW_FAILURE_POLICY}" && "${BREW_FAILURE_POLICY}" != "${HOMEBREW_DANSHAN_BREW_POLICY}" ) ]] ;;
     esac
 }
 export -f brew
@@ -39,11 +39,11 @@ assert_contains 'bundle check --verbose --file=' "${CALLS}" 'Native Bundle verif
 assert_contains 'policy=latest bundle install --verbose --file=' "${CALLS}" 'Latest group upgrades'
 assert_contains 'policy=installed bundle install --verbose --no-upgrade --file=' "${CALLS}" 'Installed group only installs missing packages'
 assert_contains 'policy=installed bundle check --verbose --no-upgrade --file=' "${CALLS}" 'Installed group accepts older installed packages'
-export DANSHAN_BREW_POLICY=invalid
+export HOMEBREW_DANSHAN_BREW_POLICY=invalid
 : > "${CALLS}"
 bundle list --cask
 assert_contains 'policy=all bundle list --cask' "${CALLS}" 'Migration inventory includes both policies despite caller override'
-unset DANSHAN_BREW_POLICY
+unset HOMEBREW_DANSHAN_BREW_POLICY
 for state in update install check; do
     BREW_FAILURE="${state}"
     : > "${CALLS}"

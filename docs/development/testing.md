@@ -2,7 +2,7 @@
 title: Bootstrap Testing Guide
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-19
+last_updated: 2026-09-23
 related:
   - ../architecture/bootstrap.md
   - ../adr/0011-perl-flock-helper.md
@@ -13,7 +13,7 @@ related:
 
 ## Environment and command
 
-测试运行于 macOS, 使用系统 Bash 3.2, Git, Perl, Ruby, plutil, sandbox-exec, 以及已安装的 Fish, Mise 和 Python 3.11 及以上. Perl 是内核文件锁 helper 和 Mise JSON inventory 校验的运行依赖, JSON::PP 属于系统 Perl 标准模块. Python 标准库用于配置/锁文件校验和 PTY 输出测试, 不是 Bootstrap 运行依赖. 测试不得执行真实安装或修改用户配置.
+测试运行于 macOS, 使用系统 Bash 3.2, Git, Perl, Ruby, plutil, sandbox-exec, 以及已安装的 Homebrew, Fish, Mise 和 Python 3.11 及以上. Perl 是内核文件锁 helper 和 Mise JSON inventory 校验的运行依赖, JSON::PP 属于系统 Perl 标准模块. Python 标准库用于配置/锁文件校验和 PTY 输出测试, 不是 Bootstrap 运行依赖. 测试不得执行真实安装或修改用户配置.
 
 ```bash
 bash tests/run.sh
@@ -31,6 +31,7 @@ bash tests/run.sh
 | `test_configuration.sh` | 文件格式, 错误字段, 重复 owner/target, 安装器数据不执行为代码, 迁移许可整体校验 |
 | `test_adapters.sh` | Bundle 实时 install/check, 单并发下载策略, update/install/verify 失败状态及停止后续步骤, update skip, 环境 override 清除, 激活失败, Stow simulate, 表格校验 |
 | `test_homebrew_output.sh` | PTY 和重定向输出, 命令结束前透传无换行 stdout/stderr, 保留 TTY 与退出码, 耗时及失败无完成提示 |
+| `test_homebrew_policy.sh` | 真实 Homebrew 环境过滤后的 Cask 分组互斥与完整性, Rebased 仅补装, latest Cask 保留, 继承策略覆盖和 HOME 无变化 |
 | `test_install_execution.sh` | 完整隔离入口, 重复执行, check 无文件变化, stage/from, 失败传播, 无隐式恢复 |
 | `test_shell.sh` | fish 路径注册, 默认登录 Shell 切换, 同轮 selector 更新, 幂等与失败传播 |
 | `test_git_repositories.sh` | missing/current/outdated pinned checkout, 前向更新, dirty, origin, worktree root 和查询失败 |
@@ -47,6 +48,8 @@ bash tests/run.sh
 Cask stub 的 uninstall 必须真的删除测试 artifact, 这样才能发现保存失败产物顺序错误. 测试不得只删除 inventory marker 而保留 artifact, 造成虚假的恢复保证.
 
 ## Extending tests
+
+Homebrew 策略验证必须经过真实 `brew` 入口, Shell stub 和直接 Ruby 求值无法覆盖上游的环境过滤. `test_homebrew_policy.sh` 在临时 HOME/XDG 和只读离线 Seatbelt profile 内仅执行 `bundle list`, 禁用 Bootsnap cache 和 API metadata 获取, 不执行 install/upgrade 或写入信任状态. 如 Homebrew 缺失或沙箱不可用, 测试失败, 不跳过该验证.
 
 新增普通应用或 CLI 通常只改变原生配置, 用结构与 lock 一致性检查验证, 不为每个 token 写一次重复安装测试. 新字段或条件应覆盖合法值, 非法值和错误传播; 新 ownership migration 则必须覆盖精确路径, success, repeat, install failure, verify failure, original/failed artifact preservation, rollback 和 rollback-incomplete.
 

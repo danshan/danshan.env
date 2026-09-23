@@ -2,7 +2,7 @@
 title: Per-package Update Policies
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-19
+last_updated: 2026-09-23
 related:
   - 0008-native-package-managers-and-explicit-migrations.md
   - 0007-reviewed-npm-trust-policy-exception.md
@@ -16,6 +16,8 @@ related:
 用户要求 Formula, Cask 和 Mise 工具分别选择每次更新或仅补装. 原先 Mise 的 `latest` 只在手工刷新锁文件时重新解析, 日常 `apply` 无法表达这种逐软件意图.
 
 采用 `latest/installed` Update Policy. Homebrew 在同一 Brewfile 的每条原生声明上使用 Ruby 条件选择策略组, Bootstrap 分组调用原生 Bundle, `installed` 组传入 `--no-upgrade`. 不维护第二份 Homebrew inventory, 不自行判断 outdated. 包级 trust, 平台条件和迁移许可语义保留.
+
+2026-09-23 修正 Homebrew 兼容性事实: 上游启动器会过滤普通自定义环境变量, 原 `DANSHAN_BREW_POLICY` 无法传入 Brewfile, 缺失时回退为 `all` 导致分组失效. 内部选择变量改为 `HOMEBREW_DANSHAN_BREW_POLICY`, 保持上述分组决策和 `--no-upgrade` 语义. 验证必须经过真实 `brew` 入口, 不能仅依赖 Shell stub 或直接 Ruby 求值. 依据为本机启动器及 [Homebrew 启动源码](https://github.com/Homebrew/brew/blob/main/bin/brew), 核对日期为 2026-09-23.
 
 Mise 使用独立策略表控制自动刷新, 原生 config 继续独占版本和 backend 选项. `apply` 在同一 Bootstrap 锁内验证策略工具, 只对非空 `latest` 组执行原生 `lock --global --bump`, 随后按 lockfile 安装全部声明. 未配置策略的工具默认 `installed`, 精确 pin 和 Trust Hold 始终优先. `installed` 仍要求锁定版本, 避免跳过安装后 Shell 指向不存在的版本.
 

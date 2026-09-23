@@ -3,29 +3,26 @@
 lockfile_version = 1
 
 [[tools."aqua:astral-sh/uv"]]
-version = "0.12.10"
+version = "0.12.17"
 backend = "aqua:astral-sh/uv"
-specifiers = [
-    "0.12.10",
-    "latest",
-]
+specifiers = ["latest"]
 
 [tools."aqua:astral-sh/uv"."platforms.macos-arm64"]
-checksum = "sha256:51c6170e8e3a01cef9f33b94f582b7b81ac65046f55d40afb35f9cff5a68c179"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.10/uv-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/545034336"
+checksum = "sha256:85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573252913"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-x64"]
-checksum = "sha256:5296d5aa2b9143360405eea866f8ef4d5dc8986b164eb0dc35e8f876a9304d30"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.10/uv-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/545034436"
+checksum = "sha256:8dcf05a8c809bb3c471d2b614788ba27a6e41298fc8c31ac84b5f4339fd468e5"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253060"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-x64-baseline"]
-checksum = "sha256:5296d5aa2b9143360405eea866f8ef4d5dc8986b164eb0dc35e8f876a9304d30"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.10/uv-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/545034436"
+checksum = "sha256:8dcf05a8c809bb3c471d2b614788ba27a6e41298fc8c31ac84b5f4339fd468e5"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253060"
 provenance = "github-attestations"
 
 [[tools.bun]]
@@ -97,22 +94,17 @@ checksum = "sha256:dfd0dbd3e721503434df7b7205e719f61b3a3a31b2bcf9729b8b91fea240f
 url = "https://nodejs.org/dist/v24.18.0/node-v24.18.0-darwin-x64.tar.gz"
 
 [[tools."npm:@anthropic-ai/claude-code"]]
-version = "2.1.261"
+version = "2.1.280"
 backend = "npm:@anthropic-ai/claude-code"
 specifiers = ["latest"]
 
 [[tools."npm:@earendil-works/pi-coding-agent"]]
-version = "0.85.0"
+version = "0.87.0"
 backend = "npm:@earendil-works/pi-coding-agent"
 specifiers = ["latest"]
 
-[[tools."npm:@google/gemini-cli"]]
-version = "0.58.0"
-backend = "npm:@google/gemini-cli"
-specifiers = ["latest"]
-
 [[tools."npm:@openai/codex"]]
-version = "0.153.4"
+version = "0.155.1"
 backend = "npm:@openai/codex"
 specifiers = ["latest"]
 
@@ -122,29 +114,13 @@ backend = "npm:@playwright/cli"
 specifiers = ["0.1.18"]
 
 [[tools."npm:agent-browser"]]
-version = "0.36.0"
+version = "0.38.1"
 backend = "npm:agent-browser"
-specifiers = [
-    "0.36.0",
-    "latest",
-]
-
-[[tools."npm:ctx7"]]
-version = "0.5.10"
-backend = "npm:ctx7"
 specifiers = ["latest"]
 
-[[tools."npm:oh-my-openagent"]]
-version = "4.19.1"
-backend = "npm:oh-my-openagent"
-specifiers = ["4.19.1"]
-
-[tools."npm:oh-my-openagent".options]
-trust_policy_excludes = '["effect@4.0.0-beta.66"]'
-
-[[tools."npm:opencode-ai"]]
-version = "1.18.29"
-backend = "npm:opencode-ai"
+[[tools."npm:ctx7"]]
+version = "0.5.11"
+backend = "npm:ctx7"
 specifiers = ["latest"]
 
 [[tools.python]]

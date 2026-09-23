@@ -40,6 +40,8 @@
 
 **Install-only Resource**: Update Policy 为 `installed` 的资源. Homebrew 接受其管理的已有版本; Mise 仍要求原生 Lockfile 选定的版本, 不把其他已安装版本视为满足版本声明.
 
+**Homebrew Policy Selection**: Bootstrap 为原生 Bundle 调用选择的 `latest`, `installed` 或 `all` 分组. 通过内部变量 `HOMEBREW_DANSHAN_BREW_POLICY` 传递以保留在 Homebrew 环境过滤之后; 调用参数覆盖继承值, 普通 list 使用 `all`.
+
 **Trust Hold**: 因候选 release 的发布信任证据下降, 将工具明确固定到经过核验的版本. 不豁免原生信任检查, 解除前必须重新核对发布证据并同步 ADR 和 Lockfile.
 
 **Lockfile**: 原生管理器保存的具体解析结果. URL, checksum 和 dependency graph 的锁定能力取决于 backend, 不能统一推断.

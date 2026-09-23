@@ -2,7 +2,7 @@
 title: Installation Runbook
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-21
+last_updated: 2026-09-23
 related:
   - ../architecture/bootstrap.md
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
@@ -108,7 +108,7 @@ bash install.sh apply --stage mise
 
 刷新命令仅调用原生 `mise lock --global --bump --platform macos-arm64,macos-x64`, 不安装工具. 可以追加 tool selector 缩小刷新范围, 例如 `bash scripts/update_mise_lock.sh npm:@openai/codex`. 这是显式维护命令, 不受自动更新策略表限制; 不传工具时刷新全部声明. 它会访问远端 metadata, 部分 backend 会下载 artifact 验证 provenance. checksum 和 dependency graph 支持由具体 backend 决定, 不手写上游不支持的字段. 审查并提交原生 lockfile 以及管理器生成的配套文件.
 
-`oh-my-openagent@4.19.1` 的 `effect@4.0.0-beta.66` 例外仍以 ADR 0007 为准. 改变依赖链前重新审查, 依赖不再需要时删除例外; 不扩大为无版本的 `effect` 例外.
+Gemini CLI, OpenCode 和 Oh My OpenAgent 当前已在 Mise config 与策略表中注释停用, 锁文件同步移除对应条目. 这不会卸载已有版本. 重新启用工具时需同步恢复声明与策略, 并刷新原生锁文件. `oh-my-openagent@4.19.1` 的 `effect@4.0.0-beta.66` 例外仍以 ADR 0007 为准. 改变依赖链前重新审查, 依赖不再需要时删除例外; 不扩大为无版本的 `effect` 例外.
 
 ## Per-package update policies
 
@@ -131,11 +131,13 @@ cask "visual-studio-code" if update_policy(:installed)
 
 当前 Formula 配置为 `latest`, 多数 Cask 配置为 `installed`; ChatGPT 和 Muxy Cask 使用 `latest`. 修改任意一行即可改变该软件的策略. Compatibility Cask 即使选择 `latest`, 也只跟随已提交的固定 Cask 定义, 不会绕过平台边界寻找不兼容版本. 策略约束 Bootstrap 的直接更新请求, 不冻结 Homebrew 的依赖更新, 系统更新或 App 自更新. 原生 `brew bundle` 的单次调用不能表达这里的混合策略, 日常操作使用 `install.sh`.
 
+Homebrew 分组使用内部变量 `HOMEBREW_DANSHAN_BREW_POLICY`, 由脚本每次调用设置, 无需用户导出. 旧的 `DANSHAN_BREW_POLICY` 会被 Homebrew 环境过滤清除, 曾导致 `installed` 软件进入第一轮升级; 当前版本已修复此传递问题. 如果 Rebased 等仅补装软件仍出现在升级组, 先确认运行的是当前脚本, 再使用 [原生策略测试](../development/testing.md) 检查分组. 仅出现在 metadata update 的 outdated 列表不代表已执行升级.
+
 Mise 在 `config/mise-policy.tsv` 中设置, 以下两列以真实 TAB 分隔:
 
 ```text
 npm:@openai/codex	latest
-npm:@google/gemini-cli	installed
+npm:@playwright/cli	installed
 node	installed
 ```
 

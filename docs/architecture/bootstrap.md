@@ -2,7 +2,7 @@
 title: Native Bootstrap Architecture
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-19
+last_updated: 2026-09-23
 related:
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
@@ -54,7 +54,7 @@ Version Selector 与 Update Policy 分别表达版本约束和自动刷新意图
 
 `shell` stage 在 Homebrew 提供 fish 后解析其绝对可执行路径. `apply` 先以精确行将该路径登记到 `/etc/shells`, 再通过 `chsh` 修改当前账户的目录服务记录并重新读取验证; 随后更新当前 Bootstrap 进程的 `SHELL`, 保证 Git dependency 和 Stow selector 在同一轮执行中选择 fish. `check` 只读取 `/etc/shells` 和账户记录, 但以期望的 fish 路径检查后续资源. 单独跳过 `shell` stage 不会补跑该依赖.
 
-Homebrew stage 显式刷新 metadata, 然后按 Brewfile 中每个软件的 Update Policy 分组执行原生 Bundle install/check. `latest` 组允许升级, `installed` 组添加 `--no-upgrade`. Brewfile 用 Ruby 条件筛选声明, 不读取 inventory; 普通状态判断完全交给 Homebrew. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass, 并将 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`. 内部策略选择由调用参数明确设置, 普通 list 总是列出全部策略, 避免迁移许可被外部环境变量隐藏. 第三方信任声明仍在具体 `brew/cask` 行中, 不信任整个 tap. 平台条件保持原生 Ruby DSL, 不通过吞掉安装错误推断兼容性.
+Homebrew stage 显式刷新 metadata, 然后按 Brewfile 中每个软件的 Update Policy 分组执行原生 Bundle install/check. `latest` 组允许升级, `installed` 组添加 `--no-upgrade`. Brewfile 用 Ruby 条件筛选声明, 不读取 inventory; 普通状态判断完全交给 Homebrew. Bundle 使用明确的 `--file`, 清除调用者的 Bundle skip/upgrade override, Cask options 和 trust bypass, 并将 `HOMEBREW_DOWNLOAD_CONCURRENCY` 固定为 `1`. 内部 Homebrew Policy Selection 由调用参数明确设置, 使用 `HOMEBREW_DANSHAN_BREW_POLICY` 跨进程传递. 此变量使用 `HOMEBREW_` 前缀以保留在上游环境过滤之后, 兼容性依据见 [ADR 0013](../adr/0013-per-package-update-policies.md). 每次调用覆盖继承值, 普通 list 总是列出全部策略, 避免迁移许可被外部环境变量隐藏. 第三方信任声明仍在具体 `brew/cask` 行中, 不信任整个 tap. 平台条件保持原生 Ruby DSL, 不通过吞掉安装错误推断兼容性.
 
 Compatibility Cask 定义位于 `Casks/`, 固定 upstream version, URL 和 SHA-256. 旧平台的 Brewfile 通过原生 `tap` 从当前仓库创建 `danshan/env` 独立 clone, 再对具体 Cask 声明 trust. Homebrew 只消费源 Git 仓库中的已提交内容, 更新仍由原生 `brew update` 完成. Bootstrap 不复制 Cask 文件, 不链接源工作树为 tap, 不增加 package 安装分支. 维护与版本切换约束见 [ADR 0010](../adr/0010-local-compatibility-casks.md).
 

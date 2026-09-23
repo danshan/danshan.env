@@ -30,6 +30,8 @@ Homebrew 安装按单并发下载以保持当前 artifact 的原生进度可见,
 
 软件可以独立选择 `latest` 或 `installed`: 前者在每次 `apply` 时更新, 后者只补装缺失资源. Homebrew 在 Brewfile 的每条声明后配置 `update_policy`, Mise 在策略表中逐行配置. 当前 Formula 和未固定版本的 Mise 开发 CLI 使用 `latest`, 多数 Cask 与固定版本工具使用 `installed`; ChatGPT 和 Muxy Cask 使用 `latest`. Mise 的 `installed` 仍要求锁文件选定版本, 其他已安装版本不能替代它. 示例和边界见 [逐软件更新策略](docs/operations/installation.md#per-package-update-policies).
 
+Homebrew 分组策略由脚本内部传递, 无需设置 Shell 环境变量. 使用 `install.sh` 执行分组, 直接调用 `brew bundle` 不应用混合更新策略.
+
 `config/` 每个文件头部包含完整格式和维护示例. Mise `apply` 自动刷新选中工具的锁文件, 保留 runtime pin 和 Trust Hold, 更新后应审查并提交原生 lockfile 及生成的配套文件. 需要在安装前单独审查更新时执行:
 
 ```bash
@@ -38,7 +40,7 @@ git diff -- dotfiles/mise/.config/mise/mise.lock
 bash install.sh apply --stage mise
 ```
 
-`oh-my-openagent` 当前保留与信任审查绑定的精确版本, 见 [ADR 0007](docs/adr/0007-reviewed-npm-trust-policy-exception.md).
+Gemini CLI, OpenCode 和 Oh My OpenAgent 当前已从 Mise 管理清单停用, 对应更新策略同步停用, 锁文件不再包含它们. 重新启用 Oh My OpenAgent 时, 仍须遵守 [ADR 0007](docs/adr/0007-reviewed-npm-trust-policy-exception.md) 的精确版本与信任审查边界.
 
 Thaw 在 macOS 14 至 25 使用固定的 1.2.0 Compatibility Cask, macOS 26 及以上使用官方当前版本. 本地 tap 读取本仓库已提交的 `Casks/` 内容; 修改 Cask 后需先提交再执行 Homebrew 阶段, 见 [兼容版本维护](docs/operations/installation.md#compatibility-casks).
 

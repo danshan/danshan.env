@@ -1,7 +1,8 @@
 # Host tools, applications and fonts owned by Homebrew.
 # Only package-level trust is allowed.
 # Each package chooses :latest (upgrade) or :installed (install only if missing).
-# Bootstrap selects each group and delegates state checks to native Bundle.
+# Bootstrap selects each group with HOMEBREW_DANSHAN_BREW_POLICY so it survives
+# Homebrew's environment filter, and delegates state checks to native Bundle.
 # For a latest Cask, also set greedy: true to include auto-updating/unversioned apps.
 # Example: cask "raycast", greedy: true if update_policy(:latest)
 # Use install.sh apply/check; a direct brew bundle call does not apply group policies.
@@ -10,7 +11,7 @@ def update_policy(policy)
   unless [:latest, :installed].include?(policy)
     raise ArgumentError, "Invalid package update policy: #{policy}"
   end
-  selected = ENV.fetch("DANSHAN_BREW_POLICY", "all")
+  selected = ENV.fetch("HOMEBREW_DANSHAN_BREW_POLICY", "all")
   unless ["all", "latest", "installed"].include?(selected)
     raise ArgumentError, "Invalid Bundle policy selection: #{selected}"
   end
