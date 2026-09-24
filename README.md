@@ -28,6 +28,8 @@ Homebrew 安装按单并发下载以保持当前 artifact 的原生进度可见,
 | 开发工具解析后的版本 | [mise.lock](dotfiles/mise/.config/mise/mise.lock) |
 | Stow package, Git dependency, 附加链接, 迁移许可 | [config/](config/) |
 
+Fish 的本机 universal variables 不纳入版本控制; Hugging Face Hub 超时配置见 [Shell 配置说明](docs/operations/installation.md#shell-and-local-secrets).
+
 软件可以独立选择 `latest` 或 `installed`: 前者在每次 `apply` 时更新, 后者只补装缺失资源. Homebrew 在 Brewfile 的每条声明后配置 `update_policy`, Mise 在策略表中逐行配置. 当前 Formula 和未固定版本的 Mise 开发 CLI 使用 `latest`, 多数 Cask 与固定版本工具使用 `installed`; ChatGPT 和 Muxy Cask 使用 `latest`. Mise 的 `installed` 仍要求锁文件选定版本, 其他已安装版本不能替代它. 示例和边界见 [逐软件更新策略](docs/operations/installation.md#per-package-update-policies).
 
 Homebrew 分组策略由脚本内部传递, 无需设置 Shell 环境变量. 使用 `install.sh` 执行分组, 直接调用 `brew bundle` 不应用混合更新策略.

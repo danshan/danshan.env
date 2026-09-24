@@ -109,3 +109,8 @@ end
 # >>> grok installer >>>
 fish_add_path --global "$HOME/.grok/bin"
 # <<< grok installer <<<
+
+export HF_HUB_ETAG_TIMEOUT=86400
+export HF_HUB_DOWNLOAD_TIMEOUT=86400
+#export HF_ENDPOINT=https://artifactory.nioint.com/artifactory/api/huggingfaceml/hf_co
+#export HF_HUB_DISABLE_XET=1

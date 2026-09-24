@@ -2,7 +2,7 @@
 title: Installation Runbook
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-23
+last_updated: 2026-09-24
 related:
   - ../architecture/bootstrap.md
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
@@ -238,6 +238,10 @@ bash install.sh check
 ## Shell and local secrets
 
 Fish 使用 Homebrew Shell 环境和 Mise activation. Bash/Zsh 配置继续保留在仓库中, 但正常 Bootstrap 在切换默认登录 Shell 后只部署 fish selector. NVM/RVM/standalone Bun, uv, OpenCode 的旧初始化已从声明配置中移除; Bootstrap 不删除机器上这些旧安装目录. `apply` 完成后新开终端进入 fish 并检查实际命令来源; 已在运行的 Fish session 可能保留先前 universal PATH, 不应以旧 session 判断新的初始化结果.
+
+`fish_variables` 保存 Fish universal variables 和插件的本机状态, 属于 Local Shell State, 已从版本控制中移除并由 Fish package 的 `.gitignore` 忽略. 需要跨机器共享的设置应显式写入声明配置.
+
+Fish 配置导出 `HF_HUB_ETAG_TIMEOUT=86400` 和 `HF_HUB_DOWNLOAD_TIMEOUT=86400`, 将 Hugging Face Hub 的对应超时设为 86400 秒. `HF_ENDPOINT` 和 `HF_HUB_DISABLE_XET` 示例仍为注释, 不启用.
 
 Bash/Zsh 的本机扩展分别为 `~/.bash.local.sh` 和 `~/.zsh.local.sh`. Fish 可从被忽略的 `conf.d/*.local.fish` 加载. 不提交真实凭据, 不对 local-secret 文件使用 `git add -f`.
 
