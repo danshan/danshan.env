@@ -1,2 +1,4 @@
 *.lock
 session*
+/herdr.sock.agent
+/release-notes.json
