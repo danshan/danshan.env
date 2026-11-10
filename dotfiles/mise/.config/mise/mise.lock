@@ -2,27 +2,49 @@
 
 lockfile_version = 1
 
+[[tools.agy]]
+version = "1.4.12"
+backend = "aqua:google-antigravity/antigravity-cli"
+specifiers = ["latest"]
+
+[tools.agy."platforms.macos-arm64"]
+checksum = "sha256:4c989b5ccf0e39c99a1ce6df82410abb628d4d83e0d3183527702df744d9c589"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.4.12/agy_cli_mac_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/693494302"
+
+[tools.agy."platforms.macos-x64"]
+checksum = "sha256:624d01369df5841f64555741dd09d3ab4a6d174699a4ded896a5180c81f2c2de"
+checksum_source = "mise-versions"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.4.12/agy_cli_mac_x64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/693488644"
+
+[tools.agy."platforms.macos-x64-baseline"]
+checksum = "sha256:624d01369df5841f64555741dd09d3ab4a6d174699a4ded896a5180c81f2c2de"
+checksum_source = "mise-versions"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.4.12/agy_cli_mac_x64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/693488644"
+
 [[tools."aqua:astral-sh/uv"]]
-version = "0.12.17"
+version = "0.13.7"
 backend = "aqua:astral-sh/uv"
 specifiers = ["latest"]
 
 [tools."aqua:astral-sh/uv"."platforms.macos-arm64"]
-checksum = "sha256:85f00cbdc6dd3e97eba4c31b4d014375a9fdfe8f570023b84e5102fc3456896b"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573252913"
+checksum = "sha256:81b811b57e4624df7ed3aac148e0359100d9962f3d9dce00aec533dc2e086731"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.7/uv-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/704009442"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-x64"]
-checksum = "sha256:8dcf05a8c809bb3c471d2b614788ba27a6e41298fc8c31ac84b5f4339fd468e5"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253060"
+checksum = "sha256:20c47e4c1f630b8abaff8c291fa9b9aa300fef92c4fbff95adf198b55287cda7"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.7/uv-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/704009775"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/uv"."platforms.macos-x64-baseline"]
-checksum = "sha256:8dcf05a8c809bb3c471d2b614788ba27a6e41298fc8c31ac84b5f4339fd468e5"
-url = "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/573253060"
+checksum = "sha256:20c47e4c1f630b8abaff8c291fa9b9aa300fef92c4fbff95adf198b55287cda7"
+url = "https://github.com/astral-sh/uv/releases/download/0.13.7/uv-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/704009775"
 provenance = "github-attestations"
 
 [[tools.bun]]
@@ -93,18 +115,13 @@ url = "https://nodejs.org/dist/v24.18.0/node-v24.18.0-darwin-x64.tar.gz"
 checksum = "sha256:dfd0dbd3e721503434df7b7205e719f61b3a3a31b2bcf9729b8b91fea240f080"
 url = "https://nodejs.org/dist/v24.18.0/node-v24.18.0-darwin-x64.tar.gz"
 
-[[tools."npm:@anthropic-ai/claude-code"]]
-version = "2.1.280"
-backend = "npm:@anthropic-ai/claude-code"
-specifiers = ["latest"]
-
 [[tools."npm:@earendil-works/pi-coding-agent"]]
-version = "0.87.0"
+version = "1.5.0"
 backend = "npm:@earendil-works/pi-coding-agent"
 specifiers = ["latest"]
 
 [[tools."npm:@openai/codex"]]
-version = "0.155.1"
+version = "0.166.0"
 backend = "npm:@openai/codex"
 specifiers = ["latest"]
 
@@ -114,12 +131,12 @@ backend = "npm:@playwright/cli"
 specifiers = ["0.1.18"]
 
 [[tools."npm:agent-browser"]]
-version = "0.38.1"
+version = "0.41.1"
 backend = "npm:agent-browser"
 specifiers = ["latest"]
 
 [[tools."npm:ctx7"]]
-version = "0.5.11"
+version = "0.9.0"
 backend = "npm:ctx7"
 specifiers = ["latest"]
 

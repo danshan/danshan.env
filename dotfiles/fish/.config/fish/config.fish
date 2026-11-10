@@ -114,3 +114,5 @@ export HF_HUB_ETAG_TIMEOUT=86400
 export HF_HUB_DOWNLOAD_TIMEOUT=86400
 #export HF_ENDPOINT=https://artifactory.nioint.com/artifactory/api/huggingfaceml/hf_co
 #export HF_HUB_DISABLE_XET=1
+
+fish_add_path --global "$HOME/workspace/nio/skymuse/skymuse-workspace/projects/skymuse-jarvis/dist/developer-toolkit/bin"

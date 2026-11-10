@@ -2,7 +2,7 @@
 title: Native Bootstrap Architecture
 status: active
 owner: repository-maintainers
-last_updated: 2026-09-23
+last_updated: 2026-11-10
 related:
   - ../adr/0008-native-package-managers-and-explicit-migrations.md
   - ../adr/0011-perl-flock-helper.md
@@ -25,7 +25,7 @@ related:
 | Git | dotfiles 使用的外部配置和插件仓库 | `config/repositories.tsv` |
 | Bootstrap | 跨阶段顺序, 精确链接, 显式 ownership migration | `config/links.tsv`, `config/migrations.txt` |
 
-Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. [Leaf](https://github.com/rivolink/leaf) 是通用终端 Markdown 预览器, 同属 Homebrew 主机 CLI; 在 `Brewfile` 中声明 `leaf-markdown-viewer`, 安装后使用 `leaf` 命令.
+Starship 属于主机 Shell 工具, 由 Homebrew 管理. `1password-cli` 使用 Cask. [Leaf](https://github.com/rivolink/leaf) 是通用终端 Markdown 预览器, 同属 Homebrew 主机 CLI; 在 `Brewfile` 中声明 `leaf-markdown-viewer`, 安装后使用 `leaf` 命令. 终端文件管理器 `yazi` 也由 Homebrew 管理, 供 Herdr 配置调用.
 
 Version Selector 与 Update Policy 分别表达版本约束和自动刷新意图. 开发 CLI 可以声明 `latest`, runtime 保留明确版本. Mise `apply` 仅刷新策略为 `latest` 的工具, 再安装原生 lockfile 的解析结果; `installed` 和未配置策略的工具不自动刷新. 原生 lockfile 及生成的配套文件应审查并提交, URL, checksum 和 dependency graph 的能力由 backend 决定.
 

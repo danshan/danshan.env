@@ -14,8 +14,8 @@ python	installed
 bun	installed
 aqua:astral-sh/uv	latest
 npm:@openai/codex	latest
-#npm:@google/gemini-cli	latest
-npm:@anthropic-ai/claude-code	latest
+agy	latest
+#npm:@anthropic-ai/claude-code	latest
 #npm:opencode-ai	latest
 #npm:oh-my-openagent	installed
 npm:@earendil-works/pi-coding-agent	latest
